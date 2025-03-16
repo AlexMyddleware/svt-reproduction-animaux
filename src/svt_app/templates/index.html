@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Menu Principal - SVT Reproduction Animaux{% endblock %}
+
+{% block content %}
+<div class="main-menu">
+    <h2>Menu Principal</h2>
+    
+    <div class="scores-display">
+        <h3>Scores</h3>
+        <p>Texte à trous: {{ scores.texte_a_trous }}</p>
+        <p>Relier les images: {{ scores.relier_images }}</p>
+    </div>
+    
+    <div class="menu-options">
+        <a href="{{ url_for('game.texte_a_trous') }}" class="menu-button">Texte à trous</a>
+        <a href="{{ url_for('game.relier_images') }}" class="menu-button">Relier les images</a>
+        <a href="{{ url_for('game.reset_scores') }}" class="menu-button">Réinitialiser les scores</a>
+        <a href="{{ url_for('settings') }}" class="menu-button">Paramètres</a>
+        <a href="{{ url_for('quit_app') }}" class="menu-button">Quitter</a>
+    </div>
+</div>
+{% endblock %} 

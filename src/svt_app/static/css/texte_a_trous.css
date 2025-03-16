@@ -1,0 +1,151 @@
+/* Styles for the Texte à trous game */
+
+.game-container {
+    text-align: center;
+}
+
+.game-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.score-display {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.question-container {
+    margin-top: 20px;
+}
+
+.question-number {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    line-height: 1.8;
+}
+
+.options-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.option {
+    background-color: #e0f7fa;
+    padding: 10px 15px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: float 3s infinite alternate;
+    position: relative;
+}
+
+.option:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.option.dragging {
+    opacity: 0.5;
+}
+
+.blank-container {
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.blank {
+    display: inline-block;
+    width: 200px;
+    height: 40px;
+    border: 2px dashed #999;
+    border-radius: 5px;
+    margin: 0 auto;
+    padding: 5px;
+    background-color: #f5f5f5;
+}
+
+.blank.filled {
+    border-style: solid;
+    background-color: #e8f5e9;
+}
+
+.blank.correct {
+    background-color: #c8e6c9;
+    border-color: #4CAF50;
+    animation: pulse-green 1s;
+}
+
+.blank.incorrect {
+    background-color: #ffcdd2;
+    border-color: #f44336;
+    animation: shake 0.5s;
+}
+
+.controls {
+    margin-top: 30px;
+}
+
+/* Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(-1deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(1deg);
+    }
+    100% {
+        transform: translateY(0) rotate(-1deg);
+    }
+}
+
+@keyframes pulse-green {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .option {
+        padding: 8px 12px;
+        margin: 8px;
+    }
+    
+    .blank {
+        width: 180px;
+    }
+} 

@@ -1,0 +1,9 @@
+/src/svt_app/__pycache__
+/src/svt_app/static/js/__pycache__
+/src/svt_app/controllers/__pycache__
+/src/svt_app/models/__pycache__
+/src/svt_app/routes/__pycache__
+/src/svt_app/utils/__pycache__
+/src/svt_app/views/__pycache__
+/src/svt_app/tests/__pycache__
+/src/svt_app/services/__pycache__

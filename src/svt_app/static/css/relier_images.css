@@ -1,0 +1,123 @@
+/* Styles for the Relier les images game */
+
+.game-container {
+    text-align: center;
+}
+
+.game-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.score-display {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.question-container {
+    margin-top: 20px;
+}
+
+.question-number {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.image-container {
+    margin: 30px auto;
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+#central-image {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.words-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 30px auto;
+}
+
+.word {
+    background-color: #e0f7fa;
+    padding: 10px 15px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.word:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.word.selected {
+    background-color: #b3e5fc;
+    box-shadow: 0 0 0 2px #29b6f6;
+}
+
+.word.correct {
+    background-color: #c8e6c9;
+    box-shadow: 0 0 0 2px #4CAF50;
+}
+
+.word.incorrect {
+    background-color: #ffcdd2;
+    box-shadow: 0 0 0 2px #f44336;
+}
+
+.connection-line {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.connection-line.correct {
+    stroke: #4CAF50;
+    stroke-width: 3;
+}
+
+.connection-line.incorrect {
+    stroke: #f44336;
+    stroke-width: 3;
+    animation: fade-out 1s forwards;
+}
+
+.controls {
+    margin-top: 30px;
+}
+
+/* Animations */
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .image-container {
+        width: 250px;
+        height: 250px;
+    }
+    
+    .word {
+        padding: 8px 12px;
+        margin: 8px;
+    }
+} 

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Relier les images - SVT Reproduction Animaux{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/relier_images.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h2>Relier les images</h2>
+    
+    <div class="score-display">
+        <p>Score: {{ scores.relier_images }}</p>
+    </div>
+    
+    <div class="navigation">
+        <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+    </div>
+    
+    {% if question %}
+    <div class="question-container">
+        <div class="question-number">
+            <p>Question {{ question_id }} / {{ total_questions }}</p>
+        </div>
+        
+        <div class="image-container">
+            <img src="{{ url_for('static', filename=question.image_path) }}" alt="Image question" id="central-image">
+        </div>
+        
+        <div class="words-container">
+            {% for word in words %}
+            <div class="word" data-word="{{ word }}">{{ word }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="controls">
+            {% if question_id > 1 %}
+            <a href="{{ url_for('game.relier_images', question_id=question_id-1) }}" class="button">Précédent</a>
+            {% endif %}
+            
+            {% if question_id < total_questions %}
+            <a href="{{ url_for('game.relier_images', question_id=question_id+1) }}" class="button">Suivant</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="no-questions">
+        <p>Aucune question disponible pour le moment.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/relier_images.js') }}"></script>
+{% endblock %} 

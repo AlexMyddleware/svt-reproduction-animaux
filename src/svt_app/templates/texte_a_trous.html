@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Texte à trous - SVT Reproduction Animaux{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/texte_a_trous.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h2>Texte à trous</h2>
+    
+    <div class="score-display">
+        <p>Score: {{ scores.texte_a_trous }}</p>
+    </div>
+    
+    <div class="navigation">
+        <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+    </div>
+    
+    {% if question %}
+    <div class="question-container">
+        <div class="question-number">
+            <p>Question {{ question_id }} / {{ total_questions }}</p>
+        </div>
+        
+        <div class="question-text">
+            <p id="question-text">{{ question.text }}</p>
+        </div>
+        
+        <div class="options-container">
+            {% for option in question.options %}
+            <div class="option" draggable="true" data-option="{{ option }}">{{ option }}</div>
+            {% endfor %}
+        </div>
+        
+        <div class="blank-container">
+            <div class="blank" id="answer-blank"></div>
+        </div>
+        
+        <div class="controls">
+            <button id="validate-btn" class="button">Valider</button>
+            
+            {% if question_id > 1 %}
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1) }}" class="button">Précédent</a>
+            {% endif %}
+            
+            {% if question_id < total_questions %}
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id+1) }}" class="button">Suivant</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="no-questions">
+        <p>Aucune question disponible pour le moment.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/texte_a_trous.js') }}"></script>
+{% endblock %} 

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres - SVT Reproduction Animaux{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <h2>Paramètres</h2>
+    
+    <div class="navigation">
+        <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+    </div>
+    
+    <div class="settings-options">
+        <div class="setting-group">
+            <h3>Langue</h3>
+            <p>Toutes les questions sont en français.</p>
+        </div>
+        
+        <div class="setting-group">
+            <h3>À propos</h3>
+            <p>SVT Reproduction Animaux - Version 1.0</p>
+            <p>Une application éducative pour apprendre sur la reproduction des animaux.</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 
