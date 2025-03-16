@@ -1,0 +1,13 @@
+{
+    "image": "assets/images/image_interaction/question1.png",
+    "words": {
+      "correct": "deux espèces différentes de grenouille",
+      "incorrect": [
+        "Un mâle et une femelle grenouille",
+        "Une grenouille et un crapaud",
+        "Une salamandre et une grenouille",
+        "Un triton et un tétard"
+      ]
+    }
+  }
+  
