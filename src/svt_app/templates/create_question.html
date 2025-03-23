@@ -4,10 +4,15 @@
 
 {% block extra_css %}
 <style>
-    .create-question-container {
+    .create-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+    }
+
+    .form-title {
+        text-align: center;
+        margin-bottom: 30px;
     }
 
     .form-group {
@@ -16,16 +21,16 @@
 
     .form-group label {
         display: block;
-        margin-bottom: 8px;
+        margin-bottom: 5px;
         font-weight: bold;
     }
 
     .form-group input[type="text"],
     .form-group textarea {
         width: 100%;
-        padding: 10px;
+        padding: 8px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 4px;
         font-size: 1rem;
     }
 
@@ -34,198 +39,302 @@
         resize: vertical;
     }
 
-    .text-input-container {
-        position: relative;
-    }
-
-    .insert-blank-btn {
-        position: absolute;
-        right: 10px;
-        top: -30px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 10px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: background-color 0.3s;
-    }
-
-    .insert-blank-btn:hover {
-        background-color: #45a049;
-    }
-
     .options-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .option-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
     }
 
     .option-input {
-        display: flex;
-        align-items: center;
+        flex-grow: 1;
     }
 
-    .option-input input[type="radio"] {
-        margin-right: 10px;
+    .remove-option {
+        padding: 8px 12px;
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .add-option {
+        margin-top: 10px;
+        padding: 8px 16px;
+        background: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .submit-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 30px;
+    }
+
+    .submit-button:hover {
+        background: #45a049;
     }
 
     .error-message {
         color: #f44336;
         margin-top: 5px;
-        display: none;
+        font-size: 0.9rem;
     }
 
-    .success-message {
-        color: #4CAF50;
-        margin-top: 5px;
-        display: none;
-    }
-
-    .button-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+    .navigation {
+        text-align: center;
         margin-top: 30px;
+    }
+
+    .nav-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .nav-button:hover {
+        background-color: #45a049;
+    }
+
+    .image-preview {
+        max-width: 300px;
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: none;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="create-question-container">
-    <h2>Créer une nouvelle question</h2>
-    
-    <form id="questionForm">
+<div class="create-container">
+    <h2 class="form-title">
+        {% if game_type == 'texte_a_trous' %}
+        Créer une Question à Trous
+        {% else %}
+        Créer une Question d'Association d'Images
+        {% endif %}
+    </h2>
+
+    {% if game_type == 'texte_a_trous' %}
+    <form id="questionForm" class="question-form">
         <div class="form-group">
-            <label for="questionText">Texte de la question (utilisez ________ pour l'espace à remplir)</label>
-            <div class="text-input-container">
-                <button type="button" class="insert-blank-btn" id="insertBlankBtn">Insérer espace à remplir</button>
-                <textarea id="questionText" required placeholder="Ex: La reproduction sexuée chez les grenouilles implique ________ qui se rencontrent dans l'eau."></textarea>
-            </div>
-            <div class="error-message" id="textError">Le texte doit contenir exactement un espace à remplir (________)</div>
+            <label for="questionText">Texte de la question (utilisez ________ pour les trous)</label>
+            <textarea id="questionText" name="text" required></textarea>
         </div>
-        
+
         <div class="form-group">
             <label>Options de réponse</label>
-            <div class="options-container">
-                {% for i in range(4) %}
-                <div class="option-input">
-                    <input type="radio" name="correctAnswer" value="{{ i }}" required>
-                    <input type="text" id="option{{ i }}" placeholder="Option {{ i + 1 }}" required>
+            <div id="optionsContainer" class="options-container">
+                <div class="option-group">
+                    <input type="text" class="option-input" required>
+                    <button type="button" class="remove-option">Supprimer</button>
                 </div>
-                {% endfor %}
             </div>
-            <div class="error-message" id="optionsError">Toutes les options doivent être différentes</div>
+            <button type="button" class="add-option" id="addOption">Ajouter une option</button>
         </div>
-        
-        <div class="button-container">
-            <button type="submit" class="button">Créer la question</button>
-            <a href="{{ url_for('index') }}" class="button">Retour au menu</a>
+
+        <div class="form-group">
+            <label for="correctAnswer">Réponse correcte</label>
+            <input type="text" id="correctAnswer" name="correct_answer" required>
+            <div class="error-message" id="correctAnswerError" style="display: none;">
+                La réponse correcte doit correspondre exactement à l'une des options
+            </div>
         </div>
-        
-        <div class="success-message" id="successMessage">Question créée avec succès!</div>
-        <div class="error-message" id="errorMessage"></div>
     </form>
+
+    {% else %}
+    <form id="questionForm" class="question-form">
+        <div class="form-group">
+            <label for="questionText">Question ou instruction</label>
+            <textarea id="questionText" name="text" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="imagePath">Image</label>
+            <input type="file" id="imageInput" accept="image/*" required>
+            <img id="imagePreview" class="image-preview">
+        </div>
+
+        <div class="form-group">
+            <label for="correctWord">Mot correct</label>
+            <input type="text" id="correctWord" name="correct_word" required>
+        </div>
+
+        <div class="form-group">
+            <label>Mots incorrects</label>
+            <div id="incorrectWordsContainer" class="options-container">
+                <div class="option-group">
+                    <input type="text" class="incorrect-word-input" required>
+                    <button type="button" class="remove-option">Supprimer</button>
+                </div>
+            </div>
+            <button type="button" class="add-option" id="addIncorrectWord">Ajouter un mot incorrect</button>
+        </div>
+    </form>
+    {% endif %}
+
+    <button type="button" class="submit-button" id="submitButton">Créer la question</button>
+
+    <div class="navigation">
+        <a href="{{ url_for('game.questions_tree', type=game_type) }}" class="nav-button">Retour à l'arbre</a>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('questionForm');
-    const textError = document.getElementById('textError');
-    const optionsError = document.getElementById('optionsError');
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
-    const questionText = document.getElementById('questionText');
-    const insertBlankBtn = document.getElementById('insertBlankBtn');
+    const gameType = '{{ game_type }}';
     
-    // Function to insert blank at cursor position
-    insertBlankBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+    if (gameType === 'texte_a_trous') {
+        // Fill in the blanks specific code
+        const addOptionBtn = document.getElementById('addOption');
+        const optionsContainer = document.getElementById('optionsContainer');
         
-        // Get cursor position
-        const start = questionText.selectionStart;
-        const end = questionText.selectionEnd;
+        addOptionBtn.addEventListener('click', function() {
+            const optionGroup = document.createElement('div');
+            optionGroup.className = 'option-group';
+            optionGroup.innerHTML = `
+                <input type="text" class="option-input" required>
+                <button type="button" class="remove-option">Supprimer</button>
+            `;
+            optionsContainer.appendChild(optionGroup);
+        });
         
-        // Insert blank at cursor position
-        const blank = "________";
-        const text = questionText.value;
-        questionText.value = text.substring(0, start) + blank + text.substring(end);
+        optionsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-option')) {
+                if (optionsContainer.children.length > 1) {
+                    e.target.parentElement.remove();
+                }
+            }
+        });
         
-        // Reset cursor position after blank
-        const newCursorPos = start + blank.length;
-        questionText.setSelectionRange(newCursorPos, newCursorPos);
+    } else {
+        // Image matching specific code
+        const addIncorrectWordBtn = document.getElementById('addIncorrectWord');
+        const incorrectWordsContainer = document.getElementById('incorrectWordsContainer');
         
-        // Focus back on textarea
-        questionText.focus();
-    });
+        addIncorrectWordBtn.addEventListener('click', function() {
+            const wordGroup = document.createElement('div');
+            wordGroup.className = 'option-group';
+            wordGroup.innerHTML = `
+                <input type="text" class="incorrect-word-input" required>
+                <button type="button" class="remove-option">Supprimer</button>
+            `;
+            incorrectWordsContainer.appendChild(wordGroup);
+        });
+        
+        incorrectWordsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-option')) {
+                if (incorrectWordsContainer.children.length > 1) {
+                    e.target.parentElement.remove();
+                }
+            }
+        });
+        
+        // Image preview
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
     
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Form submission
+    document.getElementById('submitButton').addEventListener('click', async function() {
+        const form = document.getElementById('questionForm');
+        const formData = new FormData(form);
         
-        // Reset error messages
-        textError.style.display = 'none';
-        optionsError.style.display = 'none';
-        errorMessage.style.display = 'none';
-        successMessage.style.display = 'none';
-        
-        // Get form values
-        const text = questionText.value;
-        const options = Array.from({ length: 4 }, (_, i) => document.getElementById(`option${i}`).value);
-        const correctAnswerIndex = document.querySelector('input[name="correctAnswer"]:checked')?.value;
-        
-        // Validate text format
-        const blankSpaces = (text.match(/_{8}/g) || []).length;
-        if (blankSpaces !== 1) {
-            textError.style.display = 'block';
-            return;
-        }
-        
-        // Validate options are unique
-        if (new Set(options).size !== options.length) {
-            optionsError.style.display = 'block';
-            return;
-        }
-        
-        // Prepare data
-        const data = {
-            text: text,
-            options: options,
-            correct_answer: options[correctAnswerIndex]
+        let questionData = {
+            game_type: gameType,
+            text: document.getElementById('questionText').value
         };
         
+        if (gameType === 'texte_a_trous') {
+            const options = Array.from(document.querySelectorAll('.option-input')).map(input => input.value);
+            const correctAnswer = document.getElementById('correctAnswer').value;
+            
+            if (!options.includes(correctAnswer)) {
+                document.getElementById('correctAnswerError').style.display = 'block';
+                return;
+            }
+            
+            questionData = {
+                ...questionData,
+                options: options,
+                correct_answer: correctAnswer
+            };
+        } else {
+            const imageInput = document.getElementById('imageInput');
+            const file = imageInput.files[0];
+            if (!file) {
+                alert('Veuillez sélectionner une image');
+                return;
+            }
+            
+            // Convert image to base64
+            const base64Image = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+            
+            const incorrectWords = Array.from(document.querySelectorAll('.incorrect-word-input')).map(input => input.value);
+            
+            questionData = {
+                ...questionData,
+                correct_word: document.getElementById('correctWord').value,
+                incorrect_words: incorrectWords,
+                image_path: base64Image
+            };
+        }
+        
         try {
-            // Send data to server
             const response = await fetch('/game/save_question', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(questionData)
             });
             
             const result = await response.json();
-            
             if (result.success) {
-                successMessage.textContent = result.message;
-                successMessage.style.display = 'block';
-                form.reset();
-                
-                // Redirect to main menu after a short delay
-                setTimeout(() => {
-                    window.location.href = '{{ url_for("index") }}';
-                }, 2000);
+                window.location.href = `/game/questions_tree?type=${gameType}`;
             } else {
-                errorMessage.textContent = result.message;
-                errorMessage.style.display = 'block';
+                alert(result.message);
             }
         } catch (error) {
             console.error('Error:', error);
-            errorMessage.textContent = 'Une erreur est survenue lors de la création de la question';
-            errorMessage.style.display = 'block';
+            alert('Une erreur est survenue lors de la création de la question');
         }
     });
 });

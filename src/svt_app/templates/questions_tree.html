@@ -12,12 +12,40 @@
 
     .tree-title {
         text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .game-type-selector {
+        display: flex;
+        justify-content: center;
         margin-bottom: 30px;
+        gap: 10px;
+    }
+
+    .game-type-button {
+        padding: 10px 20px;
+        border: 2px solid #4CAF50;
+        background: white;
+        color: #4CAF50;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .game-type-button.active {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .game-type-button:hover {
+        background: #4CAF50;
+        color: white;
     }
 
     .tree {
         position: relative;
-        padding-left: 40px;
+        padding-left: 60px;
     }
 
     /* Vertical line */
@@ -337,9 +365,10 @@
     
     .select-checkbox {
         position: absolute;
-        left: -25px;
+        left: -45px;
         top: 50%;
         transform: translateY(-50%);
+        z-index: 2;
     }
     
     .folder-select-all {
@@ -355,12 +384,22 @@
 <div class="tree-container">
     <h2 class="tree-title">Arbre des Questions</h2>
     
+    <div class="game-type-selector">
+        <button class="game-type-button {% if game_type == 'texte_a_trous' %}active{% endif %}" data-type="texte_a_trous">
+            Texte à trous
+        </button>
+        <button class="game-type-button {% if game_type == 'relier_images' %}active{% endif %}" data-type="relier_images">
+            Relier les images
+        </button>
+    </div>
+    
     <div class="tree-toolbar">
         <div class="selection-info">
             <span id="selected-count">0</span> élément(s) sélectionné(s)
         </div>
         <div class="toolbar-actions">
             <button id="new-folder-btn" class="toolbar-button">Nouveau dossier</button>
+            <button id="new-question-btn" class="toolbar-button">Nouvelle question</button>
             <button id="move-selected-btn" class="toolbar-button" disabled>Déplacer la sélection</button>
             <button id="delete-selected-btn" class="toolbar-button danger" disabled>Supprimer la sélection</button>
         </div>
@@ -448,6 +487,24 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Game type switching
+    const currentGameType = '{{ game_type }}';
+    
+    document.querySelectorAll('.game-type-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const gameType = this.dataset.type;
+            if (gameType !== currentGameType) {
+                window.location.href = `/game/questions_tree?type=${gameType}`;
+            }
+        });
+    });
+    
+    // New question button handler
+    document.getElementById('new-question-btn').addEventListener('click', function() {
+        const gameType = currentGameType;
+        window.location.href = `/game/create_question?type=${gameType}`;
+    });
+    
     // Folder expansion/collapse
     document.querySelectorAll('.folder-name').forEach(folder => {
         folder.addEventListener('click', function(e) {

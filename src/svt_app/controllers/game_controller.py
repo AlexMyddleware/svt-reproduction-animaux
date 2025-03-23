@@ -235,34 +235,53 @@ def create_question() -> str:
     Returns:
         str: Rendered HTML template for creating a new question.
     """
-    return render_template("create_question.html")
+    game_type = request.args.get('type', 'texte_a_trous')
+    if game_type not in ['texte_a_trous', 'relier_images']:
+        game_type = 'texte_a_trous'
+    
+    return render_template("create_question.html", game_type=game_type)
 
 
 @game_bp.route("/save_question", methods=["POST"])
 def save_question() -> Dict[str, Any]:
     """
-    Save a new fill-in-the-blank question.
+    Save a new question (either fill-in-the-blank or image matching).
     
     Returns:
         Dict[str, Any]: JSON response indicating success or failure.
     """
     try:
         data = request.get_json()
-        if not data:
-            return jsonify({"success": False, "message": "No data provided"})
+        if not data or 'game_type' not in data:
+            return jsonify({"success": False, "message": "No data or game type provided"})
         
-        # Validate required fields
-        required_fields = ["text", "options", "correct_answer"]
+        game_type = data['game_type']
+        if game_type not in ['texte_a_trous', 'relier_images']:
+            return jsonify({"success": False, "message": "Invalid game type"})
+        
+        # Validate required fields based on game type
+        if game_type == 'texte_a_trous':
+            required_fields = ["text", "options", "correct_answer"]
+        else:  # relier_images
+            required_fields = ["text", "correct_word", "incorrect_words", "image_path"]
+        
         if not all(field in data for field in required_fields):
             return jsonify({"success": False, "message": "Missing required fields"})
         
-        # Validate that correct_answer is in options
-        if data["correct_answer"] not in data["options"]:
-            return jsonify({"success": False, "message": "La réponse correcte doit correspondre exactement à l'une des options"})
+        # Additional validation based on game type
+        if game_type == 'texte_a_trous':
+            if data["correct_answer"] not in data["options"]:
+                return jsonify({"success": False, "message": "La réponse correcte doit correspondre exactement à l'une des options"})
+        else:  # relier_images
+            if not data["incorrect_words"] or not isinstance(data["incorrect_words"], list):
+                return jsonify({"success": False, "message": "Les mots incorrects doivent être une liste non vide"})
         
         # Get the next question number
-        questions_dir = "assets/Data/fill_the_blanks"
-        existing_questions = [f for f in os.listdir(questions_dir) if f.startswith("question") and f.endswith(".json")]
+        base_dir = "assets/Data/fill_the_blanks" if game_type == "texte_a_trous" else "assets/Data/image_matching"
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+        
+        existing_questions = [f for f in os.listdir(base_dir) if f.startswith("question") and f.endswith(".json")]
         next_num = 1
         if existing_questions:
             nums = [int(q[8:11]) for q in existing_questions]
@@ -272,15 +291,23 @@ def save_question() -> Dict[str, Any]:
         question_num = f"{next_num:03d}"
         filename = f"question{question_num}.json"
         
-        # Create the question JSON
-        question_data = {
-            "text": data["text"],
-            "options": data["options"],
-            "correct_answer": data["correct_answer"]
-        }
+        # Create the question data based on game type
+        if game_type == 'texte_a_trous':
+            question_data = {
+                "text": data["text"],
+                "options": data["options"],
+                "correct_answer": data["correct_answer"]
+            }
+        else:  # relier_images
+            question_data = {
+                "text": data["text"],
+                "correct_word": data["correct_word"],
+                "incorrect_words": data["incorrect_words"],
+                "image_path": data["image_path"]
+            }
         
         # Save the question file
-        filepath = os.path.join(questions_dir, filename)
+        filepath = os.path.join(base_dir, filename)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(question_data, f, ensure_ascii=False, indent=2)
         
@@ -299,6 +326,13 @@ def questions_tree() -> str:
     Returns:
         str: Rendered HTML template for the questions tree.
     """
+    # Get the game type from query parameters, default to texte_a_trous
+    game_type = request.args.get('type', 'texte_a_trous')
+    
+    # Validate game type
+    if game_type not in ['texte_a_trous', 'relier_images']:
+        game_type = 'texte_a_trous'
+    
     def get_questions_in_directory(directory: str, relative_path: str = "") -> List[Dict[str, Any]]:
         """
         Recursively get all questions in a directory and its subdirectories.
@@ -326,7 +360,7 @@ def questions_tree() -> str:
                             'type': 'folder',
                             'name': item,
                             'path': rel_path,
-                            'children': subfolder_items  # Changed from 'items' to 'children'
+                            'children': subfolder_items
                         }
                         items.append(folder_data)
                 elif item.startswith("question") and item.endswith(".json"):
@@ -354,11 +388,17 @@ def questions_tree() -> str:
         
         return items
     
-    # Get all questions and folders starting from the base directory
-    questions_dir = "assets/Data/fill_the_blanks"
-    tree_data = get_questions_in_directory(questions_dir)
+    # Set the base directory based on game type
+    base_dir = "assets/Data/fill_the_blanks" if game_type == "texte_a_trous" else "assets/Data/image_matching"
     
-    return render_template("questions_tree.html", tree_data=tree_data)
+    # Create the base directory if it doesn't exist
+    if not os.path.exists(base_dir):
+        os.makedirs(base_dir)
+    
+    # Get all questions and folders starting from the base directory
+    tree_data = get_questions_in_directory(base_dir)
+    
+    return render_template("questions_tree.html", tree_data=tree_data, game_type=game_type)
 
 
 @game_bp.route("/toggle_question_completion", methods=["POST"])

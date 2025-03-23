@@ -10,5 +10,6 @@
   "statistics": {
     "correct_answers": 1,
     "wrong_answers": 0
-  }
+  },
+  "completed": false
 }
