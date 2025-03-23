@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get the question ID from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    const questionId = urlParams.get('question_id') || 1;
+    const questionId = parseInt(urlParams.get('question_id')) || 1;
     
     let isDrawing = false;
     let selectedWord = null;
@@ -199,9 +199,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.removeEventListener('mousemove', moveConnection);
         document.removeEventListener('mouseup', endConnection);
         
+        // Store the current line for use in the response handling
+        const currentLine = connectionLine;
+        
         // Check if a word was selected
         if (selectedWord) {
             const selectedAnswer = selectedWord.dataset.word;
+            const currentWord = selectedWord;
             
             // Send the answer to the server for validation
             fetch('/game/check_answer', {
@@ -211,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     game_type: 'relier_images',
-                    question_id: parseInt(questionId),
+                    question_id: questionId,
                     answer: selectedAnswer
                 })
             })
@@ -220,8 +224,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     if (data.correct) {
                         // Correct answer
-                        connectionLine.setAttribute('class', 'connection-line correct');
-                        selectedWord.classList.add('correct');
+                        currentLine.setAttribute('class', 'connection-line correct');
+                        currentWord.classList.add('correct');
                         
                         // Update the score display
                         const scoreDisplay = document.querySelector('.score-display p');
@@ -241,23 +245,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 1500);
                     } else {
                         // Incorrect answer
-                        connectionLine.setAttribute('class', 'connection-line incorrect');
-                        selectedWord.classList.add('incorrect');
+                        currentLine.setAttribute('class', 'connection-line incorrect');
+                        currentWord.classList.add('incorrect');
                         
                         // Remove the line and reset the word after animation
                         setTimeout(() => {
-                            if (connectionLine && connectionLine.parentNode) {
-                                connectionLine.parentNode.removeChild(connectionLine);
+                            if (currentLine && currentLine.parentNode) {
+                                currentLine.parentNode.removeChild(currentLine);
                             }
-                            selectedWord.classList.remove('incorrect', 'selected');
+                            currentWord.classList.remove('incorrect', 'selected');
                         }, 1000);
                     }
                 } else {
                     alert('Erreur: ' + data.message);
                     
                     // Remove the line
-                    if (connectionLine && connectionLine.parentNode) {
-                        connectionLine.parentNode.removeChild(connectionLine);
+                    if (currentLine && currentLine.parentNode) {
+                        currentLine.parentNode.removeChild(currentLine);
                     }
                 }
             })
@@ -266,18 +270,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Une erreur est survenue lors de la validation de votre réponse.');
                 
                 // Remove the line
-                if (connectionLine && connectionLine.parentNode) {
-                    connectionLine.parentNode.removeChild(connectionLine);
+                if (currentLine && currentLine.parentNode) {
+                    currentLine.parentNode.removeChild(currentLine);
                 }
             });
         } else {
             // No word selected, remove the line
-            if (connectionLine && connectionLine.parentNode) {
-                connectionLine.parentNode.removeChild(connectionLine);
+            if (currentLine && currentLine.parentNode) {
+                currentLine.parentNode.removeChild(currentLine);
             }
         }
         
+        // Reset the global variables
         connectionLine = null;
+        selectedWord = null;
     }
     
     /**
@@ -292,9 +298,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.removeEventListener('touchmove', handleTouchMove);
         document.removeEventListener('touchend', handleTouchEnd);
         
+        // Store the current line for use in the response handling
+        const currentLine = connectionLine;
+        
         // Check if a word was selected
         if (selectedWord) {
             const selectedAnswer = selectedWord.dataset.word;
+            const currentWord = selectedWord;
             
             // Send the answer to the server for validation
             fetch('/game/check_answer', {
@@ -304,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     game_type: 'relier_images',
-                    question_id: parseInt(questionId),
+                    question_id: questionId,
                     answer: selectedAnswer
                 })
             })
@@ -313,8 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     if (data.correct) {
                         // Correct answer
-                        connectionLine.setAttribute('class', 'connection-line correct');
-                        selectedWord.classList.add('correct');
+                        currentLine.setAttribute('class', 'connection-line correct');
+                        currentWord.classList.add('correct');
                         
                         // Update the score display
                         const scoreDisplay = document.querySelector('.score-display p');
@@ -334,23 +344,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 1500);
                     } else {
                         // Incorrect answer
-                        connectionLine.setAttribute('class', 'connection-line incorrect');
-                        selectedWord.classList.add('incorrect');
+                        currentLine.setAttribute('class', 'connection-line incorrect');
+                        currentWord.classList.add('incorrect');
                         
                         // Remove the line and reset the word after animation
                         setTimeout(() => {
-                            if (connectionLine && connectionLine.parentNode) {
-                                connectionLine.parentNode.removeChild(connectionLine);
+                            if (currentLine && currentLine.parentNode) {
+                                currentLine.parentNode.removeChild(currentLine);
                             }
-                            selectedWord.classList.remove('incorrect', 'selected');
+                            currentWord.classList.remove('incorrect', 'selected');
                         }, 1000);
                     }
                 } else {
                     alert('Erreur: ' + data.message);
                     
                     // Remove the line
-                    if (connectionLine && connectionLine.parentNode) {
-                        connectionLine.parentNode.removeChild(connectionLine);
+                    if (currentLine && currentLine.parentNode) {
+                        currentLine.parentNode.removeChild(currentLine);
                     }
                 }
             })
@@ -359,17 +369,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Une erreur est survenue lors de la validation de votre réponse.');
                 
                 // Remove the line
-                if (connectionLine && connectionLine.parentNode) {
-                    connectionLine.parentNode.removeChild(connectionLine);
+                if (currentLine && currentLine.parentNode) {
+                    currentLine.parentNode.removeChild(currentLine);
                 }
             });
         } else {
             // No word selected, remove the line
-            if (connectionLine && connectionLine.parentNode) {
-                connectionLine.parentNode.removeChild(connectionLine);
+            if (currentLine && currentLine.parentNode) {
+                currentLine.parentNode.removeChild(currentLine);
             }
         }
         
+        // Reset the global variables
         connectionLine = null;
+        selectedWord = null;
     }
 }); 

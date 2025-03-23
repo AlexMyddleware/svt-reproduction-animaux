@@ -96,34 +96,55 @@ def check_answer() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: JSON response with the result.
     """
-    data = request.get_json()
+    try:
+        data = request.get_json()
+        print("Received data:", data)  # Debug log
+        
+        if not data:
+            print("No data provided")  # Debug log
+            return jsonify({"success": False, "message": "No data provided"})
+        
+        game_type = data.get("game_type")
+        question_id = data.get("question_id")
+        answer = data.get("answer")
+        
+        print(f"Game type: {game_type}, Question ID: {question_id}, Answer: {answer}")  # Debug log
+        
+        # Validate required fields
+        if not all([game_type, question_id is not None, answer]):
+            print("Missing required fields")  # Debug log
+            return jsonify({"success": False, "message": "Missing required fields"})
+        
+        # Ensure question_id is an integer
+        try:
+            question_id = int(question_id)
+        except (TypeError, ValueError):
+            print(f"Invalid question ID: {question_id}")  # Debug log
+            return jsonify({"success": False, "message": "Invalid question ID"})
+        
+        # Check the answer based on the game type
+        if game_type == "texte_a_trous":
+            question = question_service.get_fill_in_blank_question_by_id(question_id)
+            print("Fill in blank question:", question)  # Debug log
+            if question and answer == question.correct_answer:
+                scores["texte_a_trous"] += 1
+                return jsonify({"success": True, "correct": True, "score": scores["texte_a_trous"]})
+            return jsonify({"success": True, "correct": False, "score": scores["texte_a_trous"]})
+        
+        elif game_type == "relier_images":
+            question = question_service.get_image_matching_question_by_id(question_id)
+            print("Image matching question:", question)  # Debug log
+            if question and answer == question.correct_word:
+                scores["relier_images"] += 1
+                return jsonify({"success": True, "correct": True, "score": scores["relier_images"]})
+            return jsonify({"success": True, "correct": False, "score": scores["relier_images"]})
+        
+        print("Invalid game type")  # Debug log
+        return jsonify({"success": False, "message": "Invalid game type"})
     
-    if not data:
-        return jsonify({"success": False, "message": "No data provided"})
-    
-    game_type = data.get("game_type")
-    question_id = data.get("question_id")
-    answer = data.get("answer")
-    
-    if not all([game_type, question_id, answer]):
-        return jsonify({"success": False, "message": "Missing required fields"})
-    
-    # Check the answer based on the game type
-    if game_type == "texte_a_trous":
-        question = question_service.get_fill_in_blank_question_by_id(question_id)
-        if question and answer == question.correct_answer:
-            scores["texte_a_trous"] += 1
-            return jsonify({"success": True, "correct": True, "score": scores["texte_a_trous"]})
-        return jsonify({"success": True, "correct": False, "score": scores["texte_a_trous"]})
-    
-    elif game_type == "relier_images":
-        question = question_service.get_image_matching_question_by_id(question_id)
-        if question and answer == question.correct_word:
-            scores["relier_images"] += 1
-            return jsonify({"success": True, "correct": True, "score": scores["relier_images"]})
-        return jsonify({"success": True, "correct": False, "score": scores["relier_images"]})
-    
-    return jsonify({"success": False, "message": "Invalid game type"})
+    except Exception as e:
+        print(f"Error processing request: {e}")  # Debug log
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la validation"})
 
 
 @game_bp.route("/reset_scores")
