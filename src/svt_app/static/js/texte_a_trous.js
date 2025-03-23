@@ -28,14 +28,27 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initDragAndDrop() {
         // Make options draggable
-        options.forEach(option => {
+        options.forEach((option, index) => {
             option.setAttribute('draggable', true);
             
-            // Random initial position for floating effect
-            const randomX = Math.random() * 100 - 50; // -50 to 50
-            const randomY = Math.random() * 60 - 30;  // -30 to 30
+            // Random orbital parameters
+            const baseRadius = 100 + Math.random() * 50; // Base orbit radius 100-150px
+            const eccentricity = 0.8 + Math.random() * 0.4; // Orbit eccentricity 0.8-1.2
+            const orbitX = baseRadius;
+            const orbitY = baseRadius * eccentricity;
             
-            option.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            // Set custom orbital path
+            option.style.setProperty('--orbit-x', `${orbitX}px`);
+            option.style.setProperty('--orbit-y', `${orbitY}px`);
+            
+            // Random timing
+            const duration = 8 + Math.random() * 4; // 8-12 seconds per orbit
+            const delay = Math.random() * -6; // Start at random points in the orbit
+            const direction = Math.random() < 0.5 ? 'normal' : 'reverse'; // Random direction
+            
+            option.style.setProperty('--orbit-duration', `${duration}s`);
+            option.style.setProperty('--orbit-delay', `${delay}s`);
+            option.style.animationDirection = direction;
             
             // Add drag event listeners
             option.addEventListener('dragstart', dragStart);
