@@ -159,6 +159,32 @@
         margin-bottom: 10px;
     }
 
+    .question-stats {
+        display: flex;
+        gap: 15px;
+        margin: 10px 0;
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .stat-correct {
+        color: #4CAF50;
+    }
+    
+    .stat-wrong {
+        color: #f44336;
+    }
+    
+    .stat-icon {
+        font-size: 1.1em;
+    }
+
     .question-actions {
         display: flex;
         gap: 10px;
@@ -247,6 +273,16 @@
                                 {% endif %}
                             </div>
                             <div class="question-text">{{ item.text }}</div>
+                            <div class="question-stats">
+                                <div class="stat-item stat-correct">
+                                    <span class="stat-icon">✓</span>
+                                    {{ item.statistics.correct_answers if item.statistics and item.statistics.correct_answers else 0 }}
+                                </div>
+                                <div class="stat-item stat-wrong">
+                                    <span class="stat-icon">✗</span>
+                                    {{ item.statistics.wrong_answers if item.statistics and item.statistics.wrong_answers else 0 }}
+                                </div>
+                            </div>
                             <div class="question-actions">
                                 <button class="action-button complete-button {% if item.completed %}completed{% endif %}" 
                                         data-file="{{ item.file }}">

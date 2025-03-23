@@ -110,7 +110,7 @@ def relier_images() -> str:
 @game_bp.route("/check_answer", methods=["POST"])
 def check_answer() -> Dict[str, Any]:
     """
-    Check if the submitted answer is correct.
+    Check if the submitted answer is correct and update question statistics.
     
     Returns:
         Dict[str, Any]: JSON response with the result.
@@ -145,11 +145,56 @@ def check_answer() -> Dict[str, Any]:
         if game_type == "texte_a_trous":
             question = question_service.get_fill_in_blank_question_by_id(question_id)
             print("Fill in blank question:", question)  # Debug log
-            if question and answer == question.correct_answer:
-                scores["texte_a_trous"] += 1
-                return jsonify({"success": True, "correct": True, "score": scores["texte_a_trous"]})
-            return jsonify({"success": True, "correct": False, "score": scores["texte_a_trous"]})
-        
+            
+            # Find the question file
+            file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question_id:03d}.json")
+            
+            # If the file doesn't exist in root, search in subfolders
+            if not os.path.exists(file_path):
+                base_dir = "assets/Data/fill_the_blanks"
+                for root, _, files in os.walk(base_dir):
+                    for file in files:
+                        if file == f"question{question_id:03d}.json":
+                            file_path = os.path.join(root, file)
+                            break
+            
+            # Update statistics in the question file
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    question_data = json.load(f)
+                
+                # Initialize statistics if they don't exist
+                if 'statistics' not in question_data:
+                    question_data['statistics'] = {'correct_answers': 0, 'wrong_answers': 0}
+                
+                # Update the appropriate counter
+                is_correct = question and answer == question.correct_answer
+                if is_correct:
+                    question_data['statistics']['correct_answers'] += 1
+                    scores["texte_a_trous"] += 1
+                else:
+                    question_data['statistics']['wrong_answers'] += 1
+                
+                # Save the updated statistics
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(question_data, f, ensure_ascii=False, indent=2)
+                
+                return jsonify({
+                    "success": True, 
+                    "correct": is_correct, 
+                    "score": scores["texte_a_trous"],
+                    "statistics": question_data['statistics']
+                })
+                
+            except Exception as e:
+                print(f"Error updating question statistics: {e}")
+                # Continue with normal response if statistics update fails
+                return jsonify({
+                    "success": True,
+                    "correct": question and answer == question.correct_answer,
+                    "score": scores["texte_a_trous"]
+                })
+            
         elif game_type == "relier_images":
             question = question_service.get_image_matching_question_by_id(question_id)
             print("Image matching question:", question)  # Debug log
@@ -294,7 +339,11 @@ def questions_tree() -> str:
                                 'id': item[8:11],  # Extract number from filename
                                 'text': question_data['text'],
                                 'file': rel_path,
-                                'completed': question_data.get('completed', False)
+                                'completed': question_data.get('completed', False),
+                                'statistics': question_data.get('statistics', {
+                                    'correct_answers': 0,
+                                    'wrong_answers': 0
+                                })
                             })
                     except Exception as e:
                         print(f"Error reading question file {full_path}: {e}")

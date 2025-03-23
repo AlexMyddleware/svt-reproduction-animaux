@@ -6,5 +6,9 @@
     "a trois sexes",
     "a quatre sexes"
   ],
-  "correct_answer": "a deux sexes"
-} 
+  "correct_answer": "a deux sexes",
+  "statistics": {
+    "correct_answers": 1,
+    "wrong_answers": 0
+  }
+}
