@@ -28,6 +28,7 @@
         
         <div class="controls">
             <button id="validate-btn" class="button">Valider</button>
+            <button id="reset-btn" class="button">Réinitialiser</button>
             
             {% if question_id > 1 %}
             <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1) }}" class="button">Précédent</a>

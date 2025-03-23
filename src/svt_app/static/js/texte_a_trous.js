@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const options = document.querySelectorAll('.option');
     const blank = document.getElementById('answer-blank');
     const validateBtn = document.getElementById('validate-btn');
+    const resetBtn = document.getElementById('reset-btn');
     const questionText = document.getElementById('question-text');
     
     let currentOption = null;
@@ -18,9 +19,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the drag and drop functionality
     initDragAndDrop();
     
-    // Add event listener to the validate button
+    // Add event listeners to buttons
     if (validateBtn) {
         validateBtn.addEventListener('click', validateAnswer);
+    }
+    
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetWords);
     }
     
     /**
@@ -212,6 +217,57 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Une erreur est survenue lors de la validation de votre réponse.');
+        });
+    }
+    
+    /**
+     * Reset all words to random positions and clear the answer blank if not validated.
+     */
+    function resetWords() {
+        // If there's a word in the blank that hasn't been validated yet
+        if (blank && blank.classList.contains('filled') && !blank.classList.contains('correct')) {
+            // Get the word that was in the blank
+            const blankWord = blank.textContent;
+            // Find the corresponding option element
+            const option = Array.from(options).find(opt => opt.dataset.option === blankWord);
+            if (option) {
+                option.style.display = 'inline-block';
+            }
+            // Clear the blank
+            blank.textContent = '';
+            blank.classList.remove('filled', 'incorrect');
+            blank.dataset.answer = '';
+        }
+        
+        // Randomize position for each word
+        options.forEach((option) => {
+            if (option.style.display !== 'none') {
+                // Random orbital parameters
+                const baseRadius = 100 + Math.random() * 50;
+                const eccentricity = 0.8 + Math.random() * 0.4;
+                const orbitX = baseRadius;
+                const orbitY = baseRadius * eccentricity;
+                
+                // Set custom orbital path
+                option.style.setProperty('--orbit-x', `${orbitX}px`);
+                option.style.setProperty('--orbit-y', `${orbitY}px`);
+                
+                // Random timing
+                const duration = 8 + Math.random() * 4;
+                const delay = Math.random() * -6;
+                const direction = Math.random() < 0.5 ? 'normal' : 'reverse';
+                
+                // Apply new animation parameters
+                option.style.setProperty('--orbit-duration', `${duration}s`);
+                option.style.setProperty('--orbit-delay', `${delay}s`);
+                option.style.animationDirection = direction;
+                
+                // Reset any drag-related states
+                option.classList.remove('dragging');
+                option.style.animation = 'none';
+                option.offsetHeight; // Trigger reflow
+                option.style.animation = '';
+            }
         });
     }
 }); 
