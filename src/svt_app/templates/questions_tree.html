@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Arbre des Questions - SVT Reproduction Animaux{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tree-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .tree-title {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .tree {
+        position: relative;
+        padding-left: 40px;
+    }
+
+    /* Vertical line */
+    .tree::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #4CAF50;
+    }
+
+    .question-node {
+        position: relative;
+        margin: 20px 0;
+        padding: 15px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .question-node.completed {
+        background: #f1f8e9;
+        border-left: 4px solid #4CAF50;
+    }
+
+    /* Horizontal line to node */
+    .question-node::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 50%;
+        width: 20px;
+        height: 2px;
+        background: #4CAF50;
+    }
+
+    /* Node circle */
+    .question-node::after {
+        content: '';
+        position: absolute;
+        left: -26px;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        background: #4CAF50;
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    .question-node:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .question-id {
+        font-weight: bold;
+        color: #4CAF50;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .completion-badge {
+        font-size: 0.8em;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background-color: #e8f5e9;
+        color: #4CAF50;
+    }
+
+    .question-text {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .question-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .complete-button {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .complete-button:hover {
+        background-color: #45a049;
+    }
+
+    .complete-button.completed {
+        background-color: #ff9800;
+    }
+
+    .complete-button.completed:hover {
+        background-color: #f57c00;
+    }
+
+    .delete-button {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .delete-button:hover {
+        background-color: #d32f2f;
+    }
+
+    .navigation {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .nav-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .nav-button:hover {
+        background-color: #45a049;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tree-container">
+    <h2 class="tree-title">Arbre des Questions</h2>
+    
+    <div class="tree">
+        {% for question in questions %}
+        <div class="question-node {% if question.completed %}completed{% endif %}">
+            <div class="question-id">
+                Question {{ question.id }}
+                {% if question.completed %}
+                <span class="completion-badge">Terminée</span>
+                {% endif %}
+            </div>
+            <div class="question-text">{{ question.text }}</div>
+            <div class="question-actions">
+                <button class="action-button complete-button {% if question.completed %}completed{% endif %}" 
+                        data-file="{{ question.file }}">
+                    {% if question.completed %}
+                    Marquer comme non terminée
+                    {% else %}
+                    Marquer comme terminée
+                    {% endif %}
+                </button>
+                <button class="action-button delete-button" data-file="{{ question.file }}">Supprimer</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="navigation">
+        <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle completion button clicks
+    document.querySelectorAll('.complete-button').forEach(button => {
+        button.addEventListener('click', async function() {
+            const file = this.dataset.file;
+            try {
+                const response = await fetch('/game/toggle_question_completion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ file: file })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    const questionNode = this.closest('.question-node');
+                    const completionBadge = questionNode.querySelector('.completion-badge');
+                    
+                    if (result.completed) {
+                        questionNode.classList.add('completed');
+                        this.classList.add('completed');
+                        this.textContent = 'Marquer comme non terminée';
+                        
+                        if (!completionBadge) {
+                            const badge = document.createElement('span');
+                            badge.className = 'completion-badge';
+                            badge.textContent = 'Terminée';
+                            questionNode.querySelector('.question-id').appendChild(badge);
+                        }
+                    } else {
+                        questionNode.classList.remove('completed');
+                        this.classList.remove('completed');
+                        this.textContent = 'Marquer comme terminée';
+                        if (completionBadge) {
+                            completionBadge.remove();
+                        }
+                    }
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la mise à jour de la question');
+            }
+        });
+    });
+
+    // Handle delete button clicks
+    document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', async function() {
+            const file = this.dataset.file;
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette question ?')) {
+                try {
+                    const response = await fetch('/game/delete_question', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ file: file })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        // Remove the question node from the DOM
+                        this.closest('.question-node').remove();
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de la suppression de la question');
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -30,25 +30,42 @@ def texte_a_trous() -> str:
     """
     questions = question_service.get_fill_in_blank_questions()
     
+    # Filter out completed questions
+    active_questions = []
+    for question in questions:
+        file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question.id:03d}.json")
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                question_data = json.load(f)
+                if not question_data.get('completed', False):
+                    active_questions.append(question)
+        except Exception as e:
+            print(f"Error reading question file: {e}")
+            continue
+    
+    # If no active questions, show empty template
+    if not active_questions:
+        return render_template("texte_a_trous.html", question=None, scores=scores)
+    
     # Get the current question ID from the query parameters, default to 1
     question_id = request.args.get("question_id", 1, type=int)
     
     # Get the current question
-    current_question = question_service.get_fill_in_blank_question_by_id(question_id)
+    current_question = None
+    for q in active_questions:
+        if q.id == question_id:
+            current_question = q
+            break
     
-    # If the question doesn't exist, redirect to the first question
-    if current_question is None and questions:
-        return redirect(url_for("game.texte_a_trous", question_id=questions[0].id))
-    
-    # If there are no questions, show an empty template
-    if not questions:
-        return render_template("texte_a_trous.html", question=None, scores=scores)
+    # If the question doesn't exist or is completed, redirect to the first active question
+    if current_question is None and active_questions:
+        return redirect(url_for("game.texte_a_trous", question_id=active_questions[0].id))
     
     return render_template(
         "texte_a_trous.html",
         question=current_question,
         question_id=question_id,
-        total_questions=len(questions),
+        total_questions=len(active_questions),
         scores=scores
     )
 
@@ -226,4 +243,109 @@ def save_question() -> Dict[str, Any]:
     
     except Exception as e:
         print(f"Error saving question: {e}")
-        return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"}) 
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"})
+
+
+@game_bp.route("/questions_tree")
+def questions_tree() -> str:
+    """
+    Render the questions tree visualization page.
+    
+    Returns:
+        str: Rendered HTML template for the questions tree.
+    """
+    questions_dir = "assets/Data/fill_the_blanks"
+    questions = []
+    
+    # Get all question files and sort them
+    for filename in sorted(os.listdir(questions_dir)):
+        if filename.startswith("question") and filename.endswith(".json"):
+            file_path = os.path.join(questions_dir, filename)
+            with open(file_path, 'r', encoding='utf-8') as f:
+                question_data = json.load(f)
+                questions.append({
+                    'id': filename[8:11],  # Extract number from filename
+                    'text': question_data['text'],
+                    'file': filename,
+                    'completed': question_data.get('completed', False)  # Get completion status
+                })
+    
+    return render_template("questions_tree.html", questions=questions)
+
+
+@game_bp.route("/toggle_question_completion", methods=["POST"])
+def toggle_question_completion() -> Dict[str, Any]:
+    """
+    Toggle the completion status of a question.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'file' not in data:
+            return jsonify({"success": False, "message": "No file specified"})
+        
+        filename = data['file']
+        if not filename.startswith('question') or not filename.endswith('.json'):
+            return jsonify({"success": False, "message": "Invalid file name"})
+        
+        file_path = os.path.join('assets/Data/fill_the_blanks', filename)
+        
+        # Check if file exists
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "File not found"})
+        
+        # Read current question data
+        with open(file_path, 'r', encoding='utf-8') as f:
+            question_data = json.load(f)
+        
+        # Toggle completion status
+        question_data['completed'] = not question_data.get('completed', False)
+        
+        # Save updated question data
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(question_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({
+            "success": True, 
+            "completed": question_data['completed'],
+            "message": "Question marquée comme " + ("terminée" if question_data['completed'] else "non terminée")
+        })
+    
+    except Exception as e:
+        print(f"Error toggling question completion: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la mise à jour de la question"})
+
+
+@game_bp.route("/delete_question", methods=["POST"])
+def delete_question() -> Dict[str, Any]:
+    """
+    Delete a question file.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'file' not in data:
+            return jsonify({"success": False, "message": "No file specified"})
+        
+        filename = data['file']
+        if not filename.startswith('question') or not filename.endswith('.json'):
+            return jsonify({"success": False, "message": "Invalid file name"})
+        
+        file_path = os.path.join('assets/Data/fill_the_blanks', filename)
+        
+        # Check if file exists
+        if not os.path.exists(file_path):
+            return jsonify({"success": False, "message": "File not found"})
+        
+        # Delete the file
+        os.remove(file_path)
+        
+        return jsonify({"success": True, "message": "Question supprimée avec succès"})
+    
+    except Exception as e:
+        print(f"Error deleting question: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression de la question"}) 
