@@ -244,6 +244,110 @@
     .nav-button:hover {
         background-color: #45a049;
     }
+
+    .folder-actions {
+        display: flex;
+        gap: 10px;
+        margin-left: auto;
+    }
+    
+    .folder-name {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 5px 10px;
+    }
+    
+    .folder-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .folder-title {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .folder-icon {
+        color: #2196F3;
+        font-size: 1.2em;
+    }
+    
+    .tree-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 5px;
+    }
+    
+    .toolbar-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .toolbar-button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        background-color: #2196F3;
+        color: white;
+        transition: background-color 0.3s;
+    }
+    
+    .toolbar-button:hover {
+        background-color: #1976D2;
+    }
+    
+    .toolbar-button.danger {
+        background-color: #f44336;
+    }
+    
+    .toolbar-button.danger:hover {
+        background-color: #d32f2f;
+    }
+    
+    .selection-info {
+        font-size: 0.9rem;
+        color: #666;
+    }
+    
+    .draggable {
+        cursor: move;
+    }
+    
+    .draggable.dragging {
+        opacity: 0.5;
+    }
+    
+    .drop-target {
+        border: 2px dashed #2196F3;
+    }
+    
+    .selectable {
+        position: relative;
+    }
+    
+    .select-checkbox {
+        position: absolute;
+        left: -25px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .folder-select-all {
+        margin-left: 10px;
+        font-size: 0.8em;
+        color: #2196F3;
+        cursor: pointer;
+    }
 </style>
 {% endblock %}
 
@@ -251,21 +355,47 @@
 <div class="tree-container">
     <h2 class="tree-title">Arbre des Questions</h2>
     
+    <div class="tree-toolbar">
+        <div class="selection-info">
+            <span id="selected-count">0</span> élément(s) sélectionné(s)
+        </div>
+        <div class="toolbar-actions">
+            <button id="new-folder-btn" class="toolbar-button">Nouveau dossier</button>
+            <button id="move-selected-btn" class="toolbar-button" disabled>Déplacer la sélection</button>
+            <button id="delete-selected-btn" class="toolbar-button danger" disabled>Supprimer la sélection</button>
+        </div>
+    </div>
+    
     <div class="tree">
         {% macro render_tree_items(items) %}
             {% if items %}
                 {% for item in items %}
                     {% if item.type == 'folder' %}
-                        <div class="folder-node">
-                            <div class="folder-name">{{ item.name }}</div>
-                            <div class="folder-content">
+                        <div class="folder-node draggable" draggable="true" data-path="{{ item.path }}">
+                            <div class="folder-name">
+                                <div class="folder-header">
+                                    <div class="folder-title">
+                                        <span class="folder-icon">📁</span>
+                                        <span class="folder-label">{{ item.name }}</span>
+                                    </div>
+                                    <span class="folder-select-all">[Tout sélectionner]</span>
+                                </div>
+                                <div class="folder-actions">
+                                    <button class="action-button rename-folder" data-path="{{ item.path }}">Renommer</button>
+                                    <button class="action-button delete-button" data-path="{{ item.path }}">Supprimer</button>
+                                </div>
+                            </div>
+                            <div class="folder-content" data-path="{{ item.path }}">
                                 {% if item.children is defined and item.children %}
                                     {{ render_tree_items(item.children) }}
                                 {% endif %}
                             </div>
                         </div>
                     {% else %}
-                        <div class="question-node {% if item.completed %}completed{% endif %}">
+                        <div class="question-node selectable draggable {% if item.completed %}completed{% endif %}" 
+                             draggable="true" 
+                             data-path="{{ item.file }}">
+                            <input type="checkbox" class="select-checkbox" data-path="{{ item.file }}">
                             <div class="question-id">
                                 Question {{ item.id }}
                                 {% if item.completed %}
@@ -318,14 +448,221 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle folder clicks
+    // Folder expansion/collapse
     document.querySelectorAll('.folder-name').forEach(folder => {
-        folder.addEventListener('click', function() {
-            this.classList.toggle('collapsed');
-            this.nextElementSibling.classList.toggle('collapsed');
+        folder.addEventListener('click', function(e) {
+            if (!e.target.closest('.folder-actions')) {
+                this.classList.toggle('collapsed');
+                this.nextElementSibling.classList.toggle('collapsed');
+            }
         });
     });
-
+    
+    // Selection handling
+    let selectedItems = new Set();
+    
+    function updateSelectionCount() {
+        const count = selectedItems.size;
+        document.getElementById('selected-count').textContent = count;
+        document.getElementById('move-selected-btn').disabled = count === 0;
+        document.getElementById('delete-selected-btn').disabled = count === 0;
+    }
+    
+    // Individual item selection
+    document.querySelectorAll('.select-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const path = this.dataset.path;
+            if (this.checked) {
+                selectedItems.add(path);
+            } else {
+                selectedItems.delete(path);
+            }
+            updateSelectionCount();
+        });
+    });
+    
+    // Select all items in folder
+    document.querySelectorAll('.folder-select-all').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const folderContent = this.closest('.folder-node').querySelector('.folder-content');
+            const checkboxes = folderContent.querySelectorAll('.select-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+                const path = checkbox.dataset.path;
+                if (!allChecked) {
+                    selectedItems.add(path);
+                } else {
+                    selectedItems.delete(path);
+                }
+            });
+            
+            updateSelectionCount();
+        });
+    });
+    
+    // Drag and drop functionality
+    let draggedItem = null;
+    
+    document.querySelectorAll('.draggable').forEach(item => {
+        item.addEventListener('dragstart', function(e) {
+            draggedItem = this;
+            this.classList.add('dragging');
+            
+            // If dragging a selected item, include all selected items
+            const dragData = {
+                items: Array.from(selectedItems)
+            };
+            if (!selectedItems.has(this.dataset.path)) {
+                dragData.items = [this.dataset.path];
+            }
+            e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+        });
+        
+        item.addEventListener('dragend', function() {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+        });
+    });
+    
+    document.querySelectorAll('.folder-content').forEach(folder => {
+        folder.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drop-target');
+        });
+        
+        folder.addEventListener('dragleave', function() {
+            this.classList.remove('drop-target');
+        });
+        
+        folder.addEventListener('drop', async function(e) {
+            e.preventDefault();
+            this.classList.remove('drop-target');
+            
+            const targetPath = this.dataset.path;
+            const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+            
+            try {
+                const response = await fetch('/game/move_items', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        items: dragData.items,
+                        target_folder: targetPath
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    // Refresh the page to show the new structure
+                    window.location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors du déplacement des éléments');
+            }
+        });
+    });
+    
+    // New folder creation
+    document.getElementById('new-folder-btn').addEventListener('click', async function() {
+        const folderName = prompt('Nom du nouveau dossier:');
+        if (!folderName) return;
+        
+        try {
+            const response = await fetch('/game/create_folder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: folderName,
+                    parent_path: ''  // Create in root by default
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                window.location.reload();
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de la création du dossier');
+        }
+    });
+    
+    // Rename folder
+    document.querySelectorAll('.rename-folder').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const path = this.dataset.path;
+            const newName = prompt('Nouveau nom du dossier:');
+            if (!newName) return;
+            
+            try {
+                const response = await fetch('/game/rename_folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        old_path: path,
+                        new_name: newName
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    window.location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors du renommage du dossier');
+            }
+        });
+    });
+    
+    // Delete selected items
+    document.getElementById('delete-selected-btn').addEventListener('click', async function() {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer tous les éléments sélectionnés ?')) return;
+        
+        const deletePromises = Array.from(selectedItems).map(path => {
+            const isFolder = !path.endsWith('.json');
+            const endpoint = isFolder ? '/game/delete_folder' : '/game/delete_question';
+            
+            return fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path, file: path })
+            });
+        });
+        
+        try {
+            await Promise.all(deletePromises);
+            window.location.reload();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de la suppression des éléments');
+        }
+    });
+    
+    // Move selected items
+    document.getElementById('move-selected-btn').addEventListener('click', function() {
+        alert('Faites glisser les éléments sélectionnés vers le dossier de destination');
+    });
+    
     // Handle completion button clicks
     document.querySelectorAll('.complete-button').forEach(button => {
         button.addEventListener('click', async function() {

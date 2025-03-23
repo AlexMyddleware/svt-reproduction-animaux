@@ -438,4 +438,189 @@ def delete_question() -> Dict[str, Any]:
     
     except Exception as e:
         print(f"Error deleting question: {e}")
-        return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression de la question"}) 
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression de la question"})
+
+
+@game_bp.route("/create_folder", methods=["POST"])
+def create_folder() -> Dict[str, Any]:
+    """
+    Create a new folder in the questions directory.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'name' not in data or 'parent_path' not in data:
+            return jsonify({"success": False, "message": "Missing folder name or parent path"})
+        
+        folder_name = data['name'].strip()
+        parent_path = data['parent_path'].strip()
+        
+        # Validate folder name
+        if not folder_name or '/' in folder_name or '\\' in folder_name:
+            return jsonify({"success": False, "message": "Invalid folder name"})
+        
+        # Construct the full path
+        base_dir = "assets/Data/fill_the_blanks"
+        new_folder_path = os.path.join(base_dir, parent_path, folder_name)
+        
+        # Check if folder already exists
+        if os.path.exists(new_folder_path):
+            return jsonify({"success": False, "message": "Un dossier avec ce nom existe déjà"})
+        
+        # Create the folder
+        os.makedirs(new_folder_path)
+        
+        return jsonify({
+            "success": True,
+            "message": "Dossier créé avec succès",
+            "folder": {
+                "name": folder_name,
+                "path": os.path.join(parent_path, folder_name) if parent_path else folder_name
+            }
+        })
+    
+    except Exception as e:
+        print(f"Error creating folder: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la création du dossier"})
+
+
+@game_bp.route("/rename_folder", methods=["POST"])
+def rename_folder() -> Dict[str, Any]:
+    """
+    Rename an existing folder.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'old_path' not in data or 'new_name' not in data:
+            return jsonify({"success": False, "message": "Missing required fields"})
+        
+        old_path = data['old_path'].strip()
+        new_name = data['new_name'].strip()
+        
+        # Validate new name
+        if not new_name or '/' in new_name or '\\' in new_name:
+            return jsonify({"success": False, "message": "Invalid folder name"})
+        
+        # Construct paths
+        base_dir = "assets/Data/fill_the_blanks"
+        old_full_path = os.path.join(base_dir, old_path)
+        new_full_path = os.path.join(base_dir, os.path.dirname(old_path), new_name)
+        
+        # Check if source exists and destination doesn't
+        if not os.path.exists(old_full_path):
+            return jsonify({"success": False, "message": "Folder not found"})
+        if os.path.exists(new_full_path):
+            return jsonify({"success": False, "message": "Un dossier avec ce nom existe déjà"})
+        
+        # Rename the folder
+        os.rename(old_full_path, new_full_path)
+        
+        return jsonify({
+            "success": True,
+            "message": "Dossier renommé avec succès",
+            "new_path": os.path.join(os.path.dirname(old_path), new_name)
+        })
+    
+    except Exception as e:
+        print(f"Error renaming folder: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors du renommage du dossier"})
+
+
+@game_bp.route("/delete_folder", methods=["POST"])
+def delete_folder() -> Dict[str, Any]:
+    """
+    Delete a folder and all its contents.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data:
+            return jsonify({"success": False, "message": "Missing folder path"})
+        
+        folder_path = data['path'].strip()
+        
+        # Construct full path
+        base_dir = "assets/Data/fill_the_blanks"
+        full_path = os.path.join(base_dir, folder_path)
+        
+        # Check if folder exists and is a directory
+        if not os.path.exists(full_path) or not os.path.isdir(full_path):
+            return jsonify({"success": False, "message": "Folder not found"})
+        
+        # Delete the folder and all its contents
+        import shutil
+        shutil.rmtree(full_path)
+        
+        return jsonify({
+            "success": True,
+            "message": "Dossier supprimé avec succès"
+        })
+    
+    except Exception as e:
+        print(f"Error deleting folder: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression du dossier"})
+
+
+@game_bp.route("/move_items", methods=["POST"])
+def move_items() -> Dict[str, Any]:
+    """
+    Move questions or folders to a new location.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'items' not in data or 'target_folder' not in data:
+            return jsonify({"success": False, "message": "Missing required fields"})
+        
+        items = data['items']  # List of file/folder paths to move
+        target_folder = data['target_folder'].strip()  # Target folder path
+        
+        base_dir = "assets/Data/fill_the_blanks"
+        target_path = os.path.join(base_dir, target_folder)
+        
+        # Check if target folder exists
+        if not os.path.exists(target_path) or not os.path.isdir(target_path):
+            return jsonify({"success": False, "message": "Target folder not found"})
+        
+        moved_items = []
+        for item_path in items:
+            try:
+                source_path = os.path.join(base_dir, item_path)
+                if not os.path.exists(source_path):
+                    continue
+                
+                # Get the base name of the item
+                item_name = os.path.basename(item_path)
+                new_path = os.path.join(target_path, item_name)
+                
+                # Check if an item with the same name already exists in target
+                if os.path.exists(new_path):
+                    continue
+                
+                # Move the item
+                import shutil
+                shutil.move(source_path, new_path)
+                moved_items.append(item_path)
+                
+            except Exception as e:
+                print(f"Error moving item {item_path}: {e}")
+                continue
+        
+        return jsonify({
+            "success": True,
+            "message": f"{len(moved_items)} élément(s) déplacé(s) avec succès",
+            "moved_items": moved_items
+        })
+    
+    except Exception as e:
+        print(f"Error moving items: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors du déplacement des éléments"}) 
