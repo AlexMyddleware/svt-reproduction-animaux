@@ -1,0 +1,10 @@
+{
+  "text": "La fleur se transforme en ________",
+  "options": [
+    "fruit",
+    "bourgeon",
+    "graine",
+    "racine"
+  ],
+  "correct_answer": "fruit"
+}
