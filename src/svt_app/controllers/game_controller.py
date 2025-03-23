@@ -1,6 +1,8 @@
 """Game controller module for SVT Reproduction Animaux application."""
 
 from typing import Dict, Any, List, Optional
+import os
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 
 from src.svt_app.services.question_service import QuestionService
@@ -160,4 +162,68 @@ def reset_scores() -> str:
         "texte_a_trous": 0,
         "relier_images": 0
     }
-    return redirect(url_for("index")) 
+    return redirect(url_for("index"))
+
+
+@game_bp.route("/create_question", methods=["GET"])
+def create_question() -> str:
+    """
+    Render the question creation form.
+    
+    Returns:
+        str: Rendered HTML template for creating a new question.
+    """
+    return render_template("create_question.html")
+
+
+@game_bp.route("/save_question", methods=["POST"])
+def save_question() -> Dict[str, Any]:
+    """
+    Save a new fill-in-the-blank question.
+    
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"})
+        
+        # Validate required fields
+        required_fields = ["text", "options", "correct_answer"]
+        if not all(field in data for field in required_fields):
+            return jsonify({"success": False, "message": "Missing required fields"})
+        
+        # Validate that correct_answer is in options
+        if data["correct_answer"] not in data["options"]:
+            return jsonify({"success": False, "message": "La réponse correcte doit correspondre exactement à l'une des options"})
+        
+        # Get the next question number
+        questions_dir = "assets/Data/fill_the_blanks"
+        existing_questions = [f for f in os.listdir(questions_dir) if f.startswith("question") and f.endswith(".json")]
+        next_num = 1
+        if existing_questions:
+            nums = [int(q[8:11]) for q in existing_questions]
+            next_num = max(nums) + 1
+        
+        # Format the question number with leading zeros
+        question_num = f"{next_num:03d}"
+        filename = f"question{question_num}.json"
+        
+        # Create the question JSON
+        question_data = {
+            "text": data["text"],
+            "options": data["options"],
+            "correct_answer": data["correct_answer"]
+        }
+        
+        # Save the question file
+        filepath = os.path.join(questions_dir, filename)
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(question_data, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({"success": True, "message": "Question créée avec succès"})
+    
+    except Exception as e:
+        print(f"Error saving question: {e}")
+        return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"}) 
