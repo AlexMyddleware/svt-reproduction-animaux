@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Show success message and proceed to next question after a delay
                         setTimeout(() => {
-                            alert('Correct! Bien joué!');
+                            // Remove alert for correct answers
                             
                             // Go to the next question if available
                             const nextButton = document.querySelector('a[href*="question_id=' + (parseInt(questionId) + 1) + '"]');
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         // Show success message and proceed to next question after a delay
                         setTimeout(() => {
-                            alert('Correct! Bien joué!');
+                            // Remove alert for correct answers
                             
                             // Go to the next question if available
                             const nextButton = document.querySelector('a[href*="question_id=' + (parseInt(questionId) + 1) + '"]');
