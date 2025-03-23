@@ -34,6 +34,28 @@
         resize: vertical;
     }
 
+    .text-input-container {
+        position: relative;
+    }
+
+    .insert-blank-btn {
+        position: absolute;
+        right: 10px;
+        top: -30px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+    }
+
+    .insert-blank-btn:hover {
+        background-color: #45a049;
+    }
+
     .options-container {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -78,7 +100,10 @@
     <form id="questionForm">
         <div class="form-group">
             <label for="questionText">Texte de la question (utilisez ________ pour l'espace à remplir)</label>
-            <textarea id="questionText" required placeholder="Ex: La reproduction sexuée chez les grenouilles implique ________ qui se rencontrent dans l'eau."></textarea>
+            <div class="text-input-container">
+                <button type="button" class="insert-blank-btn" id="insertBlankBtn">Insérer espace à remplir</button>
+                <textarea id="questionText" required placeholder="Ex: La reproduction sexuée chez les grenouilles implique ________ qui se rencontrent dans l'eau."></textarea>
+            </div>
             <div class="error-message" id="textError">Le texte doit contenir exactement un espace à remplir (________)</div>
         </div>
         
@@ -114,6 +139,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const optionsError = document.getElementById('optionsError');
     const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
+    const questionText = document.getElementById('questionText');
+    const insertBlankBtn = document.getElementById('insertBlankBtn');
+    
+    // Function to insert blank at cursor position
+    insertBlankBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Get cursor position
+        const start = questionText.selectionStart;
+        const end = questionText.selectionEnd;
+        
+        // Insert blank at cursor position
+        const blank = "________";
+        const text = questionText.value;
+        questionText.value = text.substring(0, start) + blank + text.substring(end);
+        
+        // Reset cursor position after blank
+        const newCursorPos = start + blank.length;
+        questionText.setSelectionRange(newCursorPos, newCursorPos);
+        
+        // Focus back on textarea
+        questionText.focus();
+    });
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -125,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         successMessage.style.display = 'none';
         
         // Get form values
-        const text = document.getElementById('questionText').value;
+        const text = questionText.value;
         const options = Array.from({ length: 4 }, (_, i) => document.getElementById(`option${i}`).value);
         const correctAnswerIndex = document.querySelector('input[name="correctAnswer"]:checked')?.value;
         
