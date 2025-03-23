@@ -326,7 +326,8 @@ def toggle_question_completion() -> Dict[str, Any]:
             return jsonify({"success": False, "message": "No file specified"})
         
         filename = data['file']
-        if not filename.startswith('question') or not filename.endswith('.json'):
+        # Only validate the filename part, not the full path
+        if not os.path.basename(filename).startswith('question') or not filename.endswith('.json'):
             return jsonify({"success": False, "message": "Invalid file name"})
         
         file_path = os.path.join('assets/Data/fill_the_blanks', filename)
@@ -371,7 +372,8 @@ def delete_question() -> Dict[str, Any]:
             return jsonify({"success": False, "message": "No file specified"})
         
         filename = data['file']
-        if not filename.startswith('question') or not filename.endswith('.json'):
+        # Only validate the filename part, not the full path
+        if not os.path.basename(filename).startswith('question') or not filename.endswith('.json'):
             return jsonify({"success": False, "message": "Invalid file name"})
         
         file_path = os.path.join('assets/Data/fill_the_blanks', filename)
