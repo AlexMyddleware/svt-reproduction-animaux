@@ -31,6 +31,68 @@
         background: #4CAF50;
     }
 
+    .folder-node {
+        position: relative;
+        margin: 20px 0;
+        padding: 15px;
+        background: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .folder-node::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 50%;
+        width: 20px;
+        height: 2px;
+        background: #2196F3;
+    }
+
+    .folder-node::after {
+        content: '';
+        position: absolute;
+        left: -26px;
+        top: 50%;
+        width: 12px;
+        height: 12px;
+        background: #2196F3;
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    .folder-name {
+        font-weight: bold;
+        color: #2196F3;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .folder-name::before {
+        content: '▼';
+        font-size: 0.8em;
+        transition: transform 0.3s;
+    }
+
+    .folder-name.collapsed::before {
+        transform: rotate(-90deg);
+    }
+
+    .folder-content {
+        padding-left: 20px;
+        margin-top: 10px;
+        transition: height 0.3s, opacity 0.3s;
+    }
+
+    .folder-content.collapsed {
+        display: none;
+    }
+
     .question-node {
         position: relative;
         margin: 20px 0;
@@ -164,28 +226,51 @@
     <h2 class="tree-title">Arbre des Questions</h2>
     
     <div class="tree">
-        {% for question in questions %}
-        <div class="question-node {% if question.completed %}completed{% endif %}">
-            <div class="question-id">
-                Question {{ question.id }}
-                {% if question.completed %}
-                <span class="completion-badge">Terminée</span>
-                {% endif %}
-            </div>
-            <div class="question-text">{{ question.text }}</div>
-            <div class="question-actions">
-                <button class="action-button complete-button {% if question.completed %}completed{% endif %}" 
-                        data-file="{{ question.file }}">
-                    {% if question.completed %}
-                    Marquer comme non terminée
+        {% macro render_tree_items(items) %}
+            {% if items %}
+                {% for item in items %}
+                    {% if item.type == 'folder' %}
+                        <div class="folder-node">
+                            <div class="folder-name">{{ item.name }}</div>
+                            <div class="folder-content">
+                                {% if item.children is defined and item.children %}
+                                    {{ render_tree_items(item.children) }}
+                                {% endif %}
+                            </div>
+                        </div>
                     {% else %}
-                    Marquer comme terminée
+                        <div class="question-node {% if item.completed %}completed{% endif %}">
+                            <div class="question-id">
+                                Question {{ item.id }}
+                                {% if item.completed %}
+                                <span class="completion-badge">Terminée</span>
+                                {% endif %}
+                            </div>
+                            <div class="question-text">{{ item.text }}</div>
+                            <div class="question-actions">
+                                <button class="action-button complete-button {% if item.completed %}completed{% endif %}" 
+                                        data-file="{{ item.file }}">
+                                    {% if item.completed %}
+                                    Marquer comme non terminée
+                                    {% else %}
+                                    Marquer comme terminée
+                                    {% endif %}
+                                </button>
+                                <button class="action-button delete-button" data-file="{{ item.file }}">Supprimer</button>
+                            </div>
+                        </div>
                     {% endif %}
-                </button>
-                <button class="action-button delete-button" data-file="{{ question.file }}">Supprimer</button>
+                {% endfor %}
+            {% endif %}
+        {% endmacro %}
+        
+        {% if tree_data %}
+            {{ render_tree_items(tree_data) }}
+        {% else %}
+            <div class="no-questions">
+                <p>Aucune question n'a été trouvée.</p>
             </div>
-        </div>
-        {% endfor %}
+        {% endif %}
     </div>
     
     <div class="navigation">
@@ -197,6 +282,14 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle folder clicks
+    document.querySelectorAll('.folder-name').forEach(folder => {
+        folder.addEventListener('click', function() {
+            this.classList.toggle('collapsed');
+            this.nextElementSibling.classList.toggle('collapsed');
+        });
+    });
+
     // Handle completion button clicks
     document.querySelectorAll('.complete-button').forEach(button => {
         button.addEventListener('click', async function() {

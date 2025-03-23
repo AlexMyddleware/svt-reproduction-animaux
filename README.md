@@ -21,7 +21,9 @@ cd svt-reproduction-animaux
 2. Créez un environnement virtuel et activez-le :
 ```
 python -m venv .venv
-source .venv/bin/activate  # Sur Windows : .venv\Scripts\activate
+source .venv/bin/activate  
+# Sur Windows : 
+.venv\Scripts\activate
 ```
 
 3. Installez les dépendances :

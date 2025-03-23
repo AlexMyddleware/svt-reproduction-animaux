@@ -1,0 +1,11 @@
+{
+  "text": "Le stade reproducteur est le stade ________ ",
+  "options": [
+    "qui permet a la plante de se reproduire",
+    "qui permet a la plante de se nourrir",
+    "qui permet a la plante de se soigner",
+    "qui permet a la plante de se protéger"
+  ],
+  "correct_answer": "qui permet a la plante de se reproduire",
+  "completed": false
+}

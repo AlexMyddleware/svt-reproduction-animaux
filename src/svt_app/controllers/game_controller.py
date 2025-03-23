@@ -254,23 +254,62 @@ def questions_tree() -> str:
     Returns:
         str: Rendered HTML template for the questions tree.
     """
+    def get_questions_in_directory(directory: str, relative_path: str = "") -> List[Dict[str, Any]]:
+        """
+        Recursively get all questions in a directory and its subdirectories.
+        
+        Args:
+            directory: The absolute directory path
+            relative_path: The relative path from the base questions directory
+            
+        Returns:
+            List[Dict[str, Any]]: List of questions and folders
+        """
+        items: List[Dict[str, Any]] = []
+        
+        try:
+            # Get all items in the directory
+            for item in sorted(os.listdir(directory)):
+                full_path = os.path.join(directory, item)
+                rel_path = os.path.join(relative_path, item) if relative_path else item
+                
+                if os.path.isdir(full_path):
+                    # If it's a directory, recursively get its contents
+                    subfolder_items = get_questions_in_directory(full_path, rel_path)
+                    if subfolder_items:  # Only add non-empty folders
+                        folder_data = {
+                            'type': 'folder',
+                            'name': item,
+                            'path': rel_path,
+                            'children': subfolder_items  # Changed from 'items' to 'children'
+                        }
+                        items.append(folder_data)
+                elif item.startswith("question") and item.endswith(".json"):
+                    # If it's a question file, add it to the list
+                    try:
+                        with open(full_path, 'r', encoding='utf-8') as f:
+                            question_data = json.load(f)
+                            items.append({
+                                'type': 'question',
+                                'id': item[8:11],  # Extract number from filename
+                                'text': question_data['text'],
+                                'file': rel_path,
+                                'completed': question_data.get('completed', False)
+                            })
+                    except Exception as e:
+                        print(f"Error reading question file {full_path}: {e}")
+                        continue
+        except Exception as e:
+            print(f"Error reading directory {directory}: {e}")
+            return []
+        
+        return items
+    
+    # Get all questions and folders starting from the base directory
     questions_dir = "assets/Data/fill_the_blanks"
-    questions = []
+    tree_data = get_questions_in_directory(questions_dir)
     
-    # Get all question files and sort them
-    for filename in sorted(os.listdir(questions_dir)):
-        if filename.startswith("question") and filename.endswith(".json"):
-            file_path = os.path.join(questions_dir, filename)
-            with open(file_path, 'r', encoding='utf-8') as f:
-                question_data = json.load(f)
-                questions.append({
-                    'id': filename[8:11],  # Extract number from filename
-                    'text': question_data['text'],
-                    'file': filename,
-                    'completed': question_data.get('completed', False)  # Get completion status
-                })
-    
-    return render_template("questions_tree.html", questions=questions)
+    return render_template("questions_tree.html", tree_data=tree_data)
 
 
 @game_bp.route("/toggle_question_completion", methods=["POST"])
