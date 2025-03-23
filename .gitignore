@@ -7,3 +7,5 @@
 /src/svt_app/views/__pycache__
 /src/svt_app/tests/__pycache__
 /src/svt_app/services/__pycache__
+/.venv
+/svt_reproduction_animaux.egg-info
