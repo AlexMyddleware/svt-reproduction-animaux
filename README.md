@@ -31,12 +31,18 @@ pip install -r requirements.txt
 
 ## Utilisation
 
-1. Lancez l'application :
+1. Créez un environnement virtuel et activez-le :
+```
+python -m venv .venv
+source .venv/bin/activate  # Sur Windows : venv\Scripts\activate
+```
+
+2. Lancez l'application :
 ```
 python -m src.svt_app.app
 ```
 
-2. Ouvrez votre navigateur à l'adresse : http://localhost:5000
+3. Ouvrez votre navigateur à l'adresse : http://localhost:5000
 
 ## Structure des données
 

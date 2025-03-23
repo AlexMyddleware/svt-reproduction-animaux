@@ -10,20 +10,8 @@
 <div class="game-container">
     <h2>Relier les images</h2>
     
-    <div class="score-display">
-        <p>Score: {{ scores.relier_images }}</p>
-    </div>
-    
-    <div class="navigation">
-        <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
-    </div>
-    
     {% if question %}
     <div class="question-container">
-        <div class="question-number">
-            <p>Question {{ question_id }} / {{ total_questions }}</p>
-        </div>
-        
         <div class="image-container">
             <img src="{{ url_for('static', filename=question.image_path) }}" alt="Image question" id="central-image">
         </div>
@@ -42,6 +30,18 @@
             {% if question_id < total_questions %}
             <a href="{{ url_for('game.relier_images', question_id=question_id+1) }}" class="button">Suivant</a>
             {% endif %}
+        </div>
+
+        <div class="question-number">
+            <p>Question {{ question_id }} / {{ total_questions }}</p>
+        </div>
+        
+        <div class="score-display">
+            <p>Score: {{ scores.relier_images }}</p>
+        </div>
+        
+        <div class="navigation">
+            <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
         </div>
     </div>
     {% else %}
