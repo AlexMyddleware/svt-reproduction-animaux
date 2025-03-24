@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('src'))
 block_cipher = None
 
 a = Analysis(
-    ['src/main.py'],
+    ['run.py'],
     pathex=['src'],
     binaries=[],
     datas=[
@@ -22,7 +22,8 @@ a = Analysis(
         'jinja2',
         'werkzeug',
         'svt_app.controllers.game_controller',
-        'svt_app.services.question_service'
+        'svt_app.services.question_service',
+        'svt_app.models.question'
     ],
     hookspath=[],
     hooksconfig={},

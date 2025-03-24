@@ -21,7 +21,7 @@ cd svt-reproduction-animaux
 2. Créez un environnement virtuel et activez-le :
 ```
 python -m venv .venv
-source .venv/bin/activate  
+source .venv/bin/activate
 # Sur Windows : 
 .venv\Scripts\activate
 ```
@@ -34,6 +34,10 @@ pip install -r requirements.txt
 4. Lancez l'application :
 ```
 python -m src.svt_app.app
+
+or 
+
+python run.py
 ```
 
 5. Ouvrez votre navigateur à l'adresse : http://localhost:5000
