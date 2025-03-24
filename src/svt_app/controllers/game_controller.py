@@ -5,7 +5,7 @@ import os
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 
-from src.svt_app.services.question_service import QuestionService
+from svt_app.services.question_service import QuestionService
 
 # Create a Blueprint for the game routes
 game_bp = Blueprint("game", __name__)

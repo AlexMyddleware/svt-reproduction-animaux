@@ -5,7 +5,7 @@ import os
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
-from src.svt_app.models.question import FillInTheBlankQuestion, ImageMatchingQuestion
+from svt_app.models.question import FillInTheBlankQuestion, ImageMatchingQuestion
 
 
 class QuestionService:

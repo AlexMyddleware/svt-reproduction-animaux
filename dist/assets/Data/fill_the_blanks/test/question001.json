@@ -1,0 +1,9 @@
+{
+  "text": "bonjour test ________ ",
+  "options": [
+    "hello",
+    "test",
+    "hola"
+  ],
+  "correct_answer": "hello"
+}
