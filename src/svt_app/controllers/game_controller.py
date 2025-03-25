@@ -6,11 +6,13 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 
 from svt_app.services.question_service import QuestionService
+from svt_app.utils.debug import debug_log
 
 # Create a Blueprint for the game routes
 game_bp = Blueprint("game", __name__)
 
 # Initialize the question service
+debug_log("Initializing QuestionService")
 question_service = QuestionService()
 
 # Global scores dictionary
@@ -28,6 +30,7 @@ def texte_a_trous() -> str:
     Returns:
         str: Rendered HTML template for the 'Texte à trous' game.
     """
+    debug_log("Loading fill in the blank questions")
     questions = question_service.get_fill_in_blank_questions()
     
     # Filter out completed questions
@@ -40,15 +43,19 @@ def texte_a_trous() -> str:
                 if not question_data.get('completed', False):
                     active_questions.append(question)
         except Exception as e:
-            print(f"Error reading question file: {e}")
+            debug_log("Error reading question file {}: {}", file_path, str(e))
             continue
+    
+    debug_log("Found {} active questions", len(active_questions))
     
     # If no active questions, show empty template
     if not active_questions:
+        debug_log("No active questions found")
         return render_template("texte_a_trous.html", question=None, scores=scores)
     
     # Get the current question ID from the query parameters, default to 1
     question_id = request.args.get("question_id", 1, type=int)
+    debug_log("Current question ID: {}", question_id)
     
     # Get the current question
     current_question = None
@@ -57,17 +64,8 @@ def texte_a_trous() -> str:
             current_question = q
             break
     
-    # If the question doesn't exist or is completed, redirect to the first active question
-    if current_question is None and active_questions:
-        return redirect(url_for("game.texte_a_trous", question_id=active_questions[0].id))
-    
-    return render_template(
-        "texte_a_trous.html",
-        question=current_question,
-        question_id=question_id,
-        total_questions=len(active_questions),
-        scores=scores
-    )
+    debug_log("Current question: {}", current_question)
+    return render_template("texte_a_trous.html", question=current_question, scores=scores)
 
 
 @game_bp.route("/relier_images")
@@ -117,45 +115,48 @@ def check_answer() -> Dict[str, Any]:
     """
     try:
         data = request.get_json()
-        print("Received data:", data)  # Debug log
+        debug_log("Received answer data: {}", data)
         
         if not data:
-            print("No data provided")  # Debug log
+            debug_log("No data provided in answer submission")
             return jsonify({"success": False, "message": "No data provided"})
         
         game_type = data.get("game_type")
         question_id = data.get("question_id")
         answer = data.get("answer")
         
-        print(f"Game type: {game_type}, Question ID: {question_id}, Answer: {answer}")  # Debug log
+        debug_log("Processing answer - Game: {}, Question: {}, Answer: {}", 
+                 game_type, question_id, answer)
         
         # Validate required fields
         if not all([game_type, question_id is not None, answer]):
-            print("Missing required fields")  # Debug log
+            debug_log("Missing required fields in answer submission")
             return jsonify({"success": False, "message": "Missing required fields"})
         
         # Ensure question_id is an integer
         try:
             question_id = int(question_id)
         except (TypeError, ValueError):
-            print(f"Invalid question ID: {question_id}")  # Debug log
+            debug_log("Invalid question ID format: {}", question_id)
             return jsonify({"success": False, "message": "Invalid question ID"})
         
         # Check the answer based on the game type
         if game_type == "texte_a_trous":
             question = question_service.get_fill_in_blank_question_by_id(question_id)
-            print("Fill in blank question:", question)  # Debug log
+            debug_log("Retrieved question for checking: {}", question)
             
             # Find the question file
             file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question_id:03d}.json")
             
             # If the file doesn't exist in root, search in subfolders
             if not os.path.exists(file_path):
+                debug_log("Question file not found in root, searching subfolders")
                 base_dir = "assets/Data/fill_the_blanks"
                 for root, _, files in os.walk(base_dir):
                     for file in files:
                         if file == f"question{question_id:03d}.json":
                             file_path = os.path.join(root, file)
+                            debug_log("Found question file at: {}", file_path)
                             break
             
             # Update statistics in the question file
@@ -187,7 +188,7 @@ def check_answer() -> Dict[str, Any]:
                 })
                 
             except Exception as e:
-                print(f"Error updating question statistics: {e}")
+                debug_log("Error updating question statistics: {}", str(e))
                 # Continue with normal response if statistics update fails
                 return jsonify({
                     "success": True,
@@ -197,17 +198,17 @@ def check_answer() -> Dict[str, Any]:
             
         elif game_type == "relier_images":
             question = question_service.get_image_matching_question_by_id(question_id)
-            print("Image matching question:", question)  # Debug log
+            debug_log("Image matching question: {}", question)
             if question and answer == question.correct_word:
                 scores["relier_images"] += 1
                 return jsonify({"success": True, "correct": True, "score": scores["relier_images"]})
             return jsonify({"success": True, "correct": False, "score": scores["relier_images"]})
         
-        print("Invalid game type")  # Debug log
+        debug_log("Invalid game type")
         return jsonify({"success": False, "message": "Invalid game type"})
     
     except Exception as e:
-        print(f"Error processing request: {e}")  # Debug log
+        debug_log("Error processing request: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la validation"})
 
 
@@ -314,7 +315,7 @@ def save_question() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Question créée avec succès"})
     
     except Exception as e:
-        print(f"Error saving question: {e}")
+        debug_log("Error saving question: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"})
 
 
@@ -380,10 +381,10 @@ def questions_tree() -> str:
                                 })
                             })
                     except Exception as e:
-                        print(f"Error reading question file {full_path}: {e}")
+                        debug_log("Error reading question file {}: {}", full_path, str(e))
                         continue
         except Exception as e:
-            print(f"Error reading directory {directory}: {e}")
+            debug_log("Error reading directory {}: {}", directory, str(e))
             return []
         
         return items
@@ -443,7 +444,7 @@ def toggle_question_completion() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        print(f"Error toggling question completion: {e}")
+        debug_log("Error toggling question completion: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la mise à jour de la question"})
 
 
@@ -477,7 +478,7 @@ def delete_question() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Question supprimée avec succès"})
     
     except Exception as e:
-        print(f"Error deleting question: {e}")
+        debug_log("Error deleting question: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression de la question"})
 
 
@@ -522,7 +523,7 @@ def create_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        print(f"Error creating folder: {e}")
+        debug_log("Error creating folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la création du dossier"})
 
 
@@ -567,7 +568,7 @@ def rename_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        print(f"Error renaming folder: {e}")
+        debug_log("Error renaming folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors du renommage du dossier"})
 
 
@@ -604,7 +605,7 @@ def delete_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        print(f"Error deleting folder: {e}")
+        debug_log("Error deleting folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression du dossier"})
 
 
@@ -652,7 +653,7 @@ def move_items() -> Dict[str, Any]:
                 moved_items.append(item_path)
                 
             except Exception as e:
-                print(f"Error moving item {item_path}: {e}")
+                debug_log("Error moving item {}: {}", item_path, str(e))
                 continue
         
         return jsonify({
@@ -662,5 +663,5 @@ def move_items() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        print(f"Error moving items: {e}")
+        debug_log("Error moving items: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors du déplacement des éléments"}) 
