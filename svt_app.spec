@@ -9,12 +9,13 @@ block_cipher = None
 
 a = Analysis(
     ['run.py'],
-    pathex=['src'],
+    pathex=[],
     binaries=[],
     datas=[
+        ('assets/Data/fill_the_blanks', 'assets/Data/fill_the_blanks'),
+        ('assets/Data/image_matching', 'assets/Data/image_matching'),
         ('src/svt_app/templates', 'svt_app/templates'),
         ('src/svt_app/static', 'svt_app/static'),
-        ('assets', 'assets'),
     ],
     hiddenimports=[
         'waitress',

@@ -1,0 +1,13 @@
+{
+  "text": "bonjour test ________ ",
+  "options": [
+    "hello",
+    "test",
+    "hola"
+  ],
+  "correct_answer": "hello",
+  "statistics": {
+    "correct_answers": 1,
+    "wrong_answers": 1
+  }
+}

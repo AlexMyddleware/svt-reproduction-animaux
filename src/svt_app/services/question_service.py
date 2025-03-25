@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
@@ -18,6 +19,18 @@ class QuestionService:
     
     def __init__(self) -> None:
         """Initialize the QuestionService."""
+        # Get the base path - handles both development and PyInstaller executable
+        if getattr(sys, 'frozen', False):
+            # Running in PyInstaller bundle
+            self.base_path = os.path.join(sys._MEIPASS)
+        else:
+            # Running in normal Python environment
+            self.base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        
+        # Initialize paths relative to base_path
+        self.fill_blanks_path = os.path.join(self.base_path, "assets", "Data", "fill_the_blanks")
+        self.image_matching_path = os.path.join(self.base_path, "assets", "Data", "image_matching")
+        
         self.fill_in_blank_questions: List[FillInTheBlankQuestion] = []
         self.image_matching_questions: List[ImageMatchingQuestion] = []
         self.load_questions()
@@ -39,12 +52,10 @@ class QuestionService:
         This is a private method that loads fill-in-the-blank questions
         from the assets/Data/fill_the_blanks directory.
         """
-        fill_blanks_dir = Path("assets/Data/fill_the_blanks")
-        
-        if not fill_blanks_dir.exists():
+        if not os.path.exists(self.fill_blanks_path):
             return
         
-        for file_path in fill_blanks_dir.glob("*.json"):
+        for file_path in Path(self.fill_blanks_path).glob("*.json"):
             try:
                 with open(file_path, "r", encoding="utf-8") as file:
                     data = json.load(file)
@@ -69,12 +80,10 @@ class QuestionService:
         This is a private method that loads image matching questions
         from the assets/Data/image_interaction directory.
         """
-        image_matching_dir = Path("assets/Data/image_interaction")
-        
-        if not image_matching_dir.exists():
+        if not os.path.exists(self.image_matching_path):
             return
         
-        for file_path in image_matching_dir.glob("*.json"):
+        for file_path in Path(self.image_matching_path).glob("*.json"):
             try:
                 with open(file_path, "r", encoding="utf-8") as file:
                     data = json.load(file)
