@@ -6,5 +6,6 @@
     "graine",
     "racine"
   ],
-  "correct_answer": "fruit"
+  "correct_answer": "fruit",
+  "completed": false
 }
