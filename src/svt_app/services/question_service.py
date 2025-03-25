@@ -55,12 +55,7 @@ class QuestionService:
         self._load_image_matching_questions()
     
     def _load_fill_in_blank_questions(self) -> None:
-        """
-        Load fill-in-the-blank questions from JSON files.
-        
-        This is a private method that loads fill-in-the-blank questions
-        from the assets/Data/fill_the_blanks directory.
-        """
+        """Load fill-in-the-blank questions from JSON files."""
         debug_log("Loading fill-in-the-blank questions")
         self.fill_in_blank_questions = []
         
@@ -73,10 +68,16 @@ class QuestionService:
                         try:
                             with open(file_path, 'r', encoding='utf-8') as f:
                                 data = json.load(f)
+                                debug_log("Loaded JSON data from {}: {}", file_path, data)
+                                
+                                # Extract question ID from filename (e.g., "question001.json" -> 1)
+                                question_id = int(file[8:11])
+                                
                                 question = FillInTheBlankQuestion(
-                                    id=int(file[8:11]),  # Extract number from filename
-                                    text=data['text'],
-                                    correct_word=data['correct_word']
+                                    id=question_id,
+                                    text=data.get('text', ''),
+                                    options=data.get('options', []),
+                                    correct_answer=data.get('correct_answer', '')
                                 )
                                 self.fill_in_blank_questions.append(question)
                                 debug_log("Loaded fill-in-blank question {}: {}", question.id, question.text)
@@ -89,12 +90,7 @@ class QuestionService:
         debug_log("Loaded {} fill-in-blank questions", len(self.fill_in_blank_questions))
     
     def _load_image_matching_questions(self) -> None:
-        """
-        Load image matching questions from JSON files.
-        
-        This is a private method that loads image matching questions
-        from the assets/Data/image_interaction directory.
-        """
+        """Load image matching questions from JSON files."""
         debug_log("Loading image matching questions")
         self.image_matching_questions = []
         
@@ -107,10 +103,19 @@ class QuestionService:
                         try:
                             with open(file_path, 'r', encoding='utf-8') as f:
                                 data = json.load(f)
+                                debug_log("Loaded JSON data from {}: {}", file_path, data)
+                                
+                                # Extract question ID from filename
+                                question_id = int(file[8:11])
+                                
+                                # Get words data
+                                words_data = data.get('words', {})
+                                
                                 question = ImageMatchingQuestion(
-                                    id=int(file[8:11]),  # Extract number from filename
-                                    image_path=data['image_path'],
-                                    correct_word=data['correct_word']
+                                    id=question_id,
+                                    image_path=data.get('image', ''),
+                                    correct_word=words_data.get('correct', ''),
+                                    incorrect_words=words_data.get('incorrect', [])
                                 )
                                 self.image_matching_questions.append(question)
                                 debug_log("Loaded image matching question {}: {}", question.id, question.image_path)
@@ -145,10 +150,10 @@ class QuestionService:
         Get a fill-in-the-blank question by its ID.
         
         Args:
-            question_id (int): The ID of the question to retrieve.
+            question_id: The ID of the question to retrieve.
             
         Returns:
-            Optional[FillInTheBlankQuestion]: The question with the given ID, or None if not found.
+            Optional[FillInTheBlankQuestion]: The question if found, None otherwise.
         """
         for question in self.fill_in_blank_questions:
             if question.id == question_id:
@@ -160,10 +165,10 @@ class QuestionService:
         Get an image matching question by its ID.
         
         Args:
-            question_id (int): The ID of the question to retrieve.
+            question_id: The ID of the question to retrieve.
             
         Returns:
-            Optional[ImageMatchingQuestion]: The question with the given ID, or None if not found.
+            Optional[ImageMatchingQuestion]: The question if found, None otherwise.
         """
         for question in self.image_matching_questions:
             if question.id == question_id:

@@ -9,12 +9,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const validateBtn = document.getElementById('validate-btn');
     const resetBtn = document.getElementById('reset-btn');
     const questionText = document.getElementById('question-text');
+    const questionContainer = document.querySelector('.question-container');
     
     let currentOption = null;
     
-    // Get the question ID from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const questionId = urlParams.get('question_id') || 1;
+    // Get the question ID from the data attribute
+    const questionId = questionContainer ? parseInt(questionContainer.dataset.questionId) : 1;
     
     // Initialize the drag and drop functionality
     initDragAndDrop();
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 game_type: 'texte_a_trous',
-                question_id: parseInt(questionId),
+                question_id: questionId,
                 answer: answer
             })
         })
@@ -186,10 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Show success message and proceed to next question after a delay
                     setTimeout(() => {
-                        // Remove alert for correct answers
-                        
                         // Go to the next question if available
-                        const nextButton = document.querySelector('a[href*="question_id=' + (parseInt(questionId) + 1) + '"]');
+                        const nextButton = document.querySelector('a[href*="question_id=' + (questionId + 1) + '"]');
                         if (nextButton) {
                             window.location.href = nextButton.href;
                         }
@@ -197,77 +195,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Incorrect answer
                     blank.classList.add('incorrect');
-                    
-                    // Shake effect and reset after a delay
                     setTimeout(() => {
-                        blank.classList.remove('incorrect', 'filled');
-                        blank.textContent = '';
-                        blank.dataset.answer = '';
-                        
-                        // Show the option again
-                        if (currentOption) {
-                            currentOption.style.display = 'inline-block';
-                        }
+                        blank.classList.remove('incorrect');
+                        resetWords();
                     }, 1000);
                 }
             } else {
-                alert('Erreur: ' + data.message);
+                alert(data.message || 'Une erreur est survenue lors de la validation.');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Une erreur est survenue lors de la validation de votre réponse.');
+            alert('Une erreur est survenue lors de la validation.');
         });
     }
     
     /**
-     * Reset all words to random positions and clear the answer blank if not validated.
+     * Reset the game state, showing all options and clearing the blank.
      */
     function resetWords() {
-        // If there's a word in the blank that hasn't been validated yet
-        if (blank && blank.classList.contains('filled') && !blank.classList.contains('correct')) {
-            // Get the word that was in the blank
-            const blankWord = blank.textContent;
-            // Find the corresponding option element
-            const option = Array.from(options).find(opt => opt.dataset.option === blankWord);
-            if (option) {
-                option.style.display = 'inline-block';
-            }
-            // Clear the blank
+        // Show all options
+        options.forEach(option => {
+            option.style.display = '';
+        });
+        
+        // Clear and reset the blank
+        if (blank) {
             blank.textContent = '';
-            blank.classList.remove('filled', 'incorrect');
+            blank.classList.remove('filled', 'correct', 'incorrect');
             blank.dataset.answer = '';
         }
         
-        // Randomize position for each word
-        options.forEach((option) => {
-            if (option.style.display !== 'none') {
-                // Random orbital parameters
-                const baseRadius = 100 + Math.random() * 50;
-                const eccentricity = 0.8 + Math.random() * 0.4;
-                const orbitX = baseRadius;
-                const orbitY = baseRadius * eccentricity;
-                
-                // Set custom orbital path
-                option.style.setProperty('--orbit-x', `${orbitX}px`);
-                option.style.setProperty('--orbit-y', `${orbitY}px`);
-                
-                // Random timing
-                const duration = 8 + Math.random() * 4;
-                const delay = Math.random() * -6;
-                const direction = Math.random() < 0.5 ? 'normal' : 'reverse';
-                
-                // Apply new animation parameters
-                option.style.setProperty('--orbit-duration', `${duration}s`);
-                option.style.setProperty('--orbit-delay', `${delay}s`);
-                option.style.animationDirection = direction;
-                
-                // Reset any drag-related states
-                option.classList.remove('dragging');
-                option.style.animation = 'none';
-                option.offsetHeight; // Trigger reflow
-                option.style.animation = '';
-            }
-        });
+        currentOption = null;
     }
 }); 

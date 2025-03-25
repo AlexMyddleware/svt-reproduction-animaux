@@ -53,19 +53,36 @@ def texte_a_trous() -> str:
         debug_log("No active questions found")
         return render_template("texte_a_trous.html", question=None, scores=scores)
     
-    # Get the current question ID from the query parameters, default to 1
-    question_id = request.args.get("question_id", 1, type=int)
-    debug_log("Current question ID: {}", question_id)
+    # Get the current question ID from the query parameters, default to first active question
+    question_id = request.args.get("question_id", None, type=int)
+    debug_log("Requested question ID: {}", question_id)
     
-    # Get the current question
+    # If no question_id specified or the requested question is not in active questions,
+    # use the first active question
     current_question = None
-    for q in active_questions:
-        if q.id == question_id:
-            current_question = q
-            break
+    if question_id is not None:
+        # Try to find the requested question
+        for q in active_questions:
+            if q.id == question_id:
+                current_question = q
+                break
     
-    debug_log("Current question: {}", current_question)
-    return render_template("texte_a_trous.html", question=current_question, scores=scores)
+    # If no current question (either not specified or not found), use first active
+    if current_question is None and active_questions:
+        current_question = active_questions[0]
+        question_id = current_question.id
+    
+    debug_log("Selected question ID: {}, Question: {}", 
+              question_id, 
+              current_question.text if current_question else "None")
+    
+    return render_template(
+        "texte_a_trous.html",
+        question=current_question,
+        question_id=question_id,
+        total_questions=len(active_questions),
+        scores=scores
+    )
 
 
 @game_bp.route("/relier_images")
@@ -145,6 +162,10 @@ def check_answer() -> Dict[str, Any]:
             question = question_service.get_fill_in_blank_question_by_id(question_id)
             debug_log("Retrieved question for checking: {}", question)
             
+            if not question:
+                debug_log("Question not found: {}", question_id)
+                return jsonify({"success": False, "message": "Question not found"})
+            
             # Find the question file
             file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question_id:03d}.json")
             
@@ -159,32 +180,36 @@ def check_answer() -> Dict[str, Any]:
                             debug_log("Found question file at: {}", file_path)
                             break
             
-            # Update statistics in the question file
+            is_correct = answer == question.correct_answer
+            debug_log("Answer is {}", "correct" if is_correct else "incorrect")
+            
             try:
+                # Load existing data
                 with open(file_path, 'r', encoding='utf-8') as f:
                     question_data = json.load(f)
                 
-                # Initialize statistics if they don't exist
-                if 'statistics' not in question_data:
-                    question_data['statistics'] = {'correct_answers': 0, 'wrong_answers': 0}
-                
-                # Update the appropriate counter
-                is_correct = question and answer == question.correct_answer
+                # Update statistics
+                stats = question_data.get('statistics', {'correct_answers': 0, 'wrong_answers': 0})
                 if is_correct:
-                    question_data['statistics']['correct_answers'] += 1
+                    stats['correct_answers'] = stats.get('correct_answers', 0) + 1
+                    # Mark question as completed when answered correctly
+                    question_data['completed'] = True
                     scores["texte_a_trous"] += 1
                 else:
-                    question_data['statistics']['wrong_answers'] += 1
+                    stats['wrong_answers'] = stats.get('wrong_answers', 0) + 1
                 
-                # Save the updated statistics
+                question_data['statistics'] = stats
+                
+                # Save updated data
                 with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump(question_data, f, ensure_ascii=False, indent=2)
+                    json.dump(question_data, f, indent=4, ensure_ascii=False)
+                
+                debug_log("Updated question statistics: {}", stats)
                 
                 return jsonify({
-                    "success": True, 
-                    "correct": is_correct, 
-                    "score": scores["texte_a_trous"],
-                    "statistics": question_data['statistics']
+                    "success": True,
+                    "correct": is_correct,
+                    "score": scores["texte_a_trous"]
                 })
                 
             except Exception as e:
@@ -192,10 +217,10 @@ def check_answer() -> Dict[str, Any]:
                 # Continue with normal response if statistics update fails
                 return jsonify({
                     "success": True,
-                    "correct": question and answer == question.correct_answer,
+                    "correct": is_correct,
                     "score": scores["texte_a_trous"]
                 })
-            
+                
         elif game_type == "relier_images":
             question = question_service.get_image_matching_question_by_id(question_id)
             debug_log("Image matching question: {}", question)
