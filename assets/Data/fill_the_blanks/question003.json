@@ -1,0 +1,15 @@
+{
+  "text": "le telephone est sur________ le ",
+  "options": [
+    "bureau",
+    "chaise",
+    "toit",
+    "ecran"
+  ],
+  "correct_answer": "bureau",
+  "statistics": {
+    "correct_answers": 1,
+    "wrong_answers": 0
+  },
+  "completed": true
+}

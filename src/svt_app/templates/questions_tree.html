@@ -347,16 +347,36 @@
         color: #666;
     }
     
+    .drop-target {
+        border: 2px dashed #2196F3;
+        background-color: rgba(33, 150, 243, 0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .folder-node.drop-target {
+        transform: scale(1.02);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .folder-content.drop-target {
+        padding: 10px;
+        margin: 10px 0;
+        min-height: 60px;
+        border-radius: 5px;
+    }
+    
     .draggable {
-        cursor: move;
+        cursor: grab;
+    }
+    
+    .draggable:active {
+        cursor: grabbing;
     }
     
     .draggable.dragging {
         opacity: 0.5;
-    }
-    
-    .drop-target {
-        border: 2px dashed #2196F3;
+        transform: scale(0.95);
+        cursor: grabbing;
     }
     
     .selectable {
@@ -563,69 +583,110 @@ document.addEventListener('DOMContentLoaded', function() {
     // Drag and drop functionality
     let draggedItem = null;
     
-    document.querySelectorAll('.draggable').forEach(item => {
-        item.addEventListener('dragstart', function(e) {
-            draggedItem = this;
-            this.classList.add('dragging');
-            
-            // If dragging a selected item, include all selected items
-            const dragData = {
-                items: Array.from(selectedItems)
-            };
-            if (!selectedItems.has(this.dataset.path)) {
-                dragData.items = [this.dataset.path];
-            }
-            e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-        });
-        
-        item.addEventListener('dragend', function() {
-            this.classList.remove('dragging');
-            document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
-        });
-    });
-    
-    document.querySelectorAll('.folder-content').forEach(folder => {
-        folder.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            this.classList.add('drop-target');
-        });
-        
-        folder.addEventListener('dragleave', function() {
-            this.classList.remove('drop-target');
-        });
-        
-        folder.addEventListener('drop', async function(e) {
-            e.preventDefault();
-            this.classList.remove('drop-target');
-            
-            const targetPath = this.dataset.path;
-            const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
-            
-            try {
-                const response = await fetch('/game/move_items', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        items: dragData.items,
-                        target_folder: targetPath
-                    })
-                });
+    // Initialize all draggable items
+    function initDraggableItems() {
+        document.querySelectorAll('.draggable').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                this.classList.add('dragging');
                 
-                const result = await response.json();
-                if (result.success) {
-                    // Refresh the page to show the new structure
-                    window.location.reload();
-                } else {
-                    alert(result.message);
+                // If dragging a selected item, include all selected items
+                const dragData = {
+                    items: Array.from(selectedItems)
+                };
+                if (!selectedItems.has(this.dataset.path)) {
+                    dragData.items = [this.dataset.path];
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Une erreur est survenue lors du déplacement des éléments');
-            }
+                e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+            });
+            
+            item.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+            });
         });
-    });
+    }
+    
+    // Initialize all drop targets
+    function initDropTargets() {
+        // Make both folder-content and folder-node elements drop targets
+        document.querySelectorAll('.folder-content, .folder-node').forEach(target => {
+            target.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                if (draggedItem !== this) {
+                    this.classList.add('drop-target');
+                }
+            });
+            
+            target.addEventListener('dragleave', function(e) {
+                // Only remove the class if we're actually leaving the element
+                // not just moving between its children
+                if (!this.contains(e.relatedTarget)) {
+                    this.classList.remove('drop-target');
+                }
+            });
+            
+            target.addEventListener('drop', async function(e) {
+                e.preventDefault();
+                e.stopPropagation(); // Prevent event bubbling
+                this.classList.remove('drop-target');
+                
+                // Get the target folder path
+                let targetPath = this.dataset.path;
+                
+                // If we're dropping on a folder-node and not its content,
+                // we need to handle it differently
+                if (this.classList.contains('folder-node')) {
+                    // Find its content container
+                    const folderContent = this.querySelector('.folder-content');
+                    if (folderContent) {
+                        targetPath = folderContent.dataset.path;
+                    }
+                }
+                
+                if (!targetPath) {
+                    console.error('Target path not found');
+                    return;
+                }
+                
+                const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                
+                // Check if we're trying to drop an item into itself
+                if (dragData.items.includes(targetPath)) {
+                    alert("Impossible de déplacer un dossier dans lui-même");
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/game/move_items', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            items: dragData.items,
+                            target_folder: targetPath
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        // Refresh the page to show the new structure
+                        window.location.reload();
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors du déplacement des éléments');
+                }
+            });
+        });
+    }
+    
+    // Initialize drag and drop
+    initDraggableItems();
+    initDropTargets();
     
     // New folder creation
     document.getElementById('new-folder-btn').addEventListener('click', async function() {
