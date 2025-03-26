@@ -27,7 +27,7 @@ source .venv/bin/activate
 ```
 with debug
 
-$env:SVT_DEBUG=1; python run.py 
+$env:SVT_DEBUG=1; python run.py
 
 
 3. Installez les dépendances :

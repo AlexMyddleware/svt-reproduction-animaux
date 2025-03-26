@@ -1,0 +1,10 @@
+{
+  "text": "La poule fait des oeufs, elle est donc ________",
+  "options": [
+    "vivipare",
+    "ovipare",
+    "vipare",
+    "apare"
+  ],
+  "correct_answer": "vivipare"
+}
