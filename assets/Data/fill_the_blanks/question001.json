@@ -1,8 +1,13 @@
 {
-  "text": "bonjour mirroir ________",
-  "options": [
-    "hello la team",
-    "courrage"
-  ],
-  "correct_answer": "hello la team"
+    "text": "bonjour mirroir ________",
+    "options": [
+        "hello la team",
+        "courrage"
+    ],
+    "correct_answer": "hello la team",
+    "statistics": {
+        "correct_answers": 10,
+        "wrong_answers": 1
+    },
+    "completed": false
 }

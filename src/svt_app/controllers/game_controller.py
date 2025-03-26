@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 
 from svt_app.services.question_service import QuestionService
 from svt_app.utils.debug import debug_log
+from svt_app.controllers.settings_controller import load_settings
 
 # Create a Blueprint for the game routes
 game_bp = Blueprint("game", __name__)
@@ -217,9 +218,16 @@ def check_answer() -> Dict[str, Any]:
                 stats = question_data.get('statistics', {'correct_answers': 0, 'wrong_answers': 0})
                 if is_correct:
                     stats['correct_answers'] = stats.get('correct_answers', 0) + 1
-                    # Mark question as completed when answered correctly
-                    question_data['completed'] = True
                     scores["texte_a_trous"] += 1
+                    
+                    # Check auto-validation setting
+                    settings = load_settings()
+                    debug_log("Auto-validation setting: {}", settings.get("auto_validate", True))
+                    if settings.get("auto_validate", True):
+                        question_data['completed'] = True
+                        debug_log("Question marked as completed due to auto-validation")
+                    else:
+                        debug_log("Question not marked as completed due to auto-validation being disabled")
                 else:
                     stats['wrong_answers'] = stats.get('wrong_answers', 0) + 1
                 

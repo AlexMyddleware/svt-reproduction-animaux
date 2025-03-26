@@ -1,0 +1,13 @@
+{
+    "text": "madrianos ________",
+    "options": [
+        "total",
+        "thanos"
+    ],
+    "correct_answer": "thanos",
+    "statistics": {
+        "correct_answers": 4,
+        "wrong_answers": 0
+    },
+    "completed": false
+}

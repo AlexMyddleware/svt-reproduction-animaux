@@ -4,6 +4,7 @@ from typing import Dict, Any, Optional
 from flask import Flask, render_template, request, redirect, url_for, session
 
 from svt_app.controllers.game_controller import game_bp
+from svt_app.controllers.settings_controller import settings_bp
 from svt_app.utils.debug import debug_log, DEBUG_MODE
 
 def create_app() -> Flask:
@@ -22,6 +23,7 @@ def create_app() -> Flask:
     # Register blueprints
     debug_log("Registering blueprints")
     app.register_blueprint(game_bp, url_prefix="/game")
+    app.register_blueprint(settings_bp, url_prefix="/settings")
 
     @app.route("/")
     def index() -> str:
