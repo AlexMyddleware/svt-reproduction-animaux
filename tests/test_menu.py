@@ -90,3 +90,31 @@ def test_score_display(client: "Client") -> None:
     assert "Scores" in html_content
     assert "Texte à trous: 0" in html_content
     assert "Relier les images: 0" in html_content
+
+def test_score_reset(client: "Client") -> None:
+    """
+    Test the score reset functionality.
+    
+    This test verifies that:
+    1. The reset scores button works
+    2. After reset, 'Texte à trous' score becomes 1
+    3. After reset, 'Relier les images' score remains 0
+    
+    Args:
+        client: A pytest fixture providing a test client for making requests.
+    """
+    # First verify initial scores
+    response = client.get('/')
+    html_content = response.data.decode('utf-8')
+    assert "Texte à trous: 0" in html_content
+    assert "Relier les images: 0" in html_content
+    
+    # Trigger score reset
+    response = client.post('/game/reset_scores')
+    assert response.status_code == 200
+    
+    # Verify updated scores
+    response = client.get('/')
+    html_content = response.data.decode('utf-8')
+    assert "Texte à trous: 0" in html_content
+    assert "Relier les images: 0" in html_content

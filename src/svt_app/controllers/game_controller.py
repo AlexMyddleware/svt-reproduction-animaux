@@ -272,20 +272,24 @@ def check_answer() -> Dict[str, Any]:
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la validation"})
 
 
-@game_bp.route("/reset_scores")
-def reset_scores() -> str:
+@game_bp.route("/reset_scores", methods=["POST"])
+def reset_scores() -> Dict[str, Any]:
     """
-    Reset all game scores to zero.
+    Reset the game scores.
+    
+    Sets 'texte_a_trous' score to 0 and 'relier_images' score to 0.
     
     Returns:
-        str: Redirect to the main menu.
+        Dict[str, Any]: JSON response indicating success.
     """
     global scores
-    scores = {
-        "texte_a_trous": 0,
-        "relier_images": 0
-    }
-    return redirect(url_for("index"))
+    scores["texte_a_trous"] = 0
+    scores["relier_images"] = 0
+    
+    debug_log("Scores reset - texte_a_trous: {}, relier_images: {}", 
+              scores["texte_a_trous"], scores["relier_images"])
+    
+    return jsonify({"success": True})
 
 
 @game_bp.route("/create_question", methods=["GET"])

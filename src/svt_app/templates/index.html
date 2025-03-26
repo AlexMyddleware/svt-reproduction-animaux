@@ -17,9 +17,25 @@
         <a href="{{ url_for('game.relier_images') }}" class="menu-button">Relier les images</a>
         <a href="{{ url_for('game.create_question') }}" class="menu-button">Créer une question</a>
         <a href="{{ url_for('game.questions_tree') }}" class="menu-button">Gérer les questions</a>
-        <a href="{{ url_for('game.reset_scores') }}" class="menu-button">Réinitialiser les scores</a>
+        <button onclick="resetScores()" class="menu-button">Réinitialiser les scores</button>
         <a href="{{ url_for('settings') }}" class="menu-button">Paramètres</a>
         <a href="{{ url_for('quit_app') }}" class="menu-button">Quitter</a>
     </div>
 </div>
+
+<script>
+function resetScores() {
+    fetch('{{ url_for("game.reset_scores") }}', {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show updated scores
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 {% endblock %} 
