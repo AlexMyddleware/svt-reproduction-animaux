@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
     from pytest_mock.plugin import MockerFixture
 
+# Import create_app from your app module
+from src.svt_app.app import create_app
+
 
 def test_basic_addition() -> None:
     """
@@ -18,3 +21,11 @@ def test_basic_addition() -> None:
     """
     result = 1 + 1
     assert result == 2 
+
+def test_app_creation() -> None:
+    """
+    Test that the app is created correctly.
+    """
+    app = create_app()
+    assert app is not None
+
