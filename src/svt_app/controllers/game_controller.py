@@ -32,6 +32,8 @@ def texte_a_trous() -> str:
         str: Rendered HTML template for the 'Texte à trous' game.
     """
     debug_log("Loading fill in the blank questions")
+    # Reload questions to capture any newly created ones
+    question_service.load_questions()
     questions = question_service.get_fill_in_blank_questions()
     
     # Filter out completed questions
@@ -113,6 +115,8 @@ def relier_images() -> str:
     Returns:
         str: Rendered HTML template for the 'Relier les images' game.
     """
+    # Reload questions to capture any newly created ones
+    question_service.load_questions()
     questions = question_service.get_image_matching_questions()
     
     # Get the current question ID from the query parameters, default to 1
@@ -355,20 +359,33 @@ def save_question() -> Dict[str, Any]:
             question_data = {
                 "text": data["text"],
                 "options": data["options"],
-                "correct_answer": data["correct_answer"]
+                "correct_answer": data["correct_answer"],
+                "completed": False,  # Explicitly set to false for new questions
+                "statistics": {
+                    "correct_answers": 0,
+                    "wrong_answers": 0
+                }
             }
         else:  # relier_images
             question_data = {
                 "text": data["text"],
                 "correct_word": data["correct_word"],
                 "incorrect_words": data["incorrect_words"],
-                "image_path": data["image_path"]
+                "image_path": data["image_path"],
+                "completed": False,  # Explicitly set to false for new questions
+                "statistics": {
+                    "correct_answers": 0,
+                    "wrong_answers": 0
+                }
             }
         
         # Save the question file
         filepath = os.path.join(base_dir, filename)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(question_data, f, ensure_ascii=False, indent=2)
+        
+        # Force reload of questions to include the new one
+        question_service.load_questions()
         
         return jsonify({"success": True, "message": "Question créée avec succès"})
     
@@ -385,6 +402,9 @@ def questions_tree() -> str:
     Returns:
         str: Rendered HTML template for the questions tree.
     """
+    # Reload questions to capture any newly created ones
+    question_service.load_questions()
+    
     # Get the game type from query parameters, default to texte_a_trous
     game_type = request.args.get('type', 'texte_a_trous')
     
