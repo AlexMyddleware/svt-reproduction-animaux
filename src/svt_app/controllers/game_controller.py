@@ -115,8 +115,6 @@ def relier_images() -> str:
     Returns:
         str: Rendered HTML template for the 'Relier les images' game.
     """
-    # Reload questions to capture any newly created ones
-    question_service.load_questions()
     questions = question_service.get_image_matching_questions()
     
     # Get the current question ID from the query parameters, default to 1
@@ -359,33 +357,20 @@ def save_question() -> Dict[str, Any]:
             question_data = {
                 "text": data["text"],
                 "options": data["options"],
-                "correct_answer": data["correct_answer"],
-                "completed": False,  # Explicitly set to false for new questions
-                "statistics": {
-                    "correct_answers": 0,
-                    "wrong_answers": 0
-                }
+                "correct_answer": data["correct_answer"]
             }
         else:  # relier_images
             question_data = {
                 "text": data["text"],
                 "correct_word": data["correct_word"],
                 "incorrect_words": data["incorrect_words"],
-                "image_path": data["image_path"],
-                "completed": False,  # Explicitly set to false for new questions
-                "statistics": {
-                    "correct_answers": 0,
-                    "wrong_answers": 0
-                }
+                "image_path": data["image_path"]
             }
         
         # Save the question file
         filepath = os.path.join(base_dir, filename)
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(question_data, f, ensure_ascii=False, indent=2)
-        
-        # Force reload of questions to include the new one
-        question_service.load_questions()
         
         return jsonify({"success": True, "message": "Question créée avec succès"})
     
@@ -426,22 +411,34 @@ def questions_tree() -> str:
         items: List[Dict[str, Any]] = []
         
         try:
+            # Make sure directory exists
+            if not os.path.exists(directory):
+                debug_log("Directory does not exist: {}", directory)
+                return items
+                
             # Get all items in the directory
-            for item in sorted(os.listdir(directory)):
+            dir_contents = os.listdir(directory)
+            debug_log("Found {} items in directory {}", len(dir_contents), directory)
+            
+            for item in sorted(dir_contents):
                 full_path = os.path.join(directory, item)
                 rel_path = os.path.join(relative_path, item) if relative_path else item
                 
                 if os.path.isdir(full_path):
                     # If it's a directory, recursively get its contents
+                    debug_log("Found directory: {}", full_path)
                     subfolder_items = get_questions_in_directory(full_path, rel_path)
-                    if subfolder_items:  # Only add non-empty folders
-                        folder_data = {
-                            'type': 'folder',
-                            'name': item,
-                            'path': rel_path,
-                            'children': subfolder_items
-                        }
-                        items.append(folder_data)
+                    
+                    # Add folder even if empty
+                    folder_data = {
+                        'type': 'folder',
+                        'name': item,
+                        'path': rel_path,
+                        'children': subfolder_items
+                    }
+                    items.append(folder_data)
+                    debug_log("Added folder: {} with {} children", item, len(subfolder_items))
+                    
                 elif item.startswith("question") and item.endswith(".json"):
                     # If it's a question file, add it to the list
                     try:
@@ -450,7 +447,7 @@ def questions_tree() -> str:
                             items.append({
                                 'type': 'question',
                                 'id': item[8:11],  # Extract number from filename
-                                'text': question_data['text'],
+                                'text': question_data.get('text', 'No text available'),
                                 'file': rel_path,
                                 'completed': question_data.get('completed', False),
                                 'statistics': question_data.get('statistics', {
@@ -458,6 +455,7 @@ def questions_tree() -> str:
                                     'wrong_answers': 0
                                 })
                             })
+                            debug_log("Added question: {}", item)
                     except Exception as e:
                         debug_log("Error reading question file {}: {}", full_path, str(e))
                         continue
@@ -473,9 +471,12 @@ def questions_tree() -> str:
     # Create the base directory if it doesn't exist
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
+        debug_log("Created directory: {}", base_dir)
     
     # Get all questions and folders starting from the base directory
+    debug_log("Scanning directory tree starting from: {}", base_dir)
     tree_data = get_questions_in_directory(base_dir)
+    debug_log("Found {} top-level items in tree", len(tree_data))
     
     return render_template("questions_tree.html", tree_data=tree_data, game_type=game_type)
 
