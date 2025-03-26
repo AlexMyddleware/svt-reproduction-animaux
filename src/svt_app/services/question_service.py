@@ -73,6 +73,17 @@ class QuestionService:
                                 # Extract question ID from filename (e.g., "question001.json" -> 1)
                                 question_id = int(file[8:11])
                                 
+                                # Check if we already have a question with this ID
+                                existing_question = next(
+                                    (q for q in self.fill_in_blank_questions if q.id == question_id),
+                                    None
+                                )
+                                
+                                if existing_question:
+                                    debug_log("Warning: Duplicate question ID {} found in {}. Skipping.", 
+                                             question_id, file_path)
+                                    continue
+                                
                                 question = FillInTheBlankQuestion(
                                     id=question_id,
                                     text=data.get('text', ''),
@@ -87,6 +98,8 @@ class QuestionService:
         except Exception as e:
             debug_log("Error walking fill-in-blank questions directory: {}", str(e))
         
+        # Sort questions by ID
+        self.fill_in_blank_questions.sort(key=lambda x: x.id)
         debug_log("Loaded {} fill-in-blank questions", len(self.fill_in_blank_questions))
     
     def _load_image_matching_questions(self) -> None:
@@ -108,6 +121,17 @@ class QuestionService:
                                 # Extract question ID from filename
                                 question_id = int(file[8:11])
                                 
+                                # Check if we already have a question with this ID
+                                existing_question = next(
+                                    (q for q in self.image_matching_questions if q.id == question_id),
+                                    None
+                                )
+                                
+                                if existing_question:
+                                    debug_log("Warning: Duplicate question ID {} found in {}. Skipping.", 
+                                             question_id, file_path)
+                                    continue
+                                
                                 # Get words data
                                 words_data = data.get('words', {})
                                 
@@ -125,6 +149,8 @@ class QuestionService:
         except Exception as e:
             debug_log("Error walking image matching questions directory: {}", str(e))
         
+        # Sort questions by ID
+        self.image_matching_questions.sort(key=lambda x: x.id)
         debug_log("Loaded {} image matching questions", len(self.image_matching_questions))
     
     def get_fill_in_blank_questions(self) -> List[FillInTheBlankQuestion]:

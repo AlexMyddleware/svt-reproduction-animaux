@@ -36,15 +36,34 @@ def texte_a_trous() -> str:
     # Filter out completed questions
     active_questions = []
     for question in questions:
-        file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question.id:03d}.json")
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                question_data = json.load(f)
-                if not question_data.get('completed', False):
-                    active_questions.append(question)
-        except Exception as e:
-            debug_log("Error reading question file {}: {}", file_path, str(e))
-            continue
+        # Search for the question file in all subdirectories
+        base_dir = "assets/Data/fill_the_blanks"
+        question_file = f"question{question.id:03d}.json"
+        file_path = None
+        
+        # First try to find the file in the root directory
+        root_path = os.path.join(base_dir, question_file)
+        if os.path.exists(root_path):
+            file_path = root_path
+        else:
+            # If not found in root, search in subdirectories
+            for root, _, files in os.walk(base_dir):
+                if question_file in files:
+                    file_path = os.path.join(root, question_file)
+                    break
+        
+        if file_path:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    question_data = json.load(f)
+                    if not question_data.get('completed', False):
+                        active_questions.append(question)
+                        debug_log("Found active question {} in {}", question.id, file_path)
+            except Exception as e:
+                debug_log("Error reading question file {}: {}", file_path, str(e))
+                continue
+        else:
+            debug_log("Warning: Could not find file for question {}", question.id)
     
     debug_log("Found {} active questions", len(active_questions))
     
@@ -166,19 +185,25 @@ def check_answer() -> Dict[str, Any]:
                 debug_log("Question not found: {}", question_id)
                 return jsonify({"success": False, "message": "Question not found"})
             
-            # Find the question file
-            file_path = os.path.join("assets/Data/fill_the_blanks", f"question{question_id:03d}.json")
+            # Find the question file in all subdirectories
+            base_dir = "assets/Data/fill_the_blanks"
+            question_file = f"question{question_id:03d}.json"
+            file_path = None
             
-            # If the file doesn't exist in root, search in subfolders
-            if not os.path.exists(file_path):
-                debug_log("Question file not found in root, searching subfolders")
-                base_dir = "assets/Data/fill_the_blanks"
+            # First try to find the file in the root directory
+            root_path = os.path.join(base_dir, question_file)
+            if os.path.exists(root_path):
+                file_path = root_path
+            else:
+                # If not found in root, search in subdirectories
                 for root, _, files in os.walk(base_dir):
-                    for file in files:
-                        if file == f"question{question_id:03d}.json":
-                            file_path = os.path.join(root, file)
-                            debug_log("Found question file at: {}", file_path)
-                            break
+                    if question_file in files:
+                        file_path = os.path.join(root, question_file)
+                        break
+            
+            if not file_path:
+                debug_log("Could not find file for question {}", question_id)
+                return jsonify({"success": False, "message": "Question file not found"})
             
             is_correct = answer == question.correct_answer
             debug_log("Answer is {}", "correct" if is_correct else "incorrect")
