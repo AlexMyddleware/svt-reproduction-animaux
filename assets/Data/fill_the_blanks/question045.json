@@ -1,0 +1,10 @@
+{
+  "text": "Combien de clones peut faire la levure de boulanger en quelque heures ? ________",
+  "options": [
+    "plusieurs millions",
+    "5",
+    "10",
+    "100"
+  ],
+  "correct_answer": "plusieurs millions"
+}
