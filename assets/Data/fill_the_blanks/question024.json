@@ -1,0 +1,15 @@
+{
+    "text": "Le sexe d'une fleur femelle est appelé ________.",
+    "options": [
+        "Les bourses",
+        "Le pistil",
+        "Les ovules",
+        "Les ovaires"
+    ],
+    "correct_answer": "Le pistil",
+    "statistics": {
+        "correct_answers": 2,
+        "wrong_answers": 0
+    },
+    "completed": true
+}

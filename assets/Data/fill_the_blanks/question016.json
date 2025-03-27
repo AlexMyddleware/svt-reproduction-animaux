@@ -1,0 +1,11 @@
+{
+  "text": "Une gamète, c'est ________.",
+  "options": [
+    "une cellule de protection",
+    "une cellule de digestion",
+    "une cellule de reproduction",
+    "une cellule de respiration"
+  ],
+  "correct_answer": "une cellule de reproduction",
+  "completed": true
+}

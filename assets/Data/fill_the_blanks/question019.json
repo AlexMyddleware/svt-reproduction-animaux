@@ -1,0 +1,15 @@
+{
+    "text": "\nLe grain de pollen doit être déposé sur le ________ du pistil \n",
+    "options": [
+        "stigmate",
+        "noyau",
+        "fruit",
+        "bord"
+    ],
+    "correct_answer": "stigmate",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 1,
+        "wrong_answers": 3
+    }
+}
