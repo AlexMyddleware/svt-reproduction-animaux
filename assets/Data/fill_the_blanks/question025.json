@@ -1,15 +1,15 @@
 {
-    "text": "Que produisent les étamines chez les plantes à fleurs ?",
-    "options": [
-        "Des ovules",
-        "Des graines",
-        "Des gamètes mâles",
-        "Des fruits"
-    ],
-    "correct_answer": "Des gamètes mâles",
-    "statistics": {
-        "correct_answers": 2,
-        "wrong_answers": 0
-    },
-    "completed": true
+  "text": "Que produisent les étamines chez les plantes à fleurs ?",
+  "options": [
+    "Des ovules",
+    "Des graines",
+    "Des gamètes mâles",
+    "Des fruits"
+  ],
+  "correct_answer": "Des gamètes mâles",
+  "statistics": {
+    "correct_answers": 2,
+    "wrong_answers": 0
+  },
+  "completed": false
 }

@@ -1,15 +1,15 @@
 {
-    "text": "Le sexe d'une fleur mâle est appelé ________.",
-    "options": [
-        "Les bourses",
-        "Les stigmates",
-        "Les étamines",
-        "Les pollen"
-    ],
-    "correct_answer": "Les étamines",
-    "completed": true,
-    "statistics": {
-        "correct_answers": 1,
-        "wrong_answers": 0
-    }
+  "text": "Le sexe d'une fleur mâle est appelé ________.",
+  "options": [
+    "Les bourses",
+    "Les stigmates",
+    "Les étamines",
+    "Les pollen"
+  ],
+  "correct_answer": "Les étamines",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 1,
+    "wrong_answers": 0
+  }
 }
