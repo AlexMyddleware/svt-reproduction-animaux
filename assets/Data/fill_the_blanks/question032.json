@@ -1,0 +1,15 @@
+{
+    "text": "Une plante hermaphrodite est une plante qui :",
+    "options": [
+        "a deux sexes",
+        "a un seul sexe",
+        "a trois sexes",
+        "a quatre sexes"
+    ],
+    "correct_answer": "a deux sexes",
+    "statistics": {
+        "correct_answers": 3,
+        "wrong_answers": 0
+    },
+    "completed": true
+}
