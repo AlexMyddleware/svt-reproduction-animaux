@@ -1,11 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+# Add this at the top of the file
+added_files = [
+    ('assets/Data/fill_the_blanks', 'assets/Data/fill_the_blanks'),
+    ('assets/Data/image_matching', 'assets/Data/image_matching'),
+]
 
 a = Analysis(
     ['run.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=added_files,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
