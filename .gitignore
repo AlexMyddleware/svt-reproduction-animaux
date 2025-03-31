@@ -17,3 +17,4 @@
 /dist
 /release
 /tests/.coverage
+/tests/game_controller/__pycache__
