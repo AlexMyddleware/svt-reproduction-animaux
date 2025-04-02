@@ -1,4 +1,4 @@
-"""Question model module for SVT Reproduction Animaux application."""
+"""Question model module for Révijouer application."""
 
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass

@@ -24,7 +24,7 @@ def main() -> None:
     Timer(1.5, open_browser).start()
     
     # Run the application with waitress (production server)
-    print("Starting SVT Reproduction Animaux...")
+    print("Starting Révijouer...")
     print("Application running at http://localhost:8080")
     print("You can close the application by closing this window")
     serve(app, host='localhost', port=8080)

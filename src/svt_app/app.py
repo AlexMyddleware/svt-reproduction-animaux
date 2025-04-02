@@ -1,4 +1,4 @@
-"""Main application module for SVT Reproduction Animaux."""
+"""Main application module for Révijouer."""
 
 from typing import Dict, Any, Optional
 from flask import Flask, render_template, request, redirect, url_for, session

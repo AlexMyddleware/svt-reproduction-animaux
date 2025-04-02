@@ -1,4 +1,4 @@
-"""Question service module for SVT Reproduction Animaux application."""
+"""Question service module for Révijouer application."""
 
 import json
 import os

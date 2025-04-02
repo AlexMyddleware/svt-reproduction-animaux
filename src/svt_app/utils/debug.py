@@ -1,4 +1,4 @@
-"""Debug utility module for SVT Reproduction Animaux application."""
+"""Debug utility module for Révijouer application."""
 
 from typing import Any
 import os

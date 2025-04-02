@@ -1,1 +1,1 @@
-"""Services package for SVT Reproduction Animaux application.""" 
+"""Services package for Révijouer application.""" 

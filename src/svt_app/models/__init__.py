@@ -1,1 +1,1 @@
-"""Models package for SVT Reproduction Animaux application.""" 
+"""Models package for Révijouer application.""" 

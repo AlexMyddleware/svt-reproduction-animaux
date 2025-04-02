@@ -1,1 +1,1 @@
-"""Tests package for SVT Reproduction Animaux application.""" 
+"""Tests package for Révijouer application.""" 

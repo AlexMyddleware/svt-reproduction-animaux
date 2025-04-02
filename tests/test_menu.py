@@ -1,4 +1,4 @@
-"""Tests for the main menu functionality of the SVT Reproduction Animaux application."""
+"""Tests for the main menu functionality of the Révijouer application."""
 
 from typing import TYPE_CHECKING
 import pytest
@@ -42,7 +42,7 @@ def test_main_menu_access(client: "Client") -> None:
     html_content = response.data.decode('utf-8')
     
     # Check for expected menu elements
-    assert "SVT Reproduction Animaux" in html_content
+    assert "Révijouer" in html_content
     assert "Menu Principal" in html_content
 
 def test_main_menu_links(client: "Client") -> None:

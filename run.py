@@ -1,4 +1,4 @@
-"""Entry point script for SVT Reproduction Animaux application."""
+"""Entry point script for Révijouer application."""
 
 import os
 import sys
@@ -24,7 +24,7 @@ def main() -> None:
     Sets up the production server and launches the browser.
     """
     # Parse command line arguments
-    parser = argparse.ArgumentParser(description='SVT Reproduction Animaux')
+    parser = argparse.ArgumentParser(description='Révijouer')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
     args = parser.parse_args()
 
@@ -48,7 +48,7 @@ def main() -> None:
     
     # Run the application with waitress (production server)
     debug_log("Starting server...")
-    print("Starting SVT Reproduction Animaux...")
+    print("Starting Révijouer...")
     print("Application running at http://localhost:8080")
     print("Debug mode:", "enabled" if DEBUG_MODE else "disabled")
     print("You can close the application by closing this window")

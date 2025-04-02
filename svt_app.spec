@@ -45,7 +45,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='SVT Reproduction Animaux',
+    name='Révijouer',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

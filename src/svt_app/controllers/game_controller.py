@@ -1,4 +1,4 @@
-"""Game controller module for SVT Reproduction Animaux application."""
+"""Game controller module for Révijouer application."""
 
 from typing import Dict, Any, List, Optional
 import os

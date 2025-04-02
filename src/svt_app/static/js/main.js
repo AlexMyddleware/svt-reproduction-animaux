@@ -1,10 +1,10 @@
 /**
- * Main JavaScript file for SVT Reproduction Animaux application.
+ * Main JavaScript file for Révijouer application.
  * This file contains common functionality used across the application.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('SVT Reproduction Animaux application loaded');
+    console.log('Révijouer application loaded');
     
     // Add event listeners for buttons with confirmation
     const confirmButtons = document.querySelectorAll('[data-confirm]');

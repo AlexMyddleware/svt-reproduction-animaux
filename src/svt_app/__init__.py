@@ -1,4 +1,4 @@
-"""SVT Reproduction Animaux application package."""
+"""Révijouer application package."""
 
 from svt_app.app import create_app
 

@@ -1,1 +1,1 @@
-"""Controllers package for SVT Reproduction Animaux application.""" 
+"""Controllers package for Révijouer application.""" 

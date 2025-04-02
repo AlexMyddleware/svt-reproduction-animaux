@@ -44,7 +44,7 @@ def test_settings_page_title(client: "Client") -> None:
     response = client.get('/settings')
     html_content = response.data.decode('utf-8')
     
-    assert "SVT Reproduction Animaux" in html_content
+    assert "Révijouer" in html_content
     assert "Paramètres" in html_content
 
 def test_settings_page_elements(client: "Client") -> None:
@@ -73,7 +73,7 @@ def test_settings_page_elements(client: "Client") -> None:
     
     # About section
     assert "À propos" in html_content
-    assert "SVT Reproduction Animaux - Version 1.0" in html_content
+    assert "Révijouer - Version 1.0" in html_content
     assert "Une application éducative pour apprendre sur la reproduction des animaux." in html_content
     
     # Navigation

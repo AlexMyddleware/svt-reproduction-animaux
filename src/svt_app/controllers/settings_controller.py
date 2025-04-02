@@ -1,4 +1,4 @@
-"""Settings controller module for SVT Reproduction Animaux application."""
+"""Settings controller module for Révijouer application."""
 
 import json
 import os
