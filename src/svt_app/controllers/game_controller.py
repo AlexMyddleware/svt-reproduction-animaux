@@ -271,13 +271,12 @@ def reset_scores() -> Dict[str, Any]:
     """
     Reset the game scores.
     
-    Sets 'texte_a_trous' score to 0 and 'relier_images' score to 0.
+    Sets all game scores to 0.
     
     Returns:
         Dict[str, Any]: JSON response indicating success.
     """
-    GameScores.reset_score("texte_a_trous")
-    GameScores.reset_score("relier_images")
+    GameScores.reset_scores()  # Use the correct method name
     
     debug_log("Scores reset - texte_a_trous: {}, relier_images: {}", 
               GameScores.get_score("texte_a_trous"), GameScores.get_score("relier_images"))

@@ -19,3 +19,4 @@
 /tests/.coverage
 /tests/game_controller/__pycache__
 /src/svt_app/state/__pycache__
+assets/Data/scores.json

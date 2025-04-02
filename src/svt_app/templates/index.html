@@ -27,15 +27,28 @@
 function resetScores() {
     fetch('{{ url_for("game.reset_scores") }}', {
         method: 'POST',
+        headers: {
+            'Accept': 'application/json'
+        }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Reload the page to show updated scores
             window.location.reload();
+        } else {
+            alert('Une erreur est survenue lors de la réinitialisation des scores.');
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la réinitialisation des scores.');
+    });
 }
 </script>
 {% endblock %} 
