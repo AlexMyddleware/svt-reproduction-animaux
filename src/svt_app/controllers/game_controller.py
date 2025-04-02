@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from svt_app.services.question_service import QuestionService
 from svt_app.utils.debug import debug_log
 from svt_app.controllers.settings_controller import load_settings
+from svt_app.state import GameScores
 
 # Create a Blueprint for the game routes
 game_bp = Blueprint("game", __name__)
@@ -15,13 +16,6 @@ game_bp = Blueprint("game", __name__)
 # Initialize the question service
 debug_log("Initializing QuestionService")
 question_service = QuestionService()
-
-# Global scores dictionary
-scores: Dict[str, int] = {
-    "texte_a_trous": 0,
-    "relier_images": 0
-}
-
 
 @game_bp.route("/texte_a_trous")
 def texte_a_trous() -> str:
@@ -73,7 +67,7 @@ def texte_a_trous() -> str:
     # If no active questions, show empty template
     if not active_questions:
         debug_log("No active questions found")
-        return render_template("texte_a_trous.html", question=None, scores=scores)
+        return render_template("texte_a_trous.html", question=None, scores=GameScores.get_scores())
     
     # Get the current question ID from the query parameters, default to first active question
     question_id = request.args.get("question_id", None, type=int)
@@ -103,7 +97,7 @@ def texte_a_trous() -> str:
         question=current_question,
         question_id=question_id,
         total_questions=len(active_questions),
-        scores=scores
+        scores=GameScores.get_scores()
     )
 
 
@@ -129,7 +123,7 @@ def relier_images() -> str:
     
     # If there are no questions, show an empty template
     if not questions:
-        return render_template("relier_images.html", question=None, scores=scores)
+        return render_template("relier_images.html", question=None, scores=GameScores.get_scores())
     
     # Combine correct and incorrect words and shuffle them
     all_words = [current_question.correct_word] + current_question.incorrect_words
@@ -140,7 +134,7 @@ def relier_images() -> str:
         words=all_words,
         question_id=question_id,
         total_questions=len(questions),
-        scores=scores
+        scores=GameScores.get_scores()
     )
 
 
@@ -220,7 +214,7 @@ def check_answer() -> Dict[str, Any]:
                 stats = question_data.get('statistics', {'correct_answers': 0, 'wrong_answers': 0})
                 if is_correct:
                     stats['correct_answers'] = stats.get('correct_answers', 0) + 1
-                    scores["texte_a_trous"] += 1
+                    GameScores.increment_score("texte_a_trous")
                     
                     # Check auto-validation setting
                     settings = load_settings()
@@ -244,7 +238,7 @@ def check_answer() -> Dict[str, Any]:
                 return jsonify({
                     "success": True,
                     "correct": is_correct,
-                    "score": scores["texte_a_trous"]
+                    "score": GameScores.get_score("texte_a_trous")
                 })
                 
             except Exception as e:
@@ -253,16 +247,16 @@ def check_answer() -> Dict[str, Any]:
                 return jsonify({
                     "success": True,
                     "correct": is_correct,
-                    "score": scores["texte_a_trous"]
+                    "score": GameScores.get_score("texte_a_trous")
                 })
                 
         elif game_type == "relier_images":
             question = question_service.get_image_matching_question_by_id(question_id)
             debug_log("Image matching question: {}", question)
             if question and answer == question.correct_word:
-                scores["relier_images"] += 1
-                return jsonify({"success": True, "correct": True, "score": scores["relier_images"]})
-            return jsonify({"success": True, "correct": False, "score": scores["relier_images"]})
+                GameScores.increment_score("relier_images")
+                return jsonify({"success": True, "correct": True, "score": GameScores.get_score("relier_images")})
+            return jsonify({"success": True, "correct": False, "score": GameScores.get_score("relier_images")})
         
         debug_log("Invalid game type")
         return jsonify({"success": False, "message": "Invalid game type"})
@@ -282,12 +276,11 @@ def reset_scores() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: JSON response indicating success.
     """
-    global scores
-    scores["texte_a_trous"] = 0
-    scores["relier_images"] = 0
+    GameScores.reset_score("texte_a_trous")
+    GameScores.reset_score("relier_images")
     
     debug_log("Scores reset - texte_a_trous: {}, relier_images: {}", 
-              scores["texte_a_trous"], scores["relier_images"])
+              GameScores.get_score("texte_a_trous"), GameScores.get_score("relier_images"))
     
     return jsonify({"success": True})
 

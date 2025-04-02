@@ -2,10 +2,13 @@
 
 from typing import Dict, Any, Optional
 from flask import Flask, render_template, request, redirect, url_for, session
+import secrets
 
 from svt_app.controllers.game_controller import game_bp
 from svt_app.controllers.settings_controller import settings_bp
+from svt_app.controllers.image_matching_controller import image_matching_bp
 from svt_app.utils.debug import debug_log, DEBUG_MODE
+from svt_app.state import GameScores
 
 def create_app() -> Flask:
     """
@@ -16,14 +19,29 @@ def create_app() -> Flask:
     """
     debug_log("Creating Flask application")
     app = Flask(__name__)
-    app.secret_key = "svt_reproduction_animaux_secret_key"  # For session management
+    
+    # Generate a secure random secret key
+    app.secret_key = secrets.token_hex(32)
+    app.config['SESSION_TYPE'] = 'filesystem'
     
     debug_log("Debug mode is {}", "enabled" if DEBUG_MODE else "disabled")
+
+    @app.before_request
+    def before_request() -> None:
+        """Log session data before each request."""
+        debug_log("Session before request: {}", dict(session))
+
+    @app.after_request
+    def after_request(response: Any) -> Any:
+        """Log session data after each request."""
+        debug_log("Session after request: {}", dict(session))
+        return response
 
     # Register blueprints
     debug_log("Registering blueprints")
     app.register_blueprint(game_bp, url_prefix="/game")
     app.register_blueprint(settings_bp, url_prefix="/settings")
+    app.register_blueprint(image_matching_bp, url_prefix="/game")
 
     @app.route("/")
     def index() -> str:
@@ -34,7 +52,8 @@ def create_app() -> Flask:
             str: Rendered HTML template for the main menu.
         """
         debug_log("Rendering index page")
-        from svt_app.controllers.game_controller import scores
+        scores = GameScores.get_scores()
+        debug_log("Current scores for index page: {}", scores)
         return render_template("index.html", scores=scores)
 
     @app.route("/settings")
