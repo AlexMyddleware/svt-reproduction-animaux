@@ -37,9 +37,6 @@ pip install -r requirements.txt
 
 4. Lancez l'application :
 ```
-python -m src.svt_app.app
-
-or 
 
 python run.py
 ```
