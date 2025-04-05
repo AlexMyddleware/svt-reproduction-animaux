@@ -171,8 +171,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 answer: answer
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Raw response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Server response:', data);  // Full response logging
+            console.log('Success:', data.success);
+            console.log('Correct:', data.correct);
+            console.log('Score:', data.score);
+            console.log('Next question ID:', data.next_question_id);
+            
             if (data.success) {
                 if (data.correct) {
                     // Correct answer
@@ -186,12 +195,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Show success message and proceed to next question after a delay
                     setTimeout(() => {
-                        // Go to the next question if available
-                        const nextButton = document.querySelector('a[href*="question_id=' + (questionId + 1) + '"]');
-                        if (nextButton) {
-                            window.location.href = nextButton.href;
+                        // Go to the next question using the ID from the server response
+                        console.log('Preparing navigation...');
+                        console.log('Current question ID:', questionId);
+                        console.log('Next question ID:', data.next_question_id);
+                        
+                        if (data.next_question_id !== null && data.next_question_id !== undefined) {
+                            const nextUrl = window.location.pathname + '?question_id=' + data.next_question_id;
+                            console.log('Navigating to:', nextUrl);
+                            window.location.replace(nextUrl);  // Using replace instead of href
+                        } else {
+                            console.log('No next question ID, returning to first question');
+                            window.location.replace(window.location.pathname);
                         }
-                    }, 1000);
+                    }, 1500);  // Increased delay to ensure we see the logs
                 } else {
                     // Incorrect answer
                     blank.classList.add('incorrect');
@@ -201,11 +218,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 1000);
                 }
             } else {
+                console.error('Server returned error:', data.message);
                 alert(data.message || 'Une erreur est survenue lors de la validation.');
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Fetch error:', error);
             alert('Une erreur est survenue lors de la validation.');
         });
     }

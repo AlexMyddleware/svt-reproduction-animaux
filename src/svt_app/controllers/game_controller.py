@@ -216,14 +216,9 @@ def check_answer() -> Dict[str, Any]:
                     stats['correct_answers'] = stats.get('correct_answers', 0) + 1
                     GameScores.increment_score("texte_a_trous")
                     
-                    # Check auto-validation setting
-                    settings = load_settings()
-                    debug_log("Auto-validation setting: {}", settings.get("auto_validate", True))
-                    if settings.get("auto_validate", True):
-                        question_data['completed'] = True
-                        debug_log("Question marked as completed due to auto-validation")
-                    else:
-                        debug_log("Question not marked as completed due to auto-validation being disabled")
+                    # Always mark as completed when correct
+                    question_data['completed'] = True
+                    debug_log("Question {} marked as completed", question_id)
                 else:
                     stats['wrong_answers'] = stats.get('wrong_answers', 0) + 1
                 
@@ -233,21 +228,80 @@ def check_answer() -> Dict[str, Any]:
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(question_data, f, indent=4, ensure_ascii=False)
                 
-                debug_log("Updated question statistics: {}", stats)
+                debug_log("Updated question data: {}", question_data)
                 
-                return jsonify({
+                # Find the next available question ID
+                active_questions = []
+                debug_log("Finding next available question after ID {}", question_id)
+                
+                # First, get all questions sorted by ID
+                all_questions = sorted(question_service.get_fill_in_blank_questions(), key=lambda x: x.id)
+                question_ids = [q.id for q in all_questions]
+                debug_log("All questions (sorted): {}", question_ids)
+                
+                # Then filter for active (non-completed) questions
+                for q in all_questions:
+                    q_file = os.path.join(base_dir, f"question{q.id:03d}.json")
+                    if os.path.exists(q_file):
+                        try:
+                            with open(q_file, 'r', encoding='utf-8') as f:
+                                q_data = json.load(f)
+                                if not q_data.get('completed', False):
+                                    active_questions.append(q.id)
+                                    debug_log("Found active question: {}", q.id)
+                        except Exception as e:
+                            debug_log("Error reading question file {}: {}", q_file, str(e))
+                            continue
+                
+                debug_log("Active (non-completed) questions: {}", active_questions)
+                
+                # Find the next available question ID after the current one
+                next_question_id = None
+                
+                if active_questions:
+                    # Sort active questions to ensure proper order
+                    active_questions.sort()
+                    debug_log("Sorted active questions: {}", active_questions)
+                    
+                    # Try to find the next question after current one
+                    for q_id in active_questions:
+                        if q_id > question_id:
+                            next_question_id = q_id
+                            debug_log("Found next question ID: {}", next_question_id)
+                            break
+                    
+                    # If no next question found, loop back to the first active question
+                    if next_question_id is None:
+                        # Make sure we don't return to the current question
+                        remaining_questions = [q for q in active_questions if q != question_id]
+                        if remaining_questions:
+                            next_question_id = remaining_questions[0]
+                            debug_log("No next question found, looping back to first remaining question: {}", next_question_id)
+                        else:
+                            debug_log("No other active questions available")
+                else:
+                    debug_log("No active questions found")
+                
+                debug_log("Final next_question_id: {}", next_question_id)
+                
+                # Create the response data
+                response_data = {
                     "success": True,
                     "correct": is_correct,
-                    "score": GameScores.get_score("texte_a_trous")
-                })
+                    "score": GameScores.get_score("texte_a_trous"),
+                    "next_question_id": next_question_id
+                }
+                debug_log("Sending response: {}", response_data)
+                return jsonify(response_data)
                 
             except Exception as e:
-                debug_log("Error updating question statistics: {}", str(e))
-                # Continue with normal response if statistics update fails
+                debug_log("Error processing question: {}", str(e))
                 return jsonify({
                     "success": True,
                     "correct": is_correct,
-                    "score": GameScores.get_score("texte_a_trous")
+                    "score": GameScores.get_score("texte_a_trous"),
+                    "next_question_id": None,
+                    "error": str(e)
                 })
                 
         elif game_type == "relier_images":
