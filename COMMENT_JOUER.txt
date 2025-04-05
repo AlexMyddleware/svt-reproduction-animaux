@@ -1,0 +1,24 @@
+Comment lancer Révijouer
+=====================
+
+Pour jouer à Révijouer :
+
+1. Double-cliquez sur "Lancer_Revijouer.bat"
+   - C'est la méthode recommandée qui fonctionne directement
+   - Une fenêtre noire s'ouvrira, c'est normal !
+   - Le jeu se lancera automatiquement dans votre navigateur
+
+Note : Le fichier "Lancer_Revijouer.ps1" est une alternative pour les utilisateurs avancés qui ont configuré PowerShell sur leur système.
+
+Si c'est la première fois que vous lancez le jeu :
+- Attendez que l'installation se termine
+- Le navigateur s'ouvrira automatiquement
+- Vous pouvez commencer à jouer !
+
+En cas de problème :
+- Assurez-vous que Python est installé sur votre ordinateur
+- Si un message d'erreur apparaît, lisez-le attentivement
+- Vous pouvez toujours fermer la fenêtre et relancer le jeu
+- Si le jeu ne se lance pas, essayez de cliquer-droit sur Lancer_Revijouer.bat et choisir "Exécuter en tant qu'administrateur"
+
+Bon jeu ! 
