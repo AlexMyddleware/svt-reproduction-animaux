@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/texte_a_trous.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/collision_effects.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -63,5 +64,12 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/collision_system.js') }}"></script>
+<script src="{{ url_for('static', filename='js/option_physics.js') }}"></script>
+<script src="{{ url_for('static', filename='js/physics_manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/physics_calculations.js') }}"></script>
+<script src="{{ url_for('static', filename='js/boundary_handling.js') }}"></script>
+<script src="{{ url_for('static', filename='js/collision_effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/texte_a_trous_physics.js') }}"></script>
 <script src="{{ url_for('static', filename='js/texte_a_trous.js') }}"></script>
 {% endblock %} 

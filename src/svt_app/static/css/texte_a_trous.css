@@ -39,30 +39,33 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 30px;
     position: relative;
-    min-height: 300px; /* Space for orbiting */
+    min-height: 300px;
+    width: 100%;
+    margin: 30px 0;
+    overflow: visible; /* Allow options to move outside */
 }
 
 .option {
     background-color: #e0f7fa;
     padding: 10px 15px;
-    margin: 10px;
+    margin: 0;
     border-radius: 5px;
     cursor: grab;
     user-select: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     position: absolute;
-    animation: orbit var(--orbit-duration, 8s) infinite;
-    animation-timing-function: linear;
-    animation-delay: var(--orbit-delay, 0s);
+    z-index: 5;
+    left: 50%;
+    top: 50%;
+    transform: translate(0, 0);
     will-change: transform;
 }
 
 .option:hover {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    animation-play-state: paused;
+    z-index: 10;
 }
 
 .option.dragging {

@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const blank = document.getElementById('answer-blank');
     const validateBtn = document.getElementById('validate-btn');
     const resetBtn = document.getElementById('reset-btn');
-    const questionText = document.getElementById('question-text');
     const questionContainer = document.querySelector('.question-container');
     
     let currentOption = null;
@@ -33,27 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initDragAndDrop() {
         // Make options draggable
-        options.forEach((option, index) => {
+        options.forEach(option => {
             option.setAttribute('draggable', true);
-            
-            // Random orbital parameters
-            const baseRadius = 100 + Math.random() * 50; // Base orbit radius 100-150px
-            const eccentricity = 0.8 + Math.random() * 0.4; // Orbit eccentricity 0.8-1.2
-            const orbitX = baseRadius;
-            const orbitY = baseRadius * eccentricity;
-            
-            // Set custom orbital path
-            option.style.setProperty('--orbit-x', `${orbitX}px`);
-            option.style.setProperty('--orbit-y', `${orbitY}px`);
-            
-            // Random timing
-            const duration = 8 + Math.random() * 4; // 8-12 seconds per orbit
-            const delay = Math.random() * -6; // Start at random points in the orbit
-            const direction = Math.random() < 0.5 ? 'normal' : 'reverse'; // Random direction
-            
-            option.style.setProperty('--orbit-duration', `${duration}s`);
-            option.style.setProperty('--orbit-delay', `${delay}s`);
-            option.style.animationDirection = direction;
             
             // Add drag event listeners
             option.addEventListener('dragstart', dragStart);
@@ -80,6 +60,11 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.add('dragging');
         e.dataTransfer.setData('text/plain', this.dataset.option);
         currentOption = this;
+        
+        // Pause physics simulation during drag
+        if (window.gamePhysicsManager) {
+            window.gamePhysicsManager.stop();
+        }
     }
     
     /**
@@ -87,6 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function dragEnd() {
         this.classList.remove('dragging');
+        
+        // Resume physics if not dropped on target
+        if (this.style.display !== 'none' && window.gamePhysicsManager) {
+            window.gamePhysicsManager.start();
+        }
     }
     
     /**
@@ -145,6 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Hide the clicked option
             this.style.display = 'none';
             currentOption = this;
+            
+            // Pause physics for the used element
+            if (window.gamePhysicsManager) {
+                const physics = window.gamePhysicsManager.getOptionByElement(this);
+                if (physics) {
+                    physics.element.classList.remove('physics-controlled');
+                }
+            }
         }
     }
     
@@ -159,6 +157,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const answer = blank.dataset.answer;
         
+        // Pause physics during validation
+        if (window.gamePhysicsManager) {
+            window.gamePhysicsManager.stop();
+        }
+        
         // Send the answer to the server for validation
         fetch('/game/check_answer', {
             method: 'POST',
@@ -171,17 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 answer: answer
             })
         })
-        .then(response => {
-            console.log('Raw response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Server response:', data);  // Full response logging
-            console.log('Success:', data.success);
-            console.log('Correct:', data.correct);
-            console.log('Score:', data.score);
-            console.log('Next question ID:', data.next_question_id);
-            
             if (data.success) {
                 if (data.correct) {
                     // Correct answer
@@ -195,20 +189,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Show success message and proceed to next question after a delay
                     setTimeout(() => {
-                        // Go to the next question using the ID from the server response
-                        console.log('Preparing navigation...');
-                        console.log('Current question ID:', questionId);
-                        console.log('Next question ID:', data.next_question_id);
-                        
                         if (data.next_question_id !== null && data.next_question_id !== undefined) {
                             const nextUrl = window.location.pathname + '?question_id=' + data.next_question_id;
-                            console.log('Navigating to:', nextUrl);
-                            window.location.replace(nextUrl);  // Using replace instead of href
+                            window.location.replace(nextUrl);
                         } else {
-                            console.log('No next question ID, returning to first question');
                             window.location.replace(window.location.pathname);
                         }
-                    }, 1500);  // Increased delay to ensure we see the logs
+                    }, 1500);
                 } else {
                     // Incorrect answer
                     blank.classList.add('incorrect');
@@ -218,13 +205,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 1000);
                 }
             } else {
-                console.error('Server returned error:', data.message);
                 alert(data.message || 'Une erreur est survenue lors de la validation.');
+                // Resume physics if there was an error
+                if (window.gamePhysicsManager) {
+                    window.gamePhysicsManager.start();
+                }
             }
         })
         .catch(error => {
-            console.error('Fetch error:', error);
+            console.error('Error:', error);
             alert('Une erreur est survenue lors de la validation.');
+            // Resume physics if there was an error
+            if (window.gamePhysicsManager) {
+                window.gamePhysicsManager.start();
+            }
         });
     }
     
@@ -245,5 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         currentOption = null;
+        
+        // Restart physics
+        if (window.gamePhysicsManager) {
+            window.gamePhysicsManager.start();
+        }
     }
 }); 
