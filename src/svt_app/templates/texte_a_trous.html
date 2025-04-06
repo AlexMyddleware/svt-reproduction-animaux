@@ -17,6 +17,13 @@
             <p id="question-text">{{ question.text }}</p>
         </div>
         
+        <div class="speed-control">
+            <label for="speed-slider">Vitesse des réponses:</label>
+            <input type="range" id="speed-slider" min="20" max="500" value="120" step="20">
+            <span id="speed-value">Normal</span>
+            <span id="speed-percentage">(100%)</span>
+        </div>
+        
         <div class="options-container">
             {% for option in question.options %}
             <div class="option" draggable="true" data-option="{{ option }}">{{ option }}</div>
@@ -70,6 +77,7 @@
 <script src="{{ url_for('static', filename='js/physics_calculations.js') }}"></script>
 <script src="{{ url_for('static', filename='js/boundary_handling.js') }}"></script>
 <script src="{{ url_for('static', filename='js/collision_effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/speed_control.js') }}"></script>
 <script src="{{ url_for('static', filename='js/texte_a_trous_physics.js') }}"></script>
 <script src="{{ url_for('static', filename='js/texte_a_trous.js') }}"></script>
 {% endblock %} 

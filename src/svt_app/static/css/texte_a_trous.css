@@ -162,4 +162,40 @@
     .blank {
         width: 180px;
     }
+}
+
+/* Add this new section for the speed control */
+.speed-control {
+    margin: 15px auto;
+    padding: 10px;
+    background-color: rgba(240, 240, 250, 0.8);
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.speed-control label {
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+.speed-control input[type="range"] {
+    width: 150px;
+    height: 10px;
+    accent-color: #4CAF50;
+}
+
+.speed-control #speed-value {
+    min-width: 80px;
+    font-weight: bold;
+    color: #4A4A4A;
+}
+
+.speed-control #speed-percentage {
+    min-width: 60px;
+    font-weight: bold;
+    display: inline-block;
+    text-align: left;
 } 

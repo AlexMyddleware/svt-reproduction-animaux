@@ -11,9 +11,12 @@ class OptionPhysics {
     constructor(element) {
         this.element = element;
         this.position = { x: 0, y: 0 };
+        
+        // Set reasonable initial velocities (range -1.5 to 1.5)
+        // This keeps movement steady but not too fast
         this.velocity = { 
-            x: (Math.random() * 2 - 1) * 2,  // -2 to 2 range
-            y: (Math.random() * 2 - 1) * 2   // -2 to 2 range
+            x: (Math.random() * 1.5 - 0.75) * 2,
+            y: (Math.random() * 1.5 - 0.75) * 2
         };
         
         // Make sure velocity is not too low
@@ -24,13 +27,17 @@ class OptionPhysics {
             this.velocity.y = this.velocity.y > 0 ? 0.5 : -0.5;
         }
         
+        // Cap to maximum velocity
+        const maxInitialVelocity = 1.8;
+        if (Math.abs(this.velocity.x) > maxInitialVelocity) {
+            this.velocity.x = this.velocity.x > 0 ? maxInitialVelocity : -maxInitialVelocity;
+        }
+        if (Math.abs(this.velocity.y) > maxInitialVelocity) {
+            this.velocity.y = this.velocity.y > 0 ? maxInitialVelocity : -maxInitialVelocity;
+        }
+        
         this.lastCollisionTime = 0;
         
-        // Add random speed burst at start
-        const speedMultiplier = 1 + Math.random();
-        this.velocity.x *= speedMultiplier;
-        this.velocity.y *= speedMultiplier;
-
         // Initialize position from current transform
         this.updatePositionFromElement();
         console.log(`Physics initialized for element with velocity: (${this.velocity.x.toFixed(2)}, ${this.velocity.y.toFixed(2)})`);

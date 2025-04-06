@@ -3,6 +3,12 @@
  * Contains implementation of physics methods.
  */
 
+// Configure game speed here - higher values = faster movement
+const GAME_SPEED = 120; // Default: 120 pixels per second
+
+// Maximum velocity to prevent excessive acceleration
+const MAX_VELOCITY = 2.5;
+
 /**
  * Update positions of all options based on their velocities.
  * @param {number} deltaTime - Time elapsed since last update in seconds
@@ -11,8 +17,8 @@ PhysicsManager.prototype.updatePositions = function(deltaTime) {
     // Limit delta time to avoid huge jumps if browser tab was inactive
     const cappedDelta = Math.min(deltaTime, 0.05);
     
-    // Adjust for smoother movement - increase speed factor
-    const speedFactor = 120; // Pixels per second at velocity 1
+    // Adjust for smoother movement - use configured speed factor
+    const speedFactor = window.TEXTE_TROUS_SPEED || GAME_SPEED;
     
     let firstUpdate = false;
     if (!this.hasLoggedFirstUpdate) {
@@ -94,13 +100,26 @@ PhysicsManager.prototype.checkCollisions = function() {
                 // Only separate if moving toward each other
                 if (velocityAlongNormal < 0) {
                     // Simple bounce: reverse velocities along normal
-                    const bounce = 1.1; // Slight energy increase to make bounces more visible
+                    // Reduced bounce factor to prevent excessive acceleration
+                    const bounce = 1.0; // No energy increase (was 1.1)
+                    
+                    // Save original velocities for debugging
+                    const origVelAx = optionA.velocity.x;
+                    const origVelAy = optionA.velocity.y;
+                    const origVelBx = optionB.velocity.x;
+                    const origVelBy = optionB.velocity.y;
                     
                     // Apply impulse along the normal
                     optionA.velocity.x -= velocityAlongNormal * nx * bounce;
                     optionA.velocity.y -= velocityAlongNormal * ny * bounce;
                     optionB.velocity.x += velocityAlongNormal * nx * bounce;
                     optionB.velocity.y += velocityAlongNormal * ny * bounce;
+                    
+                    // Cap maximum velocity to prevent excessive acceleration
+                    optionA.velocity.x = Math.min(Math.max(optionA.velocity.x, -MAX_VELOCITY), MAX_VELOCITY);
+                    optionA.velocity.y = Math.min(Math.max(optionA.velocity.y, -MAX_VELOCITY), MAX_VELOCITY);
+                    optionB.velocity.x = Math.min(Math.max(optionB.velocity.x, -MAX_VELOCITY), MAX_VELOCITY);
+                    optionB.velocity.y = Math.min(Math.max(optionB.velocity.y, -MAX_VELOCITY), MAX_VELOCITY);
                     
                     // Ensure minimum velocity after collision
                     const minVelocity = 0.3;
