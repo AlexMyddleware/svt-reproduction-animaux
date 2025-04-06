@@ -149,26 +149,29 @@ PhysicsManager.prototype.checkCollisions = function() {
                     }
                 }
                 
-                // Add a visual effect
-                optionA.element.classList.add('bounce');
-                optionB.element.classList.add('bounce');
-                
-                // Add additional collision-flash class for extra visibility
-                optionA.element.classList.add('collision-flash');
-                optionB.element.classList.add('collision-flash');
-                
-                // Create a collision spark effect at the point of impact
-                createCollisionSpark(
-                    (centerAx + centerBx) / 2, 
-                    (centerAy + centerBy) / 2
-                );
-                
-                setTimeout(() => {
-                    optionA.element.classList.remove('bounce');
-                    optionB.element.classList.remove('bounce');
-                    optionA.element.classList.remove('collision-flash');
-                    optionB.element.classList.remove('collision-flash');
-                }, 300);
+                // Only add visual effects if they're enabled
+                if (window.TEXTE_TROUS_EFFECTS_ENABLED !== false) {
+                    // Add a visual effect
+                    optionA.element.classList.add('bounce');
+                    optionB.element.classList.add('bounce');
+                    
+                    // Add additional collision-flash class for extra visibility
+                    optionA.element.classList.add('collision-flash');
+                    optionB.element.classList.add('collision-flash');
+                    
+                    // Create a collision spark effect at the point of impact
+                    createCollisionSpark(
+                        (centerAx + centerBx) / 2, 
+                        (centerAy + centerBy) / 2
+                    );
+                    
+                    setTimeout(() => {
+                        optionA.element.classList.remove('bounce');
+                        optionB.element.classList.remove('bounce');
+                        optionA.element.classList.remove('collision-flash');
+                        optionB.element.classList.remove('collision-flash');
+                    }, 300);
+                }
             }
         }
     }

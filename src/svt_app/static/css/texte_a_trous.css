@@ -198,4 +198,94 @@
     font-weight: bold;
     display: inline-block;
     text-align: left;
+}
+
+/* Add this new section for the toggle switch */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    padding-left: 15px;
+    border-left: 1px solid #ddd;
+}
+
+.toggle-container label {
+    margin-right: 8px;
+    font-weight: bold;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+.switch input:checked + .slider {
+    background-color: var(--neon-purple, #9900ff);
+}
+
+.switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--neon-purple, #9900ff);
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* Rounded sliders */
+.switch .slider.round {
+    border-radius: 22px;
+}
+
+.switch .slider.round:before {
+    border-radius: 50%;
+}
+
+/* Add this class to the body when effects are disabled */
+.effects-disabled .option.bounce,
+.effects-disabled .option.collision-flash,
+.effects-disabled .option.bounce-left,
+.effects-disabled .option.bounce-right,
+.effects-disabled .option.bounce-top,
+.effects-disabled .option.bounce-bottom {
+    animation: none !important;
+    background-color: inherit !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+}
+
+.effects-disabled .collision-spark,
+.effects-disabled .collision-flash-center {
+    display: none !important;
 } 

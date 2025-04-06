@@ -27,8 +27,11 @@ PhysicsManager.prototype.checkBoundaries = function() {
             const currentSpeed = Math.abs(option.velocity.x);
             option.velocity.x = -Math.min(currentSpeed, BOUNDARY_MAX_VELOCITY);
             
-            option.element.classList.add('bounce-right');
-            setTimeout(() => option.element.classList.remove('bounce-right'), 300);
+            // Only add visual effects if they're enabled
+            if (window.TEXTE_TROUS_EFFECTS_ENABLED !== false) {
+                option.element.classList.add('bounce-right');
+                setTimeout(() => option.element.classList.remove('bounce-right'), 300);
+            }
         } else if (elementRect.left < containerRect.left + this.boundaryPadding) {
             // Hitting left boundary
             option.position.x += ((containerRect.left + this.boundaryPadding) - elementRect.left);
@@ -37,8 +40,11 @@ PhysicsManager.prototype.checkBoundaries = function() {
             const currentSpeed = Math.abs(option.velocity.x);
             option.velocity.x = Math.min(currentSpeed, BOUNDARY_MAX_VELOCITY);
             
-            option.element.classList.add('bounce-left');
-            setTimeout(() => option.element.classList.remove('bounce-left'), 300);
+            // Only add visual effects if they're enabled
+            if (window.TEXTE_TROUS_EFFECTS_ENABLED !== false) {
+                option.element.classList.add('bounce-left');
+                setTimeout(() => option.element.classList.remove('bounce-left'), 300);
+            }
         }
         
         // Check vertical boundaries
@@ -50,8 +56,11 @@ PhysicsManager.prototype.checkBoundaries = function() {
             const currentSpeed = Math.abs(option.velocity.y);
             option.velocity.y = -Math.min(currentSpeed, BOUNDARY_MAX_VELOCITY);
             
-            option.element.classList.add('bounce-bottom');
-            setTimeout(() => option.element.classList.remove('bounce-bottom'), 300);
+            // Only add visual effects if they're enabled
+            if (window.TEXTE_TROUS_EFFECTS_ENABLED !== false) {
+                option.element.classList.add('bounce-bottom');
+                setTimeout(() => option.element.classList.remove('bounce-bottom'), 300);
+            }
         } else if (elementRect.top < containerRect.top + this.boundaryPadding) {
             // Hitting top boundary
             option.position.y += ((containerRect.top + this.boundaryPadding) - elementRect.top);
@@ -60,8 +69,11 @@ PhysicsManager.prototype.checkBoundaries = function() {
             const currentSpeed = Math.abs(option.velocity.y);
             option.velocity.y = Math.min(currentSpeed, BOUNDARY_MAX_VELOCITY);
             
-            option.element.classList.add('bounce-top');
-            setTimeout(() => option.element.classList.remove('bounce-top'), 300);
+            // Only add visual effects if they're enabled
+            if (window.TEXTE_TROUS_EFFECTS_ENABLED !== false) {
+                option.element.classList.add('bounce-top');
+                setTimeout(() => option.element.classList.remove('bounce-top'), 300);
+            }
         }
         
         // Apply updated position
