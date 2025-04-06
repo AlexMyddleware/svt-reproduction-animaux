@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Menu Principal - Révijouer{% endblock %}
+{% block title %}Révijouer - Menu Principal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
+{% endblock %}
 
 {% block content %}
 <div class="main-menu">
@@ -8,8 +12,8 @@
     
     <div class="scores-display">
         <h3>Scores</h3>
-        <p>Texte à trous: {{ scores.texte_a_trous }}</p>
-        <p>Relier les images: {{ scores.relier_images }}</p>
+        <p>Texte à trous: <span id="texte-trous-score">{{ scores.texte_a_trous }}</span></p>
+        <p>Relier les images: <span id="relier-images-score">{{ scores.relier_images }}</span></p>
     </div>
     
     <div class="menu-options">
@@ -51,4 +55,8 @@ function resetScores() {
     });
 }
 </script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/retro_disco.js') }}"></script>
 {% endblock %} 
