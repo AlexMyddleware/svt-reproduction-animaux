@@ -80,6 +80,58 @@ header {
   width: 100%;
   text-align: center;
   z-index: 10;
+  background: linear-gradient(90deg, rgba(15,15,35,0) 0%, rgba(131,25,180,0.7) 20%, rgba(131,25,180,0.7) 80%, rgba(15,15,35,0) 100%);
+  padding: 15px 0;
+  box-shadow: 
+    0 0 20px rgba(131, 25, 180, 0.5),
+    0 0 40px rgba(131, 25, 180, 0.3),
+    0 0 60px rgba(131, 25, 180, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+/* Chrome effect behind the header */
+header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, 
+      transparent 20%, 
+      rgba(255, 255, 255, 0.2) 20%, 
+      rgba(255, 255, 255, 0.2) 40%, 
+      transparent 40%, 
+      transparent 60%, 
+      rgba(255, 255, 255, 0.2) 60%, 
+      rgba(255, 255, 255, 0.2) 80%, 
+      transparent 80%
+    );
+  background-size: 250px 250px;
+  animation: headerShine 5s linear infinite;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* Add a chrome bar effect */
+header::after {
+  content: '';
+  position: absolute;
+  height: 2px;
+  width: 90%;
+  left: 5%;
+  bottom: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    var(--neon-blue) 20%, 
+    var(--neon-pink) 50%, 
+    var(--neon-blue) 80%, 
+    transparent 100%);
+  box-shadow: 0 0 10px var(--neon-blue);
+  z-index: 1;
 }
 
 header h1 {
@@ -87,11 +139,70 @@ header h1 {
   font-size: 3rem;
   text-transform: uppercase;
   letter-spacing: 5px;
-  color: var(--neon-blue);
-  text-shadow: 0 0 10px rgba(0, 255, 255, var(--glow-intensity)),
-               0 0 20px rgba(0, 255, 255, var(--glow-intensity)),
-               0 0 30px rgba(0, 255, 255, var(--glow-intensity));
-  animation: pulsate 2s infinite alternate;
+  position: relative;
+  display: inline-block;
+  
+  /* Chrome text effect with multiple layers */
+  color: transparent;
+  background: linear-gradient(180deg, 
+    #ffffff 0%, 
+    #c0c0c0 40%, 
+    #8a8a8a 50%, 
+    #c0c0c0 60%, 
+    #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  
+  /* Text glow effects */
+  filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+  text-shadow: 
+    0 0 5px rgba(0, 255, 255, var(--glow-intensity)),
+    0 0 10px rgba(0, 255, 255, var(--glow-intensity)),
+    0 5px 5px rgba(0, 0, 0, 0.5);
+  
+  /* Animation */
+  animation: chromePulse 5s infinite alternate;
+}
+
+/* Add retro grid around the title */
+header h1::before, header h1::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border: 2px solid var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue);
+  z-index: -1;
+}
+
+header h1::before {
+  top: -5px;
+  left: -20px;
+}
+
+header h1::after {
+  bottom: -5px;
+  right: -20px;
+}
+
+/* Animation for the header chrome effect */
+@keyframes headerShine {
+  0% {
+    background-position: -250px 0;
+  }
+  100% {
+    background-position: 250px 0;
+  }
+}
+
+/* Animation for chrome text effect */
+@keyframes chromePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.8)) brightness(1.2);
+  }
 }
 
 /* Main Content */
