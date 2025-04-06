@@ -228,27 +228,28 @@ main {
 /* Score display */
 .scores-display {
   position: absolute;
-  top: 140px;
-  right: 80px;
+  top: 230px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(10, 10, 26, 0.7);
-  border: 2px solid var(--neon-yellow);
+  border: 2px solid var(--neon-green);
   border-radius: 5px;
-  padding: 20px;
+  padding: 15px;
   color: white;
   font-family: 'Press Start 2P', cursive;
-  font-size: 0.8rem;
-  box-shadow: 0 0 10px rgba(255, 255, 0, var(--glow-intensity)),
-              0 0 20px rgba(255, 255, 0, var(--glow-intensity));
-  transform: rotate(5deg);
+  font-size: 0.7rem;
+  box-shadow: 0 0 10px rgba(0, 255, 102, var(--glow-intensity)),
+              0 0 20px rgba(0, 255, 102, var(--glow-intensity));
   z-index: 10;
-  min-width: 250px;
+  min-width: 200px;
+  max-width: 250px;
+  text-align: center;
 }
 
 .scores-display h3 {
-  color: var(--neon-yellow);
-  margin-bottom: 15px;
+  color: var(--neon-green);
+  margin-bottom: 10px;
   text-transform: uppercase;
-  text-shadow: 0 0 5px rgba(255, 255, 0, var(--glow-intensity));
 }
 
 .scores-display p {
@@ -387,7 +388,7 @@ footer {
 }
 
 @keyframes scoreFlash {
-  0%, 100% { opacity: 1; color: var(--neon-yellow); }
+  0%, 100% { opacity: 1; color: var(--neon-green); }
   50% { opacity: 0.5; color: white; }
 }
 
