@@ -747,49 +747,88 @@ def move_items() -> Dict[str, Any]:
         Dict[str, Any]: JSON response indicating success or failure.
     """
     try:
+        debug_log("Move items request received")
         data = request.get_json()
+        debug_log("Request data: {}", data)
+        
         if not data or 'items' not in data or 'target_folder' not in data:
+            debug_log("Missing required fields in request data")
             return jsonify({"success": False, "message": "Missing required fields"})
         
         items = data['items']  # List of file/folder paths to move
         target_folder = data['target_folder'].strip()  # Target folder path
+        debug_log("Moving items: {} to target folder: '{}'", items, target_folder)
         
         base_dir = "assets/Data/fill_the_blanks"
-        target_path = os.path.join(base_dir, target_folder)
+        debug_log("Base directory: {}", base_dir)
         
-        # Check if target folder exists
-        if not os.path.exists(target_path) or not os.path.isdir(target_path):
-            return jsonify({"success": False, "message": "Target folder not found"})
+        # Handle root directory case
+        target_path = base_dir if target_folder == "" else os.path.join(base_dir, target_folder)
+        debug_log("Resolved target path: {}", target_path)
+        
+        # Create target directory if it doesn't exist
+        os.makedirs(target_path, exist_ok=True)
+        debug_log("Target directory ensured: {}", target_path)
         
         moved_items = []
         for item_path in items:
             try:
                 source_path = os.path.join(base_dir, item_path)
+                debug_log("Processing item - source path: {}", source_path)
+                
                 if not os.path.exists(source_path):
+                    debug_log("Source path does not exist: {}", source_path)
                     continue
                 
                 # Get the base name of the item
                 item_name = os.path.basename(item_path)
                 new_path = os.path.join(target_path, item_name)
+                debug_log("Target path for item: {}", new_path)
+                
+                # Skip if source and target are the same
+                if os.path.abspath(source_path) == os.path.abspath(new_path):
+                    debug_log("Source and target paths are the same, skipping: {}", source_path)
+                    continue
                 
                 # Check if an item with the same name already exists in target
                 if os.path.exists(new_path):
-                    continue
+                    # Generate a unique name by appending a number
+                    base_name = os.path.splitext(item_name)[0]
+                    ext = os.path.splitext(item_name)[1]
+                    counter = 1
+                    while os.path.exists(new_path):
+                        new_name = f"{base_name}_{counter}{ext}"
+                        new_path = os.path.join(target_path, new_name)
+                        counter += 1
+                    debug_log("Generated unique path for existing item: {}", new_path)
                 
                 # Move the item
                 import shutil
+                debug_log("Attempting to move {} to {}", source_path, new_path)
                 shutil.move(source_path, new_path)
                 moved_items.append(item_path)
+                debug_log("Successfully moved {} to {}", source_path, new_path)
                 
             except Exception as e:
                 debug_log("Error moving item {}: {}", item_path, str(e))
                 continue
         
-        return jsonify({
+        debug_log("Move operation completed. Moved items: {}", moved_items)
+        
+        if not moved_items:
+            debug_log("No items were successfully moved")
+            return jsonify({
+                "success": False,
+                "message": "Aucun élément n'a pu être déplacé"
+            })
+        
+        response_data = {
             "success": True,
             "message": f"{len(moved_items)} élément(s) déplacé(s) avec succès",
             "moved_items": moved_items
-        })
+        }
+        debug_log("Sending response: {}", response_data)
+        return jsonify(response_data)
     
     except Exception as e:
         debug_log("Error moving items: {}", str(e))

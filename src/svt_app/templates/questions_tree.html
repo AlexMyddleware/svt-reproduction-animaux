@@ -397,6 +397,18 @@
         color: #2196F3;
         cursor: pointer;
     }
+
+    .root-drop-target {
+        min-height: 100px;
+        padding: 20px;
+        border-radius: 5px;
+        transition: all 0.2s ease;
+    }
+    
+    .root-drop-target.drop-target {
+        background-color: rgba(33, 150, 243, 0.1);
+        border: 2px dashed #2196F3;
+    }
 </style>
 {% endblock %}
 
@@ -425,7 +437,7 @@
         </div>
     </div>
     
-    <div class="tree">
+    <div class="tree root-drop-target" data-path="">
         {% macro render_tree_items(items) %}
             {% if items %}
                 {% for item in items %}
@@ -589,6 +601,11 @@ document.addEventListener('DOMContentLoaded', function() {
             item.addEventListener('dragstart', function(e) {
                 draggedItem = this;
                 this.classList.add('dragging');
+                console.log('Drag started:', {
+                    element: this,
+                    path: this.dataset.path,
+                    type: this.classList.contains('folder-node') ? 'folder' : 'question'
+                });
                 
                 // If dragging a selected item, include all selected items
                 const dragData = {
@@ -597,10 +614,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!selectedItems.has(this.dataset.path)) {
                     dragData.items = [this.dataset.path];
                 }
+                console.log('Drag data being set:', dragData);
                 e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             });
             
             item.addEventListener('dragend', function() {
+                console.log('Drag ended');
                 this.classList.remove('dragging');
                 document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
             });
@@ -609,16 +628,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize all drop targets
     function initDropTargets() {
-        // Make both folder-content and folder-node elements drop targets
-        document.querySelectorAll('.folder-content, .folder-node').forEach(target => {
+        // Make both folder-content, folder-node, and root-drop-target elements drop targets
+        document.querySelectorAll('.folder-content, .folder-node, .root-drop-target').forEach(target => {
             target.addEventListener('dragover', function(e) {
                 e.preventDefault();
+                console.log('Dragover event on:', {
+                    element: this,
+                    path: this.dataset.path,
+                    classList: Array.from(this.classList)
+                });
                 if (draggedItem !== this) {
                     this.classList.add('drop-target');
                 }
             });
             
             target.addEventListener('dragleave', function(e) {
+                console.log('Dragleave event on:', {
+                    element: this,
+                    relatedTarget: e.relatedTarget,
+                    contains: this.contains(e.relatedTarget)
+                });
                 // Only remove the class if we're actually leaving the element
                 // not just moving between its children
                 if (!this.contains(e.relatedTarget)) {
@@ -629,10 +658,16 @@ document.addEventListener('DOMContentLoaded', function() {
             target.addEventListener('drop', async function(e) {
                 e.preventDefault();
                 e.stopPropagation(); // Prevent event bubbling
+                console.log('Drop event started on:', {
+                    element: this,
+                    path: this.dataset.path,
+                    classList: Array.from(this.classList)
+                });
                 this.classList.remove('drop-target');
                 
                 // Get the target folder path
                 let targetPath = this.dataset.path;
+                console.log('Initial target path:', targetPath);
                 
                 // If we're dropping on a folder-node and not its content,
                 // we need to handle it differently
@@ -641,23 +676,31 @@ document.addEventListener('DOMContentLoaded', function() {
                     const folderContent = this.querySelector('.folder-content');
                     if (folderContent) {
                         targetPath = folderContent.dataset.path;
+                        console.log('Updated target path for folder-node:', targetPath);
                     }
                 }
                 
-                if (!targetPath) {
-                    console.error('Target path not found');
-                    return;
-                }
-                
-                const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
-                
-                // Check if we're trying to drop an item into itself
-                if (dragData.items.includes(targetPath)) {
-                    alert("Impossible de déplacer un dossier dans lui-même");
-                    return;
+                if (targetPath === undefined) {
+                    targetPath = ''; // Root path
+                    console.log('Set empty target path for root');
                 }
                 
                 try {
+                    const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    console.log('Parsed drag data:', dragData);
+                    
+                    // Check if we're trying to drop an item into itself
+                    if (dragData.items.includes(targetPath)) {
+                        console.log('Attempted to drop item into itself');
+                        alert("Impossible de déplacer un dossier dans lui-même");
+                        return;
+                    }
+                    
+                    console.log('Sending move request:', {
+                        items: dragData.items,
+                        target_folder: targetPath
+                    });
+                    
                     const response = await fetch('/game/move_items', {
                         method: 'POST',
                         headers: {
@@ -670,6 +713,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     const result = await response.json();
+                    console.log('Move request result:', result);
+                    
                     if (result.success) {
                         // Refresh the page to show the new structure
                         window.location.reload();
@@ -677,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         alert(result.message);
                     }
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error during drop operation:', error);
                     alert('Une erreur est survenue lors du déplacement des éléments');
                 }
             });
@@ -685,6 +730,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize drag and drop
+    console.log('Initializing drag and drop functionality');
     initDraggableItems();
     initDropTargets();
     
