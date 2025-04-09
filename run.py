@@ -12,12 +12,15 @@ sys.path.insert(0, src_path)
 
 from waitress import serve
 from svt_app import create_app
-from svt_app.utils.debug import debug_log, DEBUG_MODE
+from svt_app.utils.logging_utils import conditional_log, log_if_enabled
 
+@log_if_enabled()
 def open_browser() -> None:
     """Open the default web browser to the application URL."""
+    conditional_log("Opening browser to http://localhost:8080")
     webbrowser.open('http://localhost:8080')
 
+@log_if_enabled()
 def main() -> None:
     """
     Main entry point for the application.
@@ -29,35 +32,38 @@ def main() -> None:
     args = parser.parse_args()
 
     # Set debug mode from command line argument
-    if args.debug:
+    debug_mode = args.debug
+    if debug_mode:
         os.environ['SVT_DEBUG'] = '1'
-        debug_log("Debug mode enabled via command line")
+        conditional_log("Debug mode enabled via command line")
 
     # Ensure the data directories exist
-    debug_log("Creating data directories if they don't exist")
+    conditional_log("Creating data directories if they don't exist")
     os.makedirs("assets/Data/fill_the_blanks", exist_ok=True)
     os.makedirs("assets/Data/image_matching", exist_ok=True)
 
     # Create the Flask application
-    debug_log("Creating Flask application")
+    conditional_log("Creating Flask application")
     app = create_app()
     
     # Open browser after a short delay
-    if not DEBUG_MODE:  # Don't auto-open browser in debug mode
+    if not debug_mode:  # Don't auto-open browser in debug mode
         Timer(1.5, open_browser).start()
     
     # Run the application with waitress (production server)
-    debug_log("Starting server...")
+    conditional_log("Starting server...")
     print("Starting Révijouer...")
     print("Application running at http://localhost:8080")
-    print("Debug mode:", "enabled" if DEBUG_MODE else "disabled")
+    print("Debug mode:", "enabled" if debug_mode else "disabled")
     print("You can close the application by closing this window")
     
-    if DEBUG_MODE:
+    if debug_mode:
         # Use Flask's development server in debug mode
+        conditional_log("Starting Flask development server")
         app.run(host='localhost', port=8080, debug=True)
     else:
         # Use waitress in production mode
+        conditional_log("Starting Waitress production server")
         serve(app, host='localhost', port=8080)
 
 if __name__ == '__main__':

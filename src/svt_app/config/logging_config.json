@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "enabled_loggers": {
+        "svt_app.controllers.game_controller": false,
+        "svt_app.services.question_service": false,
+        "svt_app.utils.debug": false,
+        "svt_app.app": false,
+        "svt_app.state.scores": false,
+        "run": false
+    },
+    "log_level": "DEBUG",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "date_format": "%Y-%m-%d %H:%M:%S"
+} 

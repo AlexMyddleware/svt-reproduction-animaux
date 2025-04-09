@@ -6,7 +6,7 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 
 from svt_app.services.question_service import QuestionService
-from svt_app.utils.debug import debug_log
+from svt_app.utils.logging_utils import conditional_log, log_if_enabled
 from svt_app.controllers.settings_controller import load_settings
 from svt_app.state import GameScores
 
@@ -14,7 +14,7 @@ from svt_app.state import GameScores
 game_bp = Blueprint("game", __name__)
 
 # Initialize the question service
-debug_log("Initializing QuestionService")
+conditional_log("Initializing QuestionService")
 question_service = QuestionService()
 
 @game_bp.route("/texte_a_trous")
@@ -25,7 +25,7 @@ def texte_a_trous() -> str:
     Returns:
         str: Rendered HTML template for the 'Texte à trous' game.
     """
-    debug_log("Loading fill in the blank questions")
+    conditional_log("Loading fill in the blank questions")
     # Reload questions to capture any newly created ones
     question_service.load_questions()
     questions = question_service.get_fill_in_blank_questions()
@@ -55,23 +55,23 @@ def texte_a_trous() -> str:
                     question_data = json.load(f)
                     if not question_data.get('completed', False):
                         active_questions.append(question)
-                        debug_log("Found active question {} in {}", question.id, file_path)
+                        conditional_log("Found active question {} in {}", question.id, file_path)
             except Exception as e:
-                debug_log("Error reading question file {}: {}", file_path, str(e))
+                conditional_log("Error reading question file {}: {}", file_path, str(e))
                 continue
         else:
-            debug_log("Warning: Could not find file for question {}", question.id)
+            conditional_log("Warning: Could not find file for question {}", question.id)
     
-    debug_log("Found {} active questions", len(active_questions))
+    conditional_log("Found {} active questions", len(active_questions))
     
     # If no active questions, show empty template
     if not active_questions:
-        debug_log("No active questions found")
+        conditional_log("No active questions found")
         return render_template("texte_a_trous.html", question=None, scores=GameScores.get_scores())
     
     # Get the current question ID from the query parameters, default to first active question
     question_id = request.args.get("question_id", None, type=int)
-    debug_log("Requested question ID: {}", question_id)
+    conditional_log("Requested question ID: {}", question_id)
     
     # If no question_id specified or the requested question is not in active questions,
     # use the first active question
@@ -88,7 +88,7 @@ def texte_a_trous() -> str:
         current_question = active_questions[0]
         question_id = current_question.id
     
-    debug_log("Selected question ID: {}, Question: {}", 
+    conditional_log("Selected question ID: {}, Question: {}", 
               question_id, 
               current_question.text if current_question else "None")
     
@@ -148,38 +148,38 @@ def check_answer() -> Dict[str, Any]:
     """
     try:
         data = request.get_json()
-        debug_log("Received answer data: {}", data)
+        conditional_log("Received answer data: {}", data)
         
         if not data:
-            debug_log("No data provided in answer submission")
+            conditional_log("No data provided in answer submission")
             return jsonify({"success": False, "message": "No data provided"})
         
         game_type = data.get("game_type")
         question_id = data.get("question_id")
         answer = data.get("answer")
         
-        debug_log("Processing answer - Game: {}, Question: {}, Answer: {}", 
+        conditional_log("Processing answer - Game: {}, Question: {}, Answer: {}", 
                  game_type, question_id, answer)
         
         # Validate required fields
         if not all([game_type, question_id is not None, answer]):
-            debug_log("Missing required fields in answer submission")
+            conditional_log("Missing required fields in answer submission")
             return jsonify({"success": False, "message": "Missing required fields"})
         
         # Ensure question_id is an integer
         try:
             question_id = int(question_id)
         except (TypeError, ValueError):
-            debug_log("Invalid question ID format: {}", question_id)
+            conditional_log("Invalid question ID format: {}", question_id)
             return jsonify({"success": False, "message": "Invalid question ID"})
         
         # Check the answer based on the game type
         if game_type == "texte_a_trous":
             question = question_service.get_fill_in_blank_question_by_id(question_id)
-            debug_log("Retrieved question for checking: {}", question)
+            conditional_log("Retrieved question for checking: {}", question)
             
             if not question:
-                debug_log("Question not found: {}", question_id)
+                conditional_log("Question not found: {}", question_id)
                 return jsonify({"success": False, "message": "Question not found"})
             
             # Find the question file in all subdirectories
@@ -199,11 +199,11 @@ def check_answer() -> Dict[str, Any]:
                         break
             
             if not file_path:
-                debug_log("Could not find file for question {}", question_id)
+                conditional_log("Could not find file for question {}", question_id)
                 return jsonify({"success": False, "message": "Question file not found"})
             
             is_correct = answer == question.correct_answer
-            debug_log("Answer is {}", "correct" if is_correct else "incorrect")
+            conditional_log("Answer is {}", "correct" if is_correct else "incorrect")
             
             try:
                 # Load existing data
@@ -218,7 +218,7 @@ def check_answer() -> Dict[str, Any]:
                     
                     # Always mark as completed when correct
                     question_data['completed'] = True
-                    debug_log("Question {} marked as completed", question_id)
+                    conditional_log("Question {} marked as completed", question_id)
                 else:
                     stats['wrong_answers'] = stats.get('wrong_answers', 0) + 1
                 
@@ -228,16 +228,16 @@ def check_answer() -> Dict[str, Any]:
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(question_data, f, indent=4, ensure_ascii=False)
                 
-                debug_log("Updated question data: {}", question_data)
+                conditional_log("Updated question data: {}", question_data)
                 
                 # Find the next available question ID
                 active_questions = []
-                debug_log("Finding next available question after ID {}", question_id)
+                conditional_log("Finding next available question after ID {}", question_id)
                 
                 # First, get all questions sorted by ID
                 all_questions = sorted(question_service.get_fill_in_blank_questions(), key=lambda x: x.id)
                 question_ids = [q.id for q in all_questions]
-                debug_log("All questions (sorted): {}", question_ids)
+                conditional_log("All questions (sorted): {}", question_ids)
                 
                 # Then filter for active (non-completed) questions
                 for q in all_questions:
@@ -248,12 +248,12 @@ def check_answer() -> Dict[str, Any]:
                                 q_data = json.load(f)
                                 if not q_data.get('completed', False):
                                     active_questions.append(q.id)
-                                    debug_log("Found active question: {}", q.id)
+                                    conditional_log("Found active question: {}", q.id)
                         except Exception as e:
-                            debug_log("Error reading question file {}: {}", q_file, str(e))
+                            conditional_log("Error reading question file {}: {}", q_file, str(e))
                             continue
                 
-                debug_log("Active (non-completed) questions: {}", active_questions)
+                conditional_log("Active (non-completed) questions: {}", active_questions)
                 
                 # Find the next available question ID after the current one
                 next_question_id = None
@@ -261,13 +261,13 @@ def check_answer() -> Dict[str, Any]:
                 if active_questions:
                     # Sort active questions to ensure proper order
                     active_questions.sort()
-                    debug_log("Sorted active questions: {}", active_questions)
+                    conditional_log("Sorted active questions: {}", active_questions)
                     
                     # Try to find the next question after current one
                     for q_id in active_questions:
                         if q_id > question_id:
                             next_question_id = q_id
-                            debug_log("Found next question ID: {}", next_question_id)
+                            conditional_log("Found next question ID: {}", next_question_id)
                             break
                     
                     # If no next question found, loop back to the first active question
@@ -276,13 +276,13 @@ def check_answer() -> Dict[str, Any]:
                         remaining_questions = [q for q in active_questions if q != question_id]
                         if remaining_questions:
                             next_question_id = remaining_questions[0]
-                            debug_log("No next question found, looping back to first remaining question: {}", next_question_id)
+                            conditional_log("No next question found, looping back to first remaining question: {}", next_question_id)
                         else:
-                            debug_log("No other active questions available")
+                            conditional_log("No other active questions available")
                 else:
-                    debug_log("No active questions found")
+                    conditional_log("No active questions found")
                 
-                debug_log("Final next_question_id: {}", next_question_id)
+                conditional_log("Final next_question_id: {}", next_question_id)
                 
                 # Create the response data
                 response_data = {
@@ -291,11 +291,11 @@ def check_answer() -> Dict[str, Any]:
                     "score": GameScores.get_score("texte_a_trous"),
                     "next_question_id": next_question_id
                 }
-                debug_log("Sending response: {}", response_data)
+                conditional_log("Sending response: {}", response_data)
                 return jsonify(response_data)
                 
             except Exception as e:
-                debug_log("Error processing question: {}", str(e))
+                conditional_log("Error processing question: {}", str(e))
                 return jsonify({
                     "success": True,
                     "correct": is_correct,
@@ -306,17 +306,17 @@ def check_answer() -> Dict[str, Any]:
                 
         elif game_type == "relier_images":
             question = question_service.get_image_matching_question_by_id(question_id)
-            debug_log("Image matching question: {}", question)
+            conditional_log("Image matching question: {}", question)
             if question and answer == question.correct_word:
                 GameScores.increment_score("relier_images")
                 return jsonify({"success": True, "correct": True, "score": GameScores.get_score("relier_images")})
             return jsonify({"success": True, "correct": False, "score": GameScores.get_score("relier_images")})
         
-        debug_log("Invalid game type")
+        conditional_log("Invalid game type")
         return jsonify({"success": False, "message": "Invalid game type"})
     
     except Exception as e:
-        debug_log("Error processing request: {}", str(e))
+        conditional_log("Error processing request: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la validation"})
 
 
@@ -332,7 +332,7 @@ def reset_scores() -> Dict[str, Any]:
     """
     GameScores.reset_scores()  # Use the correct method name
     
-    debug_log("Scores reset - texte_a_trous: {}, relier_images: {}", 
+    conditional_log("Scores reset - texte_a_trous: {}, relier_images: {}", 
               GameScores.get_score("texte_a_trous"), GameScores.get_score("relier_images"))
     
     return jsonify({"success": True})
@@ -425,7 +425,7 @@ def save_question() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Question créée avec succès"})
     
     except Exception as e:
-        debug_log("Error saving question: {}", str(e))
+        conditional_log("Error saving question: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"})
 
 
@@ -463,12 +463,12 @@ def questions_tree() -> str:
         try:
             # Make sure directory exists
             if not os.path.exists(directory):
-                debug_log("Directory does not exist: {}", directory)
+                conditional_log("Directory does not exist: {}", directory)
                 return items
                 
             # Get all items in the directory
             dir_contents = os.listdir(directory)
-            debug_log("Found {} items in directory {}", len(dir_contents), directory)
+            conditional_log("Found {} items in directory {}", len(dir_contents), directory)
             
             for item in sorted(dir_contents):
                 full_path = os.path.join(directory, item)
@@ -476,7 +476,7 @@ def questions_tree() -> str:
                 
                 if os.path.isdir(full_path):
                     # If it's a directory, recursively get its contents
-                    debug_log("Found directory: {}", full_path)
+                    conditional_log("Found directory: {}", full_path)
                     subfolder_items = get_questions_in_directory(full_path, rel_path)
                     
                     # Add folder even if empty
@@ -487,7 +487,7 @@ def questions_tree() -> str:
                         'children': subfolder_items
                     }
                     items.append(folder_data)
-                    debug_log("Added folder: {} with {} children", item, len(subfolder_items))
+                    conditional_log("Added folder: {} with {} children", item, len(subfolder_items))
                     
                 elif item.startswith("question") and item.endswith(".json"):
                     # If it's a question file, add it to the list
@@ -505,12 +505,12 @@ def questions_tree() -> str:
                                     'wrong_answers': 0
                                 })
                             })
-                            debug_log("Added question: {}", item)
+                            conditional_log("Added question: {}", item)
                     except Exception as e:
-                        debug_log("Error reading question file {}: {}", full_path, str(e))
+                        conditional_log("Error reading question file {}: {}", full_path, str(e))
                         continue
         except Exception as e:
-            debug_log("Error reading directory {}: {}", directory, str(e))
+            conditional_log("Error reading directory {}: {}", directory, str(e))
             return []
         
         return items
@@ -521,12 +521,12 @@ def questions_tree() -> str:
     # Create the base directory if it doesn't exist
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
-        debug_log("Created directory: {}", base_dir)
+        conditional_log("Created directory: {}", base_dir)
     
     # Get all questions and folders starting from the base directory
-    debug_log("Scanning directory tree starting from: {}", base_dir)
+    conditional_log("Scanning directory tree starting from: {}", base_dir)
     tree_data = get_questions_in_directory(base_dir)
-    debug_log("Found {} top-level items in tree", len(tree_data))
+    conditional_log("Found {} top-level items in tree", len(tree_data))
     
     return render_template("questions_tree.html", tree_data=tree_data, game_type=game_type)
 
@@ -573,7 +573,7 @@ def toggle_question_completion() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        debug_log("Error toggling question completion: {}", str(e))
+        conditional_log("Error toggling question completion: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la mise à jour de la question"})
 
 
@@ -607,7 +607,7 @@ def delete_question() -> Dict[str, Any]:
         return jsonify({"success": True, "message": "Question supprimée avec succès"})
     
     except Exception as e:
-        debug_log("Error deleting question: {}", str(e))
+        conditional_log("Error deleting question: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression de la question"})
 
 
@@ -652,7 +652,7 @@ def create_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        debug_log("Error creating folder: {}", str(e))
+        conditional_log("Error creating folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la création du dossier"})
 
 
@@ -697,7 +697,7 @@ def rename_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        debug_log("Error renaming folder: {}", str(e))
+        conditional_log("Error renaming folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors du renommage du dossier"})
 
 
@@ -734,11 +734,12 @@ def delete_folder() -> Dict[str, Any]:
         })
     
     except Exception as e:
-        debug_log("Error deleting folder: {}", str(e))
+        conditional_log("Error deleting folder: {}", str(e))
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la suppression du dossier"})
 
 
 @game_bp.route("/move_items", methods=["POST"])
+@log_if_enabled()
 def move_items() -> Dict[str, Any]:
     """
     Move questions or folders to a new location.
@@ -747,47 +748,47 @@ def move_items() -> Dict[str, Any]:
         Dict[str, Any]: JSON response indicating success or failure.
     """
     try:
-        debug_log("Move items request received")
+        conditional_log("Move items request received")
         data = request.get_json()
-        debug_log("Request data: {}", data)
+        conditional_log("Request data: {}", data)
         
         if not data or 'items' not in data or 'target_folder' not in data:
-            debug_log("Missing required fields in request data")
+            conditional_log("Missing required fields in request data")
             return jsonify({"success": False, "message": "Missing required fields"})
         
         items = data['items']  # List of file/folder paths to move
         target_folder = data['target_folder'].strip()  # Target folder path
-        debug_log("Moving items: {} to target folder: '{}'", items, target_folder)
+        conditional_log("Moving items: {} to target folder: '{}'", items, target_folder)
         
         base_dir = "assets/Data/fill_the_blanks"
-        debug_log("Base directory: {}", base_dir)
+        conditional_log("Base directory: {}", base_dir)
         
         # Handle root directory case
         target_path = base_dir if target_folder == "" else os.path.join(base_dir, target_folder)
-        debug_log("Resolved target path: {}", target_path)
+        conditional_log("Resolved target path: {}", target_path)
         
         # Create target directory if it doesn't exist
         os.makedirs(target_path, exist_ok=True)
-        debug_log("Target directory ensured: {}", target_path)
+        conditional_log("Target directory ensured: {}", target_path)
         
         moved_items = []
         for item_path in items:
             try:
                 source_path = os.path.join(base_dir, item_path)
-                debug_log("Processing item - source path: {}", source_path)
+                conditional_log("Processing item - source path: {}", source_path)
                 
                 if not os.path.exists(source_path):
-                    debug_log("Source path does not exist: {}", source_path)
+                    conditional_log("Source path does not exist: {}", source_path)
                     continue
                 
                 # Get the base name of the item
                 item_name = os.path.basename(item_path)
                 new_path = os.path.join(target_path, item_name)
-                debug_log("Target path for item: {}", new_path)
+                conditional_log("Target path for item: {}", new_path)
                 
                 # Skip if source and target are the same
                 if os.path.abspath(source_path) == os.path.abspath(new_path):
-                    debug_log("Source and target paths are the same, skipping: {}", source_path)
+                    conditional_log("Source and target paths are the same, skipping: {}", source_path)
                     continue
                 
                 # Check if an item with the same name already exists in target
@@ -800,23 +801,23 @@ def move_items() -> Dict[str, Any]:
                         new_name = f"{base_name}_{counter}{ext}"
                         new_path = os.path.join(target_path, new_name)
                         counter += 1
-                    debug_log("Generated unique path for existing item: {}", new_path)
+                    conditional_log("Generated unique path for existing item: {}", new_path)
                 
                 # Move the item
                 import shutil
-                debug_log("Attempting to move {} to {}", source_path, new_path)
+                conditional_log("Attempting to move {} to {}", source_path, new_path)
                 shutil.move(source_path, new_path)
                 moved_items.append(item_path)
-                debug_log("Successfully moved {} to {}", source_path, new_path)
+                conditional_log("Successfully moved {} to {}", source_path, new_path)
                 
             except Exception as e:
-                debug_log("Error moving item {}: {}", item_path, str(e))
+                conditional_log("Error moving item {}: {}", item_path, str(e), level="ERROR")
                 continue
         
-        debug_log("Move operation completed. Moved items: {}", moved_items)
+        conditional_log("Move operation completed. Moved items: {}", moved_items)
         
         if not moved_items:
-            debug_log("No items were successfully moved")
+            conditional_log("No items were successfully moved")
             return jsonify({
                 "success": False,
                 "message": "Aucun élément n'a pu être déplacé"
@@ -827,9 +828,9 @@ def move_items() -> Dict[str, Any]:
             "message": f"{len(moved_items)} élément(s) déplacé(s) avec succès",
             "moved_items": moved_items
         }
-        debug_log("Sending response: {}", response_data)
+        conditional_log("Sending response: {}", response_data)
         return jsonify(response_data)
     
     except Exception as e:
-        debug_log("Error moving items: {}", str(e))
+        conditional_log("Error moving items: {}", str(e), level="ERROR")
         return jsonify({"success": False, "message": "Une erreur est survenue lors du déplacement des éléments"}) 

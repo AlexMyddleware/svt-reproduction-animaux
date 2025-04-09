@@ -7,9 +7,10 @@ import secrets
 from svt_app.controllers.game_controller import game_bp
 from svt_app.controllers.settings_controller import settings_bp
 from svt_app.controllers.image_matching_controller import image_matching_bp
-from svt_app.utils.debug import debug_log, DEBUG_MODE
+from svt_app.utils.logging_utils import conditional_log, log_if_enabled
 from svt_app.state import GameScores
 
+@log_if_enabled()
 def create_app() -> Flask:
     """
     Create and configure the Flask application.
@@ -17,33 +18,34 @@ def create_app() -> Flask:
     Returns:
         Flask: The configured Flask application instance.
     """
-    debug_log("Creating Flask application")
+    conditional_log("Creating Flask application")
     app = Flask(__name__)
     
     # Generate a secure random secret key
     app.secret_key = secrets.token_hex(32)
     app.config['SESSION_TYPE'] = 'filesystem'
     
-    debug_log("Debug mode is {}", "enabled" if DEBUG_MODE else "disabled")
+    conditional_log("Debug mode is {}", app.debug)
 
     @app.before_request
     def before_request() -> None:
         """Log session data before each request."""
-        debug_log("Session before request: {}", dict(session))
+        conditional_log("Session before request: {}", dict(session))
 
     @app.after_request
     def after_request(response: Any) -> Any:
         """Log session data after each request."""
-        debug_log("Session after request: {}", dict(session))
+        conditional_log("Session after request: {}", dict(session))
         return response
 
     # Register blueprints
-    debug_log("Registering blueprints")
+    conditional_log("Registering blueprints")
     app.register_blueprint(game_bp, url_prefix="/game")
     app.register_blueprint(settings_bp, url_prefix="/settings")
     app.register_blueprint(image_matching_bp, url_prefix="/game")
 
     @app.route("/")
+    @log_if_enabled()
     def index() -> str:
         """
         Render the main menu page.
@@ -51,12 +53,13 @@ def create_app() -> Flask:
         Returns:
             str: Rendered HTML template for the main menu.
         """
-        debug_log("Rendering index page")
+        conditional_log("Rendering index page")
         scores = GameScores.get_scores()
-        debug_log("Current scores for index page: {}", scores)
+        conditional_log("Current scores for index page: {}", scores)
         return render_template("index.html", scores=scores)
 
     @app.route("/settings")
+    @log_if_enabled()
     def settings() -> str:
         """
         Render the settings page.
@@ -64,10 +67,11 @@ def create_app() -> Flask:
         Returns:
             str: Rendered HTML template for the settings page.
         """
-        debug_log("Rendering settings page")
+        conditional_log("Rendering settings page")
         return render_template("settings.html")
 
     @app.route("/quit")
+    @log_if_enabled()
     def quit_app() -> str:
         """
         Handle the quit action.
@@ -78,11 +82,11 @@ def create_app() -> Flask:
         Returns:
             str: Redirect to the main menu.
         """
-        debug_log("Handling quit action")
+        conditional_log("Handling quit action")
         return redirect(url_for("index"))
 
     return app
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(debug=DEBUG_MODE) 
+    app.run(debug=True) 
