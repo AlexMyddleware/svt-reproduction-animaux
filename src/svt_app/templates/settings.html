@@ -72,7 +72,7 @@
         <div class="setting-group">
             <h3>Validation des questions</h3>
             <div class="checkbox-group">
-                <input type="checkbox" id="autoValidate" name="auto_validate" {% if auto_validate %}checked{% endif %}>
+                <input type="checkbox" id="autoValidate" name="auto_validate" {% if auto_validate == True %}checked{% endif %}>
                 <label for="autoValidate">Marquer automatiquement une question comme validée lorsqu'elle est correctement répondue</label>
             </div>
         </div>

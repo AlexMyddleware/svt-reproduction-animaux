@@ -58,18 +58,6 @@ def create_app() -> Flask:
         conditional_log("Current scores for index page: {}", scores)
         return render_template("index.html", scores=scores)
 
-    @app.route("/settings")
-    @log_if_enabled()
-    def settings() -> str:
-        """
-        Render the settings page.
-        
-        Returns:
-            str: Rendered HTML template for the settings page.
-        """
-        conditional_log("Rendering settings page")
-        return render_template("settings.html")
-
     @app.route("/quit")
     @log_if_enabled()
     def quit_app() -> str:

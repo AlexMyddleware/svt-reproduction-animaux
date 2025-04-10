@@ -74,8 +74,10 @@ def settings() -> str:
         str: Rendered HTML template for the settings page.
     """
     settings_data = load_settings()
+    auto_validate = settings_data.get("auto_validate", True)
     debug_log("Rendering settings page with data: {}", settings_data)
-    return render_template("settings.html", auto_validate=settings_data.get("auto_validate", True))
+    debug_log("auto_validate value type: {}, value: {}", type(auto_validate), auto_validate)
+    return render_template("settings.html", auto_validate=auto_validate)
 
 @settings_bp.route("/save", methods=["POST"])
 def save() -> Dict[str, Any]:
