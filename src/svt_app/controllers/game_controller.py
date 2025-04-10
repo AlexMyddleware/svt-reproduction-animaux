@@ -216,9 +216,12 @@ def check_answer() -> Dict[str, Any]:
                     stats['correct_answers'] = stats.get('correct_answers', 0) + 1
                     GameScores.increment_score("texte_a_trous")
                     
-                    # Always mark as completed when correct
-                    question_data['completed'] = True
-                    conditional_log("Question {} marked as completed", question_id)
+                    # Load settings and check auto_validate
+                    settings = load_settings()
+                    # Only mark as completed when auto_validate is true
+                    if settings.get('auto_validate', True):
+                        question_data['completed'] = True
+                        conditional_log("Question {} marked as completed", question_id)
                 else:
                     stats['wrong_answers'] = stats.get('wrong_answers', 0) + 1
                 
