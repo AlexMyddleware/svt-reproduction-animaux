@@ -25,10 +25,6 @@ source .venv/bin/activate
 # Sur Windows : 
 .venv\Scripts\activate
 ```
-with debug
-
-$env:SVT_DEBUG=1; python run.py
-
 
 3. Installez les dépendances :
 ```
@@ -40,6 +36,13 @@ pip install -r requirements.txt
 
 python run.py
 ```
+
+ou avec le mode debug
+
+```
+python run.py --debug
+```
+
 
 5. Ouvrez votre navigateur à l'adresse : http://localhost:5000
 
