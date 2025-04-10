@@ -46,8 +46,8 @@ def main() -> None:
     conditional_log("Creating Flask application")
     app = create_app()
     
-    # Open browser after a short delay
-    if not debug_mode:  # Don't auto-open browser in debug mode
+    # Open browser after a short delay, but only if we're not in Flask's reloader process
+    if not os.environ.get('WERKZEUG_RUN_MAIN'):
         Timer(1.5, open_browser).start()
     
     # Run the application with waitress (production server)
