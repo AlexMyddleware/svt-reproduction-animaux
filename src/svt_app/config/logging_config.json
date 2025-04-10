@@ -1,7 +1,7 @@
 {
     "version": 1,
     "enabled_loggers": {
-        "svt_app.controllers.game_controller": false,
+        "svt_app.controllers.game_controller": true,
         "svt_app.services.question_service": false,
         "svt_app.utils.debug": false,
         "svt_app.app": false,
