@@ -2,53 +2,62 @@
 
 {% block title %}Arbre des Questions - Révijouer{% endblock %}
 
+{% block show_header %}{% endblock %}
+
+{% block show_footer %}{% endblock %}
+
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
 <style>
+    /* Reset overflow settings */
+    html, body {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Hide the base template header completely */
+    header {
+        display: none;
+    }
+
+    /* Container styles */
+    .container {
+        min-height: 100%;
+        overflow-y: auto;
+        position: relative;
+    }
+
     .tree-container {
-        max-width: 800px;
+        max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
-    }
-
-    .tree-title {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .game-type-selector {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 30px;
-        gap: 10px;
-    }
-
-    .game-type-button {
-        padding: 10px 20px;
-        border: 2px solid #4CAF50;
-        background: white;
-        color: #4CAF50;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: all 0.3s;
-    }
-
-    .game-type-button.active {
-        background: #4CAF50;
-        color: white;
-    }
-
-    .game-type-button:hover {
-        background: #4CAF50;
-        color: white;
-    }
-
-    .tree {
         position: relative;
-        padding-left: 60px;
+        z-index: 1;
     }
 
-    /* Vertical line */
+    /* Background and scanlines */
+    .scanlines {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+    }
+
+    /* Tree structure */
+    .tree {
+        background: rgba(10, 10, 26, 0.7);
+        border-radius: 10px;
+        border: 2px solid var(--neon-purple);
+        box-shadow: 0 0 20px rgba(153, 0, 255, 0.3);
+        padding: 20px 20px 20px 60px;
+        position: relative;
+        margin-bottom: 30px;
+    }
+
     .tree::before {
         content: '';
         position: absolute;
@@ -56,346 +65,294 @@
         top: 0;
         bottom: 0;
         width: 2px;
-        background: #4CAF50;
+        background: var(--neon-green);
+        box-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+    }
+
+    .tree-title {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 2rem;
+        color: transparent;
+        background: linear-gradient(180deg, 
+            #ffffff 0%, 
+            #c0c0c0 40%, 
+            #8a8a8a 50%, 
+            #c0c0c0 60%, 
+            #ffffff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+        text-shadow: 
+            0 0 5px rgba(0, 255, 255, var(--glow-intensity)),
+            0 0 10px rgba(0, 255, 255, var(--glow-intensity)),
+            0 5px 5px rgba(0, 0, 0, 0.5);
+        animation: chromePulse 5s infinite alternate;
+        margin-bottom: 30px;
+    }
+
+    .game-type-selector {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        gap: 15px;
+    }
+
+    .game-type-button {
+        font-family: 'Orbitron', sans-serif;
+        padding: 12px 25px;
+        border: 2px solid var(--neon-purple);
+        background: rgba(15, 15, 35, 0.8);
+        color: var(--neon-purple);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(153, 0, 255, 0.3);
+    }
+
+    .game-type-button:hover {
+        box-shadow: 0 0 25px rgba(153, 0, 255, 0.5);
+        transform: scale(1.05);
+    }
+
+    .game-type-button.active {
+        background: rgba(153, 0, 255, 0.2);
+        color: var(--neon-green);
+        border-color: var(--neon-green);
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+    }
+
+    .tree-toolbar {
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-blue);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .selection-info {
+        color: var(--neon-blue);
+        font-size: 0.9rem;
+    }
+
+    .toolbar-button {
+        font-family: 'Orbitron', sans-serif;
+        padding: 8px 20px;
+        border: 2px solid var(--neon-pink);
+        background: rgba(15, 15, 35, 0.8);
+        color: var(--neon-pink);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+    }
+
+    .toolbar-button:hover:not(:disabled) {
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+        transform: scale(1.05);
+    }
+
+    .toolbar-button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .toolbar-button.danger {
+        border-color: var(--neon-red, #ff0000);
+        color: var(--neon-red, #ff0000);
     }
 
     .folder-node {
-        position: relative;
-        margin: 20px 0;
-        padding: 15px;
-        background: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .folder-node::before {
-        content: '';
-        position: absolute;
-        left: -20px;
-        top: 50%;
-        width: 20px;
-        height: 2px;
-        background: #2196F3;
-    }
-
-    .folder-node::after {
-        content: '';
-        position: absolute;
-        left: -26px;
-        top: 50%;
-        width: 12px;
-        height: 12px;
-        background: #2196F3;
-        border-radius: 50%;
-        transform: translateY(-50%);
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-blue);
+        border-radius: 8px;
+        margin: 15px 0;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
     }
 
     .folder-name {
-        font-weight: bold;
-        color: #2196F3;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
+        font-family: 'Orbitron', sans-serif;
+        color: var(--neon-blue);
+        padding: 10px 15px;
     }
 
-    .folder-name::before {
-        content: '▼';
-        font-size: 0.8em;
-        transition: transform 0.3s;
+    .folder-icon {
+        color: var(--neon-blue);
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     }
 
-    .folder-name.collapsed::before {
-        transform: rotate(-90deg);
-    }
-
-    .folder-content {
-        padding-left: 20px;
-        margin-top: 10px;
-        transition: height 0.3s, opacity 0.3s;
-    }
-
-    .folder-content.collapsed {
-        display: none;
+    .folder-select-all {
+        color: var(--neon-pink);
+        text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
     }
 
     .question-node {
-        position: relative;
-        margin: 20px 0;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-pink);
+        border-radius: 8px;
+        margin: 15px 0;
         padding: 15px;
-        background: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .question-node.completed {
-        background: #f1f8e9;
-        border-left: 4px solid #4CAF50;
-    }
-
-    /* Horizontal line to node */
-    .question-node::before {
-        content: '';
-        position: absolute;
-        left: -20px;
-        top: 50%;
-        width: 20px;
-        height: 2px;
-        background: #4CAF50;
-    }
-
-    /* Node circle */
-    .question-node::after {
-        content: '';
-        position: absolute;
-        left: -26px;
-        top: 50%;
-        width: 12px;
-        height: 12px;
-        background: #4CAF50;
-        border-radius: 50%;
-        transform: translateY(-50%);
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        font-family: 'Orbitron', sans-serif;
+        transition: all 0.3s;
     }
 
     .question-node:hover {
         transform: translateX(5px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.5);
+    }
+
+    .question-node.completed {
+        border-color: var(--neon-green);
+        box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
     }
 
     .question-id {
-        font-weight: bold;
-        color: #4CAF50;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .completion-badge {
-        font-size: 0.8em;
-        padding: 2px 8px;
-        border-radius: 10px;
-        background-color: #e8f5e9;
-        color: #4CAF50;
-    }
-
-    .question-text {
-        color: #333;
+        color: var(--neon-pink);
+        font-size: 1.1rem;
         margin-bottom: 10px;
     }
 
-    .question-stats {
-        display: flex;
-        gap: 15px;
-        margin: 10px 0;
-        font-size: 0.9em;
-        color: #666;
-    }
-    
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .stat-correct {
-        color: #4CAF50;
-    }
-    
-    .stat-wrong {
-        color: #f44336;
-    }
-    
-    .stat-icon {
-        font-size: 1.1em;
+    .completion-badge {
+        background: rgba(0, 255, 102, 0.2);
+        color: var(--neon-green);
+        border: 1px solid var(--neon-green);
+        box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
     }
 
-    .question-actions {
-        display: flex;
-        gap: 10px;
+    .question-text {
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .question-stats {
+        margin: 15px 0;
+    }
+
+    .stat-correct {
+        color: var(--neon-green);
+        text-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
+    }
+
+    .stat-wrong {
+        color: var(--neon-red, #ff0000);
+        text-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
     }
 
     .action-button {
-        padding: 5px 10px;
-        border: none;
-        border-radius: 3px;
+        font-family: 'Orbitron', sans-serif;
+        padding: 8px 15px;
+        border: 2px solid var(--neon-purple);
+        background: rgba(15, 15, 35, 0.8);
+        color: var(--neon-purple);
+        border-radius: 8px;
         cursor: pointer;
-        font-size: 0.9rem;
-        text-decoration: none;
-        transition: background-color 0.3s;
+        font-size: 0.8rem;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 10px rgba(153, 0, 255, 0.3);
     }
 
-    .complete-button {
-        background-color: #4CAF50;
-        color: white;
+    .action-button:hover {
+        box-shadow: 0 0 20px rgba(153, 0, 255, 0.5);
+        transform: scale(1.05);
     }
 
-    .complete-button:hover {
-        background-color: #45a049;
-    }
-
-    .complete-button.completed {
-        background-color: #ff9800;
-    }
-
-    .complete-button.completed:hover {
-        background-color: #f57c00;
-    }
-
-    .delete-button {
-        background-color: #f44336;
-        color: white;
-    }
-
-    .delete-button:hover {
-        background-color: #d32f2f;
+    .action-button.delete-button {
+        border-color: var(--neon-red, #ff0000);
+        color: var(--neon-red, #ff0000);
     }
 
     .navigation {
-        text-align: center;
         margin-top: 30px;
+        text-align: center;
     }
 
     .nav-button {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
+        font-family: 'Orbitron', sans-serif;
+        padding: 12px 25px;
+        border: 2px solid var(--neon-green);
+        background: rgba(15, 15, 35, 0.8);
+        color: var(--neon-green);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
         text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+        display: inline-block;
     }
 
     .nav-button:hover {
-        background-color: #45a049;
+        box-shadow: 0 0 25px rgba(0, 255, 102, 0.5);
+        transform: scale(1.05);
     }
 
-    .folder-actions {
-        display: flex;
-        gap: 10px;
-        margin-left: auto;
+    .drop-target {
+        border-color: var(--neon-blue) !important;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.5) !important;
     }
-    
-    .folder-name {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        padding: 5px 10px;
-    }
-    
-    .folder-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .folder-title {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .folder-icon {
-        color: #2196F3;
-        font-size: 1.2em;
-    }
-    
-    .tree-toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding: 10px;
-        background: #f5f5f5;
-        border-radius: 5px;
-    }
-    
-    .toolbar-actions {
-        display: flex;
-        gap: 10px;
-    }
-    
-    .toolbar-button {
-        padding: 8px 15px;
-        border: none;
+
+    /* Custom checkbox styling */
+    .select-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--neon-purple);
+        background: rgba(15, 15, 35, 0.8);
         border-radius: 4px;
         cursor: pointer;
-        font-size: 0.9rem;
-        background-color: #2196F3;
-        color: white;
-        transition: background-color 0.3s;
-    }
-    
-    .toolbar-button:hover {
-        background-color: #1976D2;
-    }
-    
-    .toolbar-button.danger {
-        background-color: #f44336;
-    }
-    
-    .toolbar-button.danger:hover {
-        background-color: #d32f2f;
-    }
-    
-    .selection-info {
-        font-size: 0.9rem;
-        color: #666;
-    }
-    
-    .drop-target {
-        border: 2px dashed #2196F3;
-        background-color: rgba(33, 150, 243, 0.1);
-        transition: all 0.2s ease;
-    }
-    
-    .folder-node.drop-target {
-        transform: scale(1.02);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-    
-    .folder-content.drop-target {
-        padding: 10px;
-        margin: 10px 0;
-        min-height: 60px;
-        border-radius: 5px;
-    }
-    
-    .draggable {
-        cursor: grab;
-    }
-    
-    .draggable:active {
-        cursor: grabbing;
-    }
-    
-    .draggable.dragging {
-        opacity: 0.5;
-        transform: scale(0.95);
-        cursor: grabbing;
-    }
-    
-    .selectable {
         position: relative;
+        transition: all 0.3s;
     }
-    
-    .select-checkbox {
+
+    .select-checkbox:checked {
+        background: rgba(153, 0, 255, 0.2);
+        border-color: var(--neon-green);
+    }
+
+    .select-checkbox:checked::before {
+        content: '✓';
         position: absolute;
-        left: -45px;
+        color: var(--neon-green);
+        font-size: 14px;
         top: 50%;
-        transform: translateY(-50%);
-        z-index: 2;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-shadow: 0 0 5px rgba(0, 255, 102, 0.5);
     }
-    
-    .folder-select-all {
-        margin-left: 10px;
-        font-size: 0.8em;
-        color: #2196F3;
-        cursor: pointer;
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .tree-container {
+            padding: 10px;
+        }
+
+        .tree-title {
+            font-size: 1.5rem;
+        }
+
+        .game-type-button,
+        .toolbar-button,
+        .action-button {
+            padding: 8px 15px;
+            font-size: 0.8rem;
+        }
+
+        .question-node {
+            padding: 10px;
+        }
     }
 
     .root-drop-target {
@@ -403,11 +360,7 @@
         padding: 20px;
         border-radius: 5px;
         transition: all 0.2s ease;
-    }
-    
-    .root-drop-target.drop-target {
-        background-color: rgba(33, 150, 243, 0.1);
-        border: 2px dashed #2196F3;
+        overflow: visible;
     }
 </style>
 {% endblock %}
@@ -514,6 +467,8 @@
         <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
     </div>
 </div>
+
+<div class="scanlines"></div>
 {% endblock %}
 
 {% block extra_js %}
