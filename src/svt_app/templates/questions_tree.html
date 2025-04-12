@@ -597,28 +597,59 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize all draggable items
     function initDraggableItems() {
+        console.log('Initializing draggable items function');
         document.querySelectorAll('.draggable').forEach(item => {
             item.addEventListener('dragstart', function(e) {
+                // Stop if this is a bubbled event from a child element
+                if (e.target !== this) {
+                    console.log('Ignoring bubbled drag event from child:', e.target);
+                    return;
+                }
+                
+                // Stop event propagation
+                e.stopPropagation();
+                
                 draggedItem = this;
                 this.classList.add('dragging');
+                
+                const isFolder = this.classList.contains('folder-node');
+                const itemPath = this.dataset.path;
+                
                 console.log('Drag started:', {
                     element: this,
-                    path: this.dataset.path,
-                    type: this.classList.contains('folder-node') ? 'folder' : 'question'
+                    path: itemPath,
+                    type: isFolder ? 'folder' : 'question'
                 });
                 
-                // If dragging a selected item, include all selected items
-                const dragData = {
-                    items: Array.from(selectedItems)
+                console.log("selectedItems", selectedItems);
+                
+                // Prepare drag data
+                let dragData = {
+                    items: [],
+                    types: {}
                 };
-                if (!selectedItems.has(this.dataset.path)) {
-                    dragData.items = [this.dataset.path];
+                
+                if (selectedItems.size > 0 && selectedItems.has(itemPath)) {
+                    // Include all selected items
+                    dragData.items = Array.from(selectedItems);
+                    selectedItems.forEach(path => {
+                        const selectedElement = document.querySelector(`[data-path="${path}"]`);
+                        dragData.types[path] = selectedElement.classList.contains('folder-node') ? 'folder' : 'question';
+                    });
+                } else {
+                    // Just include the dragged item
+                    dragData.items = [itemPath];
+                    dragData.types[itemPath] = isFolder ? 'folder' : 'question';
                 }
-                console.log('Drag data being set:', dragData);
+                
+                console.log('Setting drag data:', dragData);
                 e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
             });
             
-            item.addEventListener('dragend', function() {
+            item.addEventListener('dragend', function(e) {
+                // Stop if this is a bubbled event
+                if (e.target !== this) return;
+                
                 console.log('Drag ended');
                 this.classList.remove('dragging');
                 document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
@@ -698,7 +729,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     console.log('Sending move request:', {
                         items: dragData.items,
-                        target_folder: targetPath
+                        target_folder: targetPath,
+                        types: dragData.types
                     });
                     
                     const response = await fetch('/game/move_items', {
@@ -708,7 +740,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         },
                         body: JSON.stringify({
                             items: dragData.items,
-                            target_folder: targetPath
+                            target_folder: targetPath,
+                            types: dragData.types
                         })
                     });
                     

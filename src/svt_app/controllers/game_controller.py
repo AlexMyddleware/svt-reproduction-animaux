@@ -755,13 +755,14 @@ def move_items() -> Dict[str, Any]:
         data = request.get_json()
         conditional_log("Request data: {}", data)
         
-        if not data or 'items' not in data or 'target_folder' not in data:
+        if not data or 'items' not in data or 'target_folder' not in data or 'types' not in data:
             conditional_log("Missing required fields in request data")
             return jsonify({"success": False, "message": "Missing required fields"})
         
         items = data['items']  # List of file/folder paths to move
+        types = data['types']  # Dictionary mapping paths to their types (folder/question)
         target_folder = data['target_folder'].strip()  # Target folder path
-        conditional_log("Moving items: {} to target folder: '{}'", items, target_folder)
+        conditional_log("Moving items: {} with types {} to target folder: '{}'", items, types, target_folder)
         
         base_dir = "assets/Data/fill_the_blanks"
         conditional_log("Base directory: {}", base_dir)
@@ -777,8 +778,13 @@ def move_items() -> Dict[str, Any]:
         moved_items = []
         for item_path in items:
             try:
+                item_type = types.get(item_path)
+                if not item_type:
+                    conditional_log("No type information for item: {}", item_path)
+                    continue
+                    
                 source_path = os.path.join(base_dir, item_path)
-                conditional_log("Processing item - source path: {}", source_path)
+                conditional_log("Processing {} - source path: {}", item_type, source_path)
                 
                 if not os.path.exists(source_path):
                     conditional_log("Source path does not exist: {}", source_path)
@@ -787,24 +793,29 @@ def move_items() -> Dict[str, Any]:
                 # Get the base name of the item
                 item_name = os.path.basename(item_path)
                 new_path = os.path.join(target_path, item_name)
-                conditional_log("Target path for item: {}", new_path)
+                conditional_log("Target path for {}: {}", item_type, new_path)
                 
                 # Skip if source and target are the same
                 if os.path.abspath(source_path) == os.path.abspath(new_path):
                     conditional_log("Source and target paths are the same, skipping: {}", source_path)
                     continue
                 
+                # For folders, check if we're trying to move a folder into itself
+                if item_type == 'folder' and new_path.startswith(source_path):
+                    conditional_log("Cannot move folder into itself: {} -> {}", source_path, new_path)
+                    continue
+                
                 # Check if an item with the same name already exists in target
                 if os.path.exists(new_path):
                     # Generate a unique name by appending a number
                     base_name = os.path.splitext(item_name)[0]
-                    ext = os.path.splitext(item_name)[1]
+                    ext = os.path.splitext(item_name)[1] if item_type == 'question' else ''
                     counter = 1
                     while os.path.exists(new_path):
                         new_name = f"{base_name}_{counter}{ext}"
                         new_path = os.path.join(target_path, new_name)
                         counter += 1
-                    conditional_log("Generated unique path for existing item: {}", new_path)
+                    conditional_log("Generated unique path for existing {}: {}", item_type, new_path)
                 
                 # Move the item
                 import shutil
