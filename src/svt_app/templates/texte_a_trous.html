@@ -2,17 +2,30 @@
 
 {% block title %}Texte à trous - Révijouer{% endblock %}
 
+{% block show_header %}{% endblock %}
+
+{% block show_footer %}{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/texte_a_trous.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/collision_effects.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="game-container">
-    <h2>Texte à trous</h2>
-    
     {% if question %}
     <div class="question-container" data-question-id="{{ question_id }}">
+        <div class="top-info">
+            <div class="score-display">
+                <p>Score: {{ scores.texte_a_trous }}</p>
+            </div>
+
+            <div class="question-number">
+                <p>Question {{ question_id }} / {{ total_questions }}</p>
+            </div>
+        </div>
+
         <div class="question-text">
             <p id="question-text">{{ question.text }}</p>
         </div>
@@ -42,39 +55,33 @@
         </div>
         
         <div class="controls">
-            <button id="validate-btn" class="button">Valider</button>
-            <button id="reset-btn" class="button">Réinitialiser</button>
+            <button id="validate-btn" class="retro-button">Valider</button>
+            <button id="reset-btn" class="retro-button">Réinitialiser</button>
             
             {% if question_id > 1 %}
-            <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1) }}" class="button">Précédent</a>
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1) }}" class="retro-button">Précédent</a>
             {% endif %}
             
             {% if question_id < total_questions %}
-            <a href="{{ url_for('game.texte_a_trous', question_id=question_id+1) }}" class="button">Suivant</a>
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id+1) }}" class="retro-button">Suivant</a>
             {% endif %}
         </div>
 
-        <div class="question-number">
-            <p>Question {{ question_id }} / {{ total_questions }}</p>
-        </div>
-        
-        <div class="score-display">
-            <p>Score: {{ scores.texte_a_trous }}</p>
-        </div>
-        
         <div class="navigation">
-            <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+            <a href="{{ url_for('index') }}" class="retro-button">Retour au menu</a>
         </div>
     </div>
     {% else %}
     <div class="no-questions">
         <p>Aucune question disponible pour le moment.</p>
         <div class="navigation">
-            <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
+            <a href="{{ url_for('index') }}" class="retro-button">Retour au menu</a>
         </div>
     </div>
     {% endif %}
 </div>
+
+<div class="scanlines"></div>
 {% endblock %}
 
 {% block extra_js %}

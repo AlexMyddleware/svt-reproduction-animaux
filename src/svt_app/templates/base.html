@@ -10,16 +10,20 @@
 <body>
     <div class="container">
         <header>
+            {% block show_header %}
             <h1>Revijouer</h1>
+            {% endblock %}
         </header>
         
         <main>
             {% block content %}{% endblock %}
         </main>
         
+        {% block show_footer %}
         <footer>
             <p>&copy; 2025 Revijouer</p>
         </footer>
+        {% endblock %}
     </div>
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
