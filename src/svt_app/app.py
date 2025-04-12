@@ -1,8 +1,10 @@
 """Main application module for Révijouer."""
 
 from typing import Dict, Any, Optional
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import secrets
+import os
+import threading
 
 from svt_app.controllers.game_controller import game_bp
 from svt_app.controllers.settings_controller import settings_bp
@@ -64,14 +66,25 @@ def create_app() -> Flask:
         """
         Handle the quit action.
         
-        In a web application, this typically redirects to a goodbye page
-        or back to the main menu.
+        Shuts down the application by terminating the Python process
+        after a short delay to allow the response to be sent.
         
         Returns:
-            str: Redirect to the main menu.
+            str: JSON response indicating success.
         """
         conditional_log("Handling quit action")
-        return redirect(url_for("index"))
+        
+        def delayed_shutdown():
+            # Wait a short moment to allow the response to be sent
+            threading.Timer(0.5, lambda: os._exit(0)).start()
+        
+        try:
+            # Start the delayed shutdown
+            delayed_shutdown()
+            return jsonify({"success": True})
+        except Exception as e:
+            conditional_log("Error during shutdown: {}", str(e))
+            return jsonify({"success": False, "error": str(e)})
 
     return app
 
