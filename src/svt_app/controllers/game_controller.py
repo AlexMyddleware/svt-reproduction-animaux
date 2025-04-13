@@ -6,6 +6,7 @@ import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 
 from svt_app.services.question_service import QuestionService
+from svt_app.services.texte_a_trous_service import TexteATrousService
 from svt_app.utils.logging_utils import conditional_log, log_if_enabled
 from svt_app.controllers.settings_controller import load_settings
 from svt_app.state import GameScores
@@ -13,9 +14,10 @@ from svt_app.state import GameScores
 # Create a Blueprint for the game routes
 game_bp = Blueprint("game", __name__)
 
-# Initialize the question service
-conditional_log("Initializing QuestionService")
+# Initialize the services
+conditional_log("Initializing services")
 question_service = QuestionService()
+texte_a_trous_service = TexteATrousService(question_service)
 
 @game_bp.route("/texte_a_trous")
 def texte_a_trous() -> str:
@@ -25,80 +27,14 @@ def texte_a_trous() -> str:
     Returns:
         str: Rendered HTML template for the 'Texte à trous' game.
     """
-    conditional_log("Loading fill in the blank questions")
-    # Reload questions to capture any newly created ones
-    question_service.load_questions()
-    questions = question_service.get_fill_in_blank_questions()
-    
-    # Filter out completed questions
-    active_questions = []
-    for question in questions:
-        # Search for the question file in all subdirectories
-        base_dir = "assets/Data/fill_the_blanks"
-        question_file = f"question{question.id:03d}.json"
-        file_path = None
-        
-        # First try to find the file in the root directory
-        root_path = os.path.join(base_dir, question_file)
-        if os.path.exists(root_path):
-            file_path = root_path
-        else:
-            # If not found in root, search in subdirectories
-            for root, _, files in os.walk(base_dir):
-                if question_file in files:
-                    file_path = os.path.join(root, question_file)
-                    break
-        
-        if file_path:
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    question_data = json.load(f)
-                    if not question_data.get('completed', False):
-                        active_questions.append(question)
-                        conditional_log("Found active question {} in {}", question.id, file_path)
-            except Exception as e:
-                conditional_log("Error reading question file {}: {}", file_path, str(e))
-                continue
-        else:
-            conditional_log("Warning: Could not find file for question {}", question.id)
-    
-    conditional_log("Found {} active questions", len(active_questions))
-    
-    # If no active questions, show empty template
-    if not active_questions:
-        conditional_log("No active questions found")
-        return render_template("texte_a_trous.html", question=None, scores=GameScores.get_scores())
-    
-    # Get the current question ID from the query parameters, default to first active question
+    # Get question ID from request parameters
     question_id = request.args.get("question_id", None, type=int)
-    conditional_log("Requested question ID: {}", question_id)
     
-    # If no question_id specified or the requested question is not in active questions,
-    # use the first active question
-    current_question = None
-    if question_id is not None:
-        # Try to find the requested question
-        for q in active_questions:
-            if q.id == question_id:
-                current_question = q
-                break
+    # Get game data from service
+    game_data = texte_a_trous_service.get_game_data(question_id)
     
-    # If no current question (either not specified or not found), use first active
-    if current_question is None and active_questions:
-        current_question = active_questions[0]
-        question_id = current_question.id
-    
-    conditional_log("Selected question ID: {}, Question: {}", 
-              question_id, 
-              current_question.text if current_question else "None")
-    
-    return render_template(
-        "texte_a_trous.html",
-        question=current_question,
-        question_id=question_id,
-        total_questions=len(active_questions),
-        scores=GameScores.get_scores()
-    )
+    # Render template with game data
+    return render_template("texte_a_trous.html", **game_data)
 
 
 @game_bp.route("/relier_images")
