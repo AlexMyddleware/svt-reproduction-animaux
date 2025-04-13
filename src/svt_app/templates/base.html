@@ -28,8 +28,10 @@
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-    // Global flag to track if quit functionality is initialized
+    // Global flags
     let quitInitialized = false;
+    let isQuitting = false;
+    let hasUnsavedChanges = false;
 
     function closeWindow() {
         // Try multiple approaches to close the window
@@ -63,6 +65,7 @@
 
     function quitApp() {
         if (confirm('Êtes-vous sûr de vouloir quitter l\'application ?')) {
+            isQuitting = true;
             fetch('{{ url_for("quit_app") }}')
                 .then(response => response.json())
                 .then(data => {
@@ -76,10 +79,12 @@
                             closeWindow();
                         }, 100);
                     } else {
+                        isQuitting = false;
                         throw new Error(data.error || 'Échec de la fermeture de l\'application');
                     }
                 })
                 .catch(error => {
+                    isQuitting = false;
                     console.error('Error:', error);
                     alert('Une erreur est survenue lors de la fermeture de l\'application.');
                 });
@@ -97,15 +102,21 @@
             link.addEventListener('click', handleQuitClick);
         });
         
-        // Also handle beforeunload event
+        // Handle beforeunload event
         window.addEventListener('beforeunload', (e) => {
-            // If the app is being closed through our quit button, don't show the confirmation
-            if (quitInitialized && document.body.style.pointerEvents === 'none') {
+            // If we're quitting through our quit button, don't show confirmation
+            if (isQuitting) {
                 return undefined;
             }
-            // Otherwise show a confirmation
-            e.preventDefault();
-            return e.returnValue = 'Êtes-vous sûr de vouloir quitter l\'application ?';
+            
+            // If there are unsaved changes, show confirmation
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                return e.returnValue = 'Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter ?';
+            }
+            
+            // Otherwise, let the navigation happen without confirmation
+            return undefined;
         });
         
         quitInitialized = true;
@@ -119,6 +130,11 @@
 
     // Initialize on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', initQuitFunctionality);
+
+    // Export function to set unsaved changes state
+    window.setUnsavedChanges = function(value) {
+        hasUnsavedChanges = value;
+    };
     </script>
     {% block extra_js %}{% endblock %}
 </body>
