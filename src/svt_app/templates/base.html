@@ -31,19 +31,50 @@
     // Global flag to track if quit functionality is initialized
     let quitInitialized = false;
 
+    function closeWindow() {
+        // Try multiple approaches to close the window
+        const closeApproaches = [
+            () => window.close(),
+            () => window.open('', '_self').close(),
+            () => window.open('about:blank', '_self').close(),
+            () => window.open('', '_self', '').close(),
+        ];
+
+        // Try each approach
+        for (const approach of closeApproaches) {
+            try {
+                approach();
+                // If we get here, the window might have closed
+                break;
+            } catch (e) {
+                console.log('Close attempt failed:', e);
+                // Continue to next approach
+            }
+        }
+
+        // Fallback: If window is still open after 500ms, show message and force reload
+        setTimeout(() => {
+            if (!window.closed) {
+                alert('L\'application a été arrêtée. La fenêtre va se fermer automatiquement.');
+                window.location.href = 'about:blank';
+            }
+        }, 500);
+    }
+
     function quitApp() {
         if (confirm('Êtes-vous sûr de vouloir quitter l\'application ?')) {
             fetch('{{ url_for("quit_app") }}')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Try to close the current tab
-                        window.close();
+                        // First disable all interactive elements to prevent further interaction
+                        document.body.style.pointerEvents = 'none';
+                        document.body.style.opacity = '0.5';
                         
-                        // If window.close() didn't work, show a message after a short delay
+                        // Add a small delay to ensure the server has time to shut down
                         setTimeout(() => {
-                            alert('L\'application a été arrêtée. Vous pouvez maintenant fermer cet onglet.');
-                        }, 1000);
+                            closeWindow();
+                        }, 100);
                     } else {
                         throw new Error(data.error || 'Échec de la fermeture de l\'application');
                     }
@@ -64,6 +95,17 @@
             link.removeEventListener('click', handleQuitClick);
             // Add the new listener
             link.addEventListener('click', handleQuitClick);
+        });
+        
+        // Also handle beforeunload event
+        window.addEventListener('beforeunload', (e) => {
+            // If the app is being closed through our quit button, don't show the confirmation
+            if (quitInitialized && document.body.style.pointerEvents === 'none') {
+                return undefined;
+            }
+            // Otherwise show a confirmation
+            e.preventDefault();
+            return e.returnValue = 'Êtes-vous sûr de vouloir quitter l\'application ?';
         });
         
         quitInitialized = true;
