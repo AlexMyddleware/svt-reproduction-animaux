@@ -2,66 +2,198 @@
 
 {% block title %}Paramètres - Révijouer{% endblock %}
 
+{% block show_header %}{% endblock %}
+
+{% block show_footer %}{% endblock %}
+
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
 <style>
+    /* Hide the base template header completely */
+    header {
+        display: none;
+    }
+
     .settings-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
+    }
+
+    .settings-title {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 2rem;
+        color: transparent;
+        background: linear-gradient(180deg, 
+            #ffffff 0%, 
+            #c0c0c0 40%, 
+            #8a8a8a 50%, 
+            #c0c0c0 60%, 
+            #ffffff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+        text-shadow: 
+            0 0 5px rgba(0, 255, 255, var(--glow-intensity)),
+            0 0 10px rgba(0, 255, 255, var(--glow-intensity)),
+            0 5px 5px rgba(0, 0, 0, 0.5);
+        animation: chromePulse 5s infinite alternate;
+        margin-bottom: 30px;
+        text-align: center;
     }
 
     .settings-options {
-        margin-top: 30px;
+        background: rgba(10, 10, 26, 0.7);
+        border: 2px solid var(--neon-purple);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 20px rgba(153, 0, 255, 0.3);
     }
 
     .setting-group {
-        background: #f9f9f9;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-blue);
+        border-radius: 8px;
         padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
     }
 
     .setting-group h3 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--neon-pink);
+        text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
         margin-bottom: 15px;
-        color: #333;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+
+    .setting-group p {
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+        margin: 10px 0;
+        font-size: 0.9rem;
+        line-height: 1.6;
     }
 
     .checkbox-group {
         display: flex;
         align-items: center;
-        margin: 10px 0;
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-group:hover {
+        background: rgba(153, 0, 255, 0.1);
+        border-color: var(--neon-purple);
     }
 
     .checkbox-group input[type="checkbox"] {
-        margin-right: 10px;
+        margin-right: 15px;
+        width: 20px;
+        height: 20px;
+        accent-color: var(--neon-green);
     }
 
     .checkbox-group label {
+        color: white;
+        font-family: 'Orbitron', sans-serif;
         cursor: pointer;
+        font-size: 0.9rem;
+        line-height: 1.4;
     }
 
     .save-button {
         display: block;
         width: 100%;
-        padding: 12px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 1.1rem;
-        cursor: pointer;
+        padding: 15px;
         margin-top: 30px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        border-radius: 8px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
     }
 
     .save-button:hover {
-        background: #45a049;
+        box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
+        transform: scale(1.02);
+        background: rgba(0, 255, 102, 0.2);
+    }
+
+    .navigation {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .nav-button {
+        display: inline-block;
+        padding: 12px 25px;
+        font-family: 'Orbitron', sans-serif;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(153, 0, 255, 0.3);
+    }
+
+    .nav-button:hover {
+        box-shadow: 0 0 25px rgba(153, 0, 255, 0.5);
+        transform: scale(1.05);
+        background: rgba(153, 0, 255, 0.2);
+    }
+
+    /* Success message styling */
+    .settings-message {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 15px 30px;
+        background: rgba(15, 15, 35, 0.9);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        border-radius: 8px;
+        font-family: 'Orbitron', sans-serif;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+        z-index: 1000;
+        display: none;
+        animation: messageSlideDown 0.5s ease-out;
+    }
+
+    @keyframes messageSlideDown {
+        from {
+            transform: translate(-50%, -100%);
+            opacity: 0;
+        }
+        to {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="settings-container">
-    <h2>Paramètres</h2>
+    <h2 class="settings-title">Paramètres</h2>
     
     <form id="settingsForm" class="settings-options">
         <div class="setting-group">
@@ -90,12 +222,27 @@
         <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
     </div>
 </div>
+
+<div id="settingsMessage" class="settings-message"></div>
+<div class="scanlines"></div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const settingsForm = document.getElementById('settingsForm');
+    const settingsMessage = document.getElementById('settingsMessage');
+    
+    function showMessage(message, isSuccess = true) {
+        settingsMessage.textContent = message;
+        settingsMessage.style.display = 'block';
+        settingsMessage.style.borderColor = isSuccess ? 'var(--neon-green)' : 'var(--neon-pink)';
+        settingsMessage.style.color = isSuccess ? 'var(--neon-green)' : 'var(--neon-pink)';
+        
+        setTimeout(() => {
+            settingsMessage.style.display = 'none';
+        }, 3000);
+    }
     
     settingsForm.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -115,13 +262,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const result = await response.json();
             if (result.success) {
-                alert('Paramètres enregistrés avec succès');
+                showMessage('Paramètres enregistrés avec succès');
             } else {
-                alert(result.message || 'Une erreur est survenue lors de l\'enregistrement des paramètres');
+                showMessage(result.message || 'Une erreur est survenue lors de l\'enregistrement des paramètres', false);
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Une erreur est survenue lors de l\'enregistrement des paramètres');
+            showMessage('Une erreur est survenue lors de l\'enregistrement des paramètres', false);
         }
     });
 });
