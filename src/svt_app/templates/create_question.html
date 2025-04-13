@@ -2,116 +2,216 @@
 
 {% block title %}Créer une Question - Révijouer{% endblock %}
 
+{% block show_header %}{% endblock %}
+
+{% block show_footer %}{% endblock %}
+
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
 <style>
+    /* Hide the base template header completely */
+    header {
+        display: none;
+    }
+
     .create-container {
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
+        min-height: 100vh;
+        position: relative;
+        z-index: 1;
     }
 
     .form-title {
-        text-align: center;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 2rem;
+        color: transparent;
+        background: linear-gradient(180deg, 
+            #ffffff 0%, 
+            #c0c0c0 40%, 
+            #8a8a8a 50%, 
+            #c0c0c0 60%, 
+            #ffffff 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.5));
+        text-shadow: 
+            0 0 5px rgba(0, 255, 255, var(--glow-intensity)),
+            0 0 10px rgba(0, 255, 255, var(--glow-intensity)),
+            0 5px 5px rgba(0, 0, 0, 0.5);
+        animation: chromePulse 5s infinite alternate;
         margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .question-form {
+        background: rgba(10, 10, 26, 0.7);
+        border: 2px solid var(--neon-purple);
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 20px rgba(153, 0, 255, 0.3);
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
     .form-group label {
         display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
+        margin-bottom: 10px;
+        font-family: 'Orbitron', sans-serif;
+        color: var(--neon-blue);
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        font-size: 1.1rem;
+        letter-spacing: 1px;
     }
 
     .form-group input[type="text"],
     .form-group textarea {
         width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 12px;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-pink);
+        border-radius: 8px;
+        color: white;
+        font-family: 'Orbitron', sans-serif;
         font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--neon-green);
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
     }
 
     .form-group textarea {
-        height: 100px;
+        height: 120px;
         resize: vertical;
     }
 
-    .options-container {
-        margin-top: 10px;
+    .form-group input[type="file"] {
+        display: none;
+    }
+
+    .file-upload-label {
+        display: inline-block;
+        padding: 12px 20px;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-blue);
+        color: var(--neon-blue);
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: 'Orbitron', sans-serif;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .file-upload-label:hover {
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
     }
 
     .option-group {
         display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: center;
     }
 
     .option-input {
         flex-grow: 1;
     }
 
-    .remove-option {
-        padding: 8px 12px;
-        background: #f44336;
-        color: white;
-        border: none;
-        border-radius: 4px;
+    .button-base {
+        font-family: 'Orbitron', sans-serif;
+        padding: 10px 20px;
+        border-radius: 8px;
         cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        background: rgba(15, 15, 35, 0.8);
+    }
+
+    .remove-option {
+        border: 2px solid var(--neon-pink);
+        color: var(--neon-pink);
+        box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+    }
+
+    .remove-option:hover {
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
+        transform: scale(1.05);
     }
 
     .add-option {
-        margin-top: 10px;
-        padding: 8px 16px;
-        background: #2196F3;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        border: 2px solid var(--neon-blue);
+        color: var(--neon-blue);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
     }
-    
+
+    .add-option:hover {
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
+    }
+
     .insert-blank {
-        margin-top: 5px;
-        padding: 8px 16px;
-        background: #9C27B0;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        box-shadow: 0 0 15px rgba(153, 0, 255, 0.2);
     }
-    
+
+    .insert-blank:hover {
+        box-shadow: 0 0 25px rgba(153, 0, 255, 0.4);
+        transform: scale(1.05);
+    }
+
     .set-as-correct {
-        padding: 8px 12px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+    }
+
+    .set-as-correct:hover {
+        box-shadow: 0 0 25px rgba(0, 255, 102, 0.4);
+        transform: scale(1.05);
     }
 
     .submit-button {
         display: block;
         width: 100%;
-        padding: 12px;
-        background: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 1.1rem;
-        cursor: pointer;
+        padding: 15px;
         margin-top: 30px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.2rem;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+        border-radius: 8px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
     }
 
     .submit-button:hover {
-        background: #45a049;
+        box-shadow: 0 0 30px rgba(0, 255, 102, 0.5);
+        transform: scale(1.02);
     }
 
     .error-message {
-        color: #f44336;
-        margin-top: 5px;
+        color: var(--neon-pink);
+        margin-top: 8px;
+        font-family: 'Orbitron', sans-serif;
         font-size: 0.9rem;
+        text-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
     }
 
     .navigation {
@@ -121,24 +221,41 @@
 
     .nav-button {
         display: inline-block;
-        padding: 10px 20px;
-        background-color: #4CAF50;
-        color: white;
+        padding: 12px 25px;
+        font-family: 'Orbitron', sans-serif;
+        background: rgba(15, 15, 35, 0.8);
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
         text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s;
+        border-radius: 8px;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 15px rgba(153, 0, 255, 0.3);
     }
 
     .nav-button:hover {
-        background-color: #45a049;
+        box-shadow: 0 0 25px rgba(153, 0, 255, 0.5);
+        transform: scale(1.05);
     }
 
     .image-preview {
         max-width: 300px;
-        margin-top: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        margin-top: 15px;
+        border: 2px solid var(--neon-blue);
+        border-radius: 8px;
         display: none;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+
+    /* Add common button styles */
+    .remove-option, .add-option, .insert-blank, .set-as-correct {
+        composes: button-base;
+    }
+
+    /* Make all buttons use the retro font */
+    button {
+        font-family: 'Orbitron', sans-serif;
     }
 </style>
 {% endblock %}
@@ -219,6 +336,8 @@
         <a href="{{ url_for('game.questions_tree', type=game_type) }}" class="nav-button">Retour à l'arbre</a>
     </div>
 </div>
+
+<div class="scanlines"></div>
 {% endblock %}
 
 {% block extra_js %}

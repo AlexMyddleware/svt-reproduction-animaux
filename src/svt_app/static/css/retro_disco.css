@@ -409,3 +409,25 @@ footer {
   pointer-events: none;
   opacity: 0.2;
 } 
+
+/* new question fix background of buttons */
+
+#insertBlank {
+  background-color: rgba(10, 10, 26, 0.8);
+}
+
+.set-as-correct {
+  background-color: rgba(10, 10, 26, 0.8);
+}
+
+.remove-option {
+  background-color: rgba(10, 10, 26, 0.8);
+}
+
+#addOption {
+  background-color: rgba(10, 10, 26, 0.8);
+}
+
+#addOption {
+  background-color: rgba(10, 10, 26, 0.8);
+}
