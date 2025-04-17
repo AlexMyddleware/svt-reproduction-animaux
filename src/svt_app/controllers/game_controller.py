@@ -4,6 +4,7 @@ from typing import Dict, Any, List, Optional
 import os
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
+import subprocess
 
 from svt_app.services.question_service import QuestionService
 from svt_app.services.texte_a_trous_service import TexteATrousService
@@ -783,4 +784,41 @@ def move_items() -> Dict[str, Any]:
     
     except Exception as e:
         conditional_log("Error moving items: {}", str(e), level="ERROR")
-        return jsonify({"success": False, "message": "Une erreur est survenue lors du déplacement des éléments"}) 
+        return jsonify({"success": False, "message": "Une erreur est survenue lors du déplacement des éléments"})
+
+
+@game_bp.route('/open_folder', methods=['POST'])
+def open_folder():
+    """Open a folder in the system's file explorer."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'message': 'Invalid JSON data'}), 400
+            
+        folder_path = data.get('path', '')
+        
+        # Get the base directory (where the questions are stored)
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'assets', 'Data', 'fill_the_blanks'))
+        
+        # Join with the requested folder path
+        abs_path = os.path.abspath(os.path.join(base_dir, folder_path))
+        
+        # Security check - make sure the path is within the base directory
+        if not abs_path.startswith(base_dir):
+            return jsonify({'success': False, 'message': 'Invalid folder path'}), 403
+            
+        # Check if the folder exists
+        if not os.path.exists(abs_path):
+            return jsonify({'success': False, 'message': 'Folder not found'}), 404
+            
+        if os.name == 'nt':  # Windows
+            os.startfile(abs_path)
+        elif os.name == 'posix':  # macOS and Linux
+            if os.path.exists('/usr/bin/xdg-open'):  # Linux
+                subprocess.run(['xdg-open', abs_path])
+            else:  # macOS
+                subprocess.run(['open', abs_path])
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500 

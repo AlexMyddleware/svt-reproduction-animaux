@@ -424,6 +424,15 @@
         background: var(--neon-blue);
         box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
     }
+
+    .action-button.open-folder {
+        border-color: var(--neon-green);
+        color: var(--neon-green);
+    }
+
+    .action-button.open-folder:hover {
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+    }
 </style>
 {% endblock %}
 
@@ -463,6 +472,7 @@
                                 </div>
                                 <div class="folder-actions">
                                     <button class="action-button rename-folder" data-path="{{ item.path }}">Renommer</button>
+                                    <button class="action-button open-folder" data-path="{{ item.path }}">Ouvrir</button>
                                     <button class="action-button delete-button" data-path="{{ item.path }}">Supprimer</button>
                                 </div>
                             </div>
@@ -944,6 +954,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error:', error);
                     alert('Une erreur est survenue lors de la suppression de la question');
                 }
+            }
+        });
+    });
+
+    // Open folder in explorer
+    document.querySelectorAll('.open-folder').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const path = this.dataset.path;
+            
+            try {
+                const response = await fetch('/game/open_folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ path: path })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                if (!result.success) {
+                    alert(result.message || 'Une erreur est survenue lors de l\'ouverture du dossier');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de l\'ouverture du dossier');
             }
         });
     });
