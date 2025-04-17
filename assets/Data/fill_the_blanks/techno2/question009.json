@@ -1,0 +1,15 @@
+{
+    "text": "Que permet une résistance chauffante ?",
+    "options": [
+        "Allumer une lumière",
+        "Faire du bruit",
+        "Convertir l’énergie électrique en thermique",
+        "Augmenter la vitesse"
+    ],
+    "correct_answer": "Convertir l’énergie électrique en thermique",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

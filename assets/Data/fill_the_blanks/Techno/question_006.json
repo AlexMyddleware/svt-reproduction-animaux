@@ -1,0 +1,11 @@
+{
+  "text": "Quelle solution est la plus solide pour fixer un porte brosse à dents ?",
+  "options": [
+    "Bande adhésive",
+    "Ventouse",
+    "Colle",
+    "Vis"
+  ],
+  "correct_answer": "Vis",
+  "completed": false
+}

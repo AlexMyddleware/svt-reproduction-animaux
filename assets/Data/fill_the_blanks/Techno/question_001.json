@@ -1,0 +1,11 @@
+{
+  "text": "Quelle chaîne s'occupe de capter des informations avec des capteurs ?",
+  "options": [
+    "Chaîne d'énergie",
+    "Chaîne d'information",
+    "Chaîne alimentaire",
+    "Chaîne de transmission"
+  ],
+  "correct_answer": "Chaîne d'information",
+  "completed": false
+}

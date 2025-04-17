@@ -1,0 +1,11 @@
+{
+  "text": "Quel matériau est le plus mauvais pour l’environnement ?",
+  "options": [
+    "Bois",
+    "Acier",
+    "PVC",
+    "Aluminium"
+  ],
+  "correct_answer": "Aluminium",
+  "completed": false
+}

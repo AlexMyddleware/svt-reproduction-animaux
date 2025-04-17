@@ -1,0 +1,11 @@
+{
+  "text": "Que fait la chaîne d'énergie ?",
+  "options": [
+    "Elle regarde la télévision",
+    "Elle transmet l'énergie pour faire bouger des choses",
+    "Elle capte les sons",
+    "Elle donne des ordres aux capteurs"
+  ],
+  "correct_answer": "Elle transmet l'énergie pour faire bouger des choses",
+  "completed": false
+}

@@ -1,0 +1,11 @@
+{
+  "text": "Quelle est la première étape de la chaîne d'énergie ?",
+  "options": [
+    "Convertir l'énergie",
+    "Distribuer l'énergie",
+    "Alimenter",
+    "Transmettre l'énergie"
+  ],
+  "correct_answer": "Alimenter",
+  "completed": false
+}

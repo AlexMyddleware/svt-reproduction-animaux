@@ -1,0 +1,15 @@
+{
+    "text": "Quel est le rôle de l'alimentation  dans un système ?",
+    "options": [
+        "Afficher des données",
+        "Fournir de l'énergie",
+        "Faire du bruit",
+        "Envoyer un message"
+    ],
+    "correct_answer": "Fournir de l'énergie",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

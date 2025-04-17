@@ -1,0 +1,15 @@
+{
+    "text": "Quel élément commence la chaîne d'information ?",
+    "options": [
+        "Une batterie",
+        "Un moteur",
+        "Un capteur",
+        "Une roue"
+    ],
+    "correct_answer": "Un capteur",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 1,
+        "wrong_answers": 0
+    }
+}

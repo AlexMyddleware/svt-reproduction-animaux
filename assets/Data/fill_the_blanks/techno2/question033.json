@@ -1,0 +1,15 @@
+{
+    "text": "À quoi sert le processeur dans la chaîne d'information  dans un système ?",
+    "options": [
+        "À traiter les données",
+        "À produire de l'énergie",
+        "À allumer une lampe",
+        "À refroidir le système"
+    ],
+    "correct_answer": "À traiter les données",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}
