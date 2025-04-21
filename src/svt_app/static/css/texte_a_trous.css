@@ -345,4 +345,52 @@ header {
 .effects-disabled .retro-button:hover {
     transform: none;
     box-shadow: none;
+}
+
+.color-picker-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.color-picker-button label {
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8em;
+}
+
+#color-picker {
+    width: 60px;
+    height: 30px;
+    padding: 0;
+    border: 3px solid #fff;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+#color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+
+/* Add some hover effects for the color picker */
+#color-picker:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transition: all 0.2s ease;
+}
+
+/* Specific styles for the apply button to complement existing retro-button */
+.color-apply-btn {
+    min-width: 100px;
+    font-size: 0.8em !important;
+    padding: 5px 10px !important;
 } 

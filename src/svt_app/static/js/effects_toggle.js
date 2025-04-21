@@ -64,7 +64,7 @@ function changeColor(hex) {
 // Initialize color picker functionality
 document.addEventListener('DOMContentLoaded', function() {
     const colorPicker = document.getElementById('color-picker');
-    const applyColorBtn = document.querySelector('.color-picker-button button');
+    const applyColorBtn = document.querySelector('.color-apply-btn');
     
     if (colorPicker && applyColorBtn) {
         // Load saved color preference if available
