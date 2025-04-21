@@ -931,8 +931,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle delete button clicks
-    document.querySelectorAll('.delete-button').forEach(button => {
+    // Handle delete button clicks (for questions only)
+    document.querySelectorAll('.question-node .delete-button').forEach(button => {
         button.addEventListener('click', async function() {
             const file = this.dataset.file;
             if (confirm('Êtes-vous sûr de vouloir supprimer cette question ?')) {
