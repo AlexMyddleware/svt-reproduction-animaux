@@ -8,6 +8,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/folder_management.css') }}">
 <style>
     /* Reset overflow settings */
     html, body {
@@ -539,6 +540,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/folder_management.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Game type switching

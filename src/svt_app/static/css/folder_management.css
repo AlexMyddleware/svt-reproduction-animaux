@@ -1,0 +1,31 @@
+/* Folder management styles */
+.folder-content.collapsed {
+    display: none;
+}
+
+.folder-name.collapsed {
+    border-bottom: none;
+}
+
+#fold-all-btn {
+    margin-right: 10px;
+}
+
+.fold-folder {
+    margin-right: 5px;
+}
+
+/* Transition for smooth folding/unfolding */
+.folder-content {
+    transition: height 0.3s ease-in-out;
+}
+
+/* Style adjustments for fold button */
+.action-button.fold-folder {
+    border-color: var(--neon-blue);
+    color: var(--neon-blue);
+}
+
+.action-button.fold-folder:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+} 
