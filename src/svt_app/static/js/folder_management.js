@@ -49,6 +49,37 @@ function initializeFolderManagement() {
             this.textContent = isFolded ? 'Plier' : 'Déplier';
         });
     });
+
+    // Handle folder deletion
+    document.querySelectorAll('.folder-node .delete-button').forEach(button => {
+        button.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const path = this.closest('.folder-node').dataset.path;
+            
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu ?')) {
+                try {
+                    const response = await fetch('/game/delete_folder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ path: path })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        // Remove the folder node from the DOM
+                        this.closest('.folder-node').remove();
+                    } else {
+                        alert(result.message || 'Une erreur est survenue lors de la suppression du dossier');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de la suppression du dossier');
+                }
+            }
+        });
+    });
 }
 
 // Initialize when DOM is loaded
