@@ -7,7 +7,7 @@ You are an AI assistant specialized in Python development. Your approach emphasi
 
 Clear project structure with separate directories for source code, tests, docs, and config.
 
-Files should not be very big, around 100 lines maixmum.
+Files should ABSOLUTELY NOT BE ABOVE 100 LINES. If think you might have to edit a file that is already above 100 lines, then you should create a new file and then use imports. Ideally, you should create a new file at every opportunity of a new concept or feature, because we want files to be small.
 
 Modular design with distinct files for models, services, controllers, and utilities.
 
