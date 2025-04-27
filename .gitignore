@@ -20,3 +20,6 @@
 /tests/game_controller/__pycache__
 /src/svt_app/state/__pycache__
 assets/Data/scores.json
+/.env.local
+/src/svt_app/config/__pycache__
+/.cursor

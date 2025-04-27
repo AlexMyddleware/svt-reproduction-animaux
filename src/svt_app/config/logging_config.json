@@ -6,6 +6,7 @@
         "svt_app.utils.debug": false,
         "svt_app.app": false,
         "svt_app.state.scores": false,
+        "svt_app.services.anki_service": true,
         "run": false
     },
     "log_level": "DEBUG",

@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Anki Integration</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Authentication Status</h5>
+            <p id="auth-status" class="card-text">Checking authentication...</p>
+            <div id="auth-details" class="d-none">
+                <h6>Troubleshooting</h6>
+                <ul id="auth-causes" class="list-group mb-2"></ul>
+                <h6>Suggestions</h6>
+                <ul id="auth-suggestions" class="list-group"></ul>
+            </div>
+            <button id="authenticate" class="btn btn-primary">Authenticate</button>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Connection Status</h5>
+            <p id="connection-status" class="card-text">Checking connection to Anki...</p>
+            <div id="connection-details" class="d-none">
+                <h6>Troubleshooting</h6>
+                <ul id="connection-causes" class="list-group mb-2"></ul>
+                <h6>Suggestions</h6>
+                <ul id="connection-suggestions" class="list-group"></ul>
+            </div>
+            <button id="test-connection" class="btn btn-primary">Test Connection</button>
+        </div>
+    </div>
+
+    <div id="decks-container" class="card mt-4 d-none">
+        <div class="card-body">
+            <h5 class="card-title">Available Decks</h5>
+            <ul id="decks-list" class="list-group">
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const authStatusElement = document.getElementById('auth-status');
+    const authDetailsElement = document.getElementById('auth-details');
+    const authCausesElement = document.getElementById('auth-causes');
+    const authSuggestionsElement = document.getElementById('auth-suggestions');
+    const authButton = document.getElementById('authenticate');
+    
+    const statusElement = document.getElementById('connection-status');
+    const connectionDetailsElement = document.getElementById('connection-details');
+    const connectionCausesElement = document.getElementById('connection-causes');
+    const connectionSuggestionsElement = document.getElementById('connection-suggestions');
+    const testButton = document.getElementById('test-connection');
+    
+    const decksContainer = document.getElementById('decks-container');
+    const decksList = document.getElementById('decks-list');
+
+    function updateErrorDetails(error, detailsElement, causesElement, suggestionsElement) {
+        console.log('Updating error details:', error);
+        if (error && (error.possible_causes || error.suggestions)) {
+            detailsElement.classList.remove('d-none');
+            
+            if (error.possible_causes) {
+                causesElement.innerHTML = error.possible_causes
+                    .map(cause => `<li class="list-group-item list-group-item-warning">${cause}</li>`)
+                    .join('');
+            }
+            
+            if (error.suggestions) {
+                suggestionsElement.innerHTML = error.suggestions
+                    .map(suggestion => `<li class="list-group-item list-group-item-info">${suggestion}</li>`)
+                    .join('');
+            }
+        } else {
+            detailsElement.classList.add('d-none');
+        }
+    }
+
+    async function authenticate() {
+        console.log('Attempting to authenticate with Anki...');
+        try {
+            authStatusElement.textContent = 'Authenticating...';
+            const response = await fetch('/anki/authenticate');
+            const data = await response.json();
+            
+            console.log('Authentication response:', data);
+            authStatusElement.textContent = data.message;
+            
+            if (data.authenticated) {
+                authStatusElement.className = 'card-text text-success';
+                authDetailsElement.classList.add('d-none');
+                await loadDecks();
+            } else {
+                authStatusElement.className = 'card-text text-danger';
+                updateErrorDetails(data.error, authDetailsElement, authCausesElement, authSuggestionsElement);
+                decksContainer.classList.add('d-none');
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            authStatusElement.textContent = 'Error during authentication';
+            authStatusElement.className = 'card-text text-danger';
+            decksContainer.classList.add('d-none');
+        }
+    }
+
+    async function testConnection() {
+        console.log('Testing Anki connection...');
+        try {
+            statusElement.textContent = 'Testing connection...';
+            const response = await fetch('/anki/test-connection');
+            const data = await response.json();
+            
+            console.log('Connection test response:', data);
+            statusElement.textContent = data.message;
+            
+            if (data.connected) {
+                statusElement.className = 'card-text text-success';
+                connectionDetailsElement.classList.add('d-none');
+                await authenticate();
+            } else {
+                statusElement.className = 'card-text text-danger';
+                updateErrorDetails(data.error, connectionDetailsElement, connectionCausesElement, connectionSuggestionsElement);
+                decksContainer.classList.add('d-none');
+            }
+        } catch (error) {
+            console.error('Connection test error:', error);
+            statusElement.textContent = 'Error testing connection';
+            statusElement.className = 'card-text text-danger';
+            decksContainer.classList.add('d-none');
+        }
+    }
+
+    async function loadDecks() {
+        console.log('Loading Anki decks...');
+        try {
+            const response = await fetch('/anki/decks');
+            const data = await response.json();
+            
+            console.log('Decks response:', data);
+            if (data.success) {
+                decksList.innerHTML = '';
+                data.decks.forEach(deck => {
+                    console.log('Adding deck:', deck);
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = deck;
+                    decksList.appendChild(li);
+                });
+                decksContainer.classList.remove('d-none');
+            } else {
+                console.error('Failed to load decks:', data.error);
+                if (data.error) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item list-group-item-danger';
+                    li.textContent = `Error: ${data.error.message || 'Unknown error'}`;
+                    decksList.appendChild(li);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading decks:', error);
+        }
+    }
+
+    authButton.addEventListener('click', authenticate);
+    testButton.addEventListener('click', testConnection);
+    testConnection(); // Test connection on page load
+});
+</script>
+{% endblock %} 
