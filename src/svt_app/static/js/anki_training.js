@@ -76,6 +76,7 @@ function toggleCard() {
 async function submitAnswer(ease) {
     console.log("Shady sam this is the submit answer function", ease);
     try {
+        console.log("Making request with cardId:", currentCardId, "and ease:", ease);
         const response = await fetch('/api/anki/answer', {
             method: 'POST',
             headers: {
@@ -87,13 +88,18 @@ async function submitAnswer(ease) {
             })
         });
         
+        console.log("Response received:", response);
         const data = await response.json();
+        console.log("Response data:", data);
+        
         if (data.success) {
-            console.log("martin septim this is the submit answer function", data);
+            console.log("Answer submitted successfully");
             currentCardIndex++;
-            console.log("uriel septim this is the current card index", currentCardIndex);
+            console.log("New card index:", currentCardIndex);
             updateProgress();
             showNextCard();
+        } else {
+            console.error("Answer submission failed:", data.error);
         }
     } catch (error) {
         console.error('Error submitting answer:', error);

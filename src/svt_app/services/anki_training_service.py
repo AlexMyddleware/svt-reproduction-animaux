@@ -78,11 +78,18 @@ class AnkiTrainingService:
             True if answer was submitted successfully
         """
         conditional_log("Answering card {} with ease {}", card_id, ease)
-        response, _ = self.anki._make_request("guiAnswerCard", {
-            "cardId": card_id,
-            "ease": ease
+        
+        # Correct the request structure
+        response, _ = self.anki._make_request("answerCards", {
+            "answers": [  # Directly pass answers as a list
+                {
+                    "cardId": card_id,
+                    "ease": ease
+                }
+            ]
         })
         
         success = response and 'error' not in response
         conditional_log("Answer submission {}", "successful" if success else "failed")
-        return success 
+        return success
+

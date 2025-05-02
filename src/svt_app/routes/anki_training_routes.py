@@ -59,6 +59,7 @@ def submit_answer() -> Dict[str, Any]:
         JSON response indicating success
     """
     if not session.get('anki_authenticated'):
+        conditional_log("Answer submission failed: Not authenticated")
         return jsonify({
             'success': False,
             'error': 'Not authenticated'
@@ -66,17 +67,29 @@ def submit_answer() -> Dict[str, Any]:
 
     try:
         data = request.get_json()
+        conditional_log("Received answer submission data: {}", data)
+        
         cardId = data.get('cardId')
         ease = data.get('ease')
         
         if not cardId or not ease:
+            conditional_log("Answer submission failed: Missing cardId or ease")
             return jsonify({
                 'success': False,
                 'error': 'Missing cardId or ease'
             })
             
+        conditional_log("Submitting answer for card {} with ease {}", cardId, ease)
         success = training_service.answer_card(cardId, ease)
-        return jsonify({'success': success})
+        conditional_log("Answer submission result: {}", success)
+        
+        if not success:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to submit answer to Anki'
+            })
+            
+        return jsonify({'success': True})
     except Exception as e:
         conditional_log("Error submitting answer: {}", str(e), level='ERROR')
         return jsonify({
