@@ -1,5 +1,43 @@
 {% extends "base.html" %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
+<style>
+.deck-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    margin: 5px 0;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff00ff;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.deck-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px #ff00ff;
+}
+
+.train-button {
+    padding: 8px 16px;
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    border: none;
+    border-radius: 5px;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.train-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #ff00ff;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>Anki Integration</h2>
@@ -35,8 +73,8 @@
     <div id="decks-container" class="card mt-4 d-none">
         <div class="card-body">
             <h5 class="card-title">Available Decks</h5>
-            <ul id="decks-list" class="list-group">
-            </ul>
+            <div id="decks-list" class="list-group">
+            </div>
         </div>
     </div>
 </div>
@@ -144,10 +182,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 decksList.innerHTML = '';
                 data.decks.forEach(deck => {
                     console.log('Adding deck:', deck);
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item';
-                    li.textContent = deck;
-                    decksList.appendChild(li);
+                    const div = document.createElement('div');
+                    div.className = 'deck-item';
+                    div.innerHTML = `
+                        <span>${deck}</span>
+                        <a href="/anki/train/${encodeURIComponent(deck)}" class="train-button">
+                            Train
+                        </a>
+                    `;
+                    decksList.appendChild(div);
                 });
                 decksContainer.classList.remove('d-none');
             } else {

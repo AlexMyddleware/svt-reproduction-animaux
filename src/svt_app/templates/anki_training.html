@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/anki_training.css') }}">
+<style>
+.card-container {
+    perspective: 1000px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+}
+
+.card {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    cursor: pointer;
+    min-height: 200px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff00ff;
+    box-shadow: 0 0 20px #ff00ff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+.cloze-highlight {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.answer-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.answer-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.again { background: #ff0055; color: white; }
+.hard { background: #ff9900; color: white; }
+.good { background: #00ff00; color: black; }
+.easy { background: #00ffff; color: black; }
+
+.answer-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px currentColor;
+}
+
+.progress-bar {
+    width: 80%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #ff00ff, #00ffff);
+    transition: width 0.3s;
+}
+
+.deck-info {
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 10px #ff00ff;
+    margin-bottom: 20px;
+}
+
+/* Additional styling for card content */
+img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+}
+
+table {
+    margin: 10px auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid #ff00ff;
+    padding: 5px 10px;
+}
+
+.card-content {
+    width: 100%;
+    height: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="deck-info">
+        <h2>{{ deck_name }}</h2>
+        <p>Cards remaining: <span id="remaining-count">0</span></p>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress" id="progress" style="width: 0%"></div>
+    </div>
+
+    <div class="card-container">
+        <div class="card" id="current-card">
+            <div class="card-front">
+                <div id="question" class="card-content">Loading cards...</div>
+            </div>
+            <div class="card-back">
+                <div id="answer" class="card-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="answer-buttons" style="display: none">
+        <button class="answer-button again" onclick="submitAnswer(1)">Again</button>
+        <button class="answer-button hard" onclick="submitAnswer(2)">Hard</button>
+        <button class="answer-button good" onclick="submitAnswer(3)">Good</button>
+        <button class="answer-button easy" onclick="submitAnswer(4)">Easy</button>
+    </div>
+</div>
+
+<script>
+    const deckName = "{{ deck_name }}";
+</script>
+<script src="{{ url_for('static', filename='js/anki_training.js') }}"></script>
+{% endblock %} 

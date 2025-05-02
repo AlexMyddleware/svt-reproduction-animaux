@@ -1,0 +1,127 @@
+.card-container {
+    perspective: 1000px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 600px;
+}
+
+.card {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    min-height: 200px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ff00ff;
+    box-shadow: 0 0 20px #ff00ff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8); /* Match card background */
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
+.cloze-highlight {
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.answer-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.answer-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.again { background: #ff0055; color: white; }
+.hard { background: #ff9900; color: white; }
+.good { background: #00ff00; color: black; }
+.easy { background: #00ffff; color: black; }
+
+.answer-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px currentColor;
+}
+
+.progress-bar {
+    width: 80%;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, #ff00ff, #00ffff);
+    transition: width 0.3s;
+}
+
+.deck-info {
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 0 10px #ff00ff;
+    margin-bottom: 20px;
+}
+
+/* Card content styling */
+.card-content {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.card-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+}
+
+.card-content table {
+    margin: 10px auto;
+    border-collapse: collapse;
+}
+
+.card-content td,
+.card-content th {
+    border: 1px solid #ff00ff;
+    padding: 5px 10px;
+} 

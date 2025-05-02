@@ -10,6 +10,7 @@ from svt_app.controllers.game_controller import game_bp
 from svt_app.controllers.settings_controller import settings_bp
 from svt_app.controllers.image_matching_controller import image_matching_bp
 from svt_app.routes.anki_routes import anki_bp
+from svt_app.routes.anki_training_routes import training_bp
 from svt_app.utils.logging_utils import conditional_log, log_if_enabled
 from svt_app.state import GameScores
 
@@ -47,6 +48,7 @@ def create_app() -> Flask:
     app.register_blueprint(settings_bp, url_prefix="/settings")
     app.register_blueprint(image_matching_bp, url_prefix="/game")
     app.register_blueprint(anki_bp, url_prefix="/")
+    app.register_blueprint(training_bp, url_prefix="/")
 
     @app.route("/")
     @log_if_enabled()
