@@ -38,7 +38,7 @@ async function loadCards() {
 function showNextCard() {
     console.log("this is the show next card function", currentCardIndex, currentCards.length);
     if (currentCardIndex >= currentCards.length) {
-        showMessage('Review complete!');
+        showMessage('Tu as fini de révijouer ce paquet!');
         return;
     }
 
@@ -61,6 +61,7 @@ function showMessage(message) {
     elements.answer.innerHTML = '';
     elements.currentCard.style.cursor = 'default';
     elements.answerButtons.style.display = 'none';
+    elements.currentCard.classList.add('review-complete');
 }
 
 function toggleCard() {

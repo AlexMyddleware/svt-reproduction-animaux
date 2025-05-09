@@ -125,3 +125,7 @@
     border: 1px solid #ff00ff;
     padding: 5px 10px;
 } 
+
+.review-complete {
+    transform: rotateY(360deg) !important;
+}
