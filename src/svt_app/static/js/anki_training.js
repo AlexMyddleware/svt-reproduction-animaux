@@ -13,7 +13,8 @@ const elements = {
     remainingCount: document.getElementById('remaining-count'),
     currentCard: document.getElementById('current-card'),
     answerButtons: document.querySelector('.answer-buttons'),
-    progress: document.getElementById('progress')
+    progress: document.getElementById('progress'),
+    returnButton: document.createElement('button')
 };
 
 const wooshAudio = new Audio('/static/audio/short_woosh.mp3');
@@ -133,4 +134,16 @@ function updateProgress() {
 
 // Initialize
 elements.currentCard.addEventListener('click', toggleCard);
+elements.returnButton.textContent = 'Retour aux paquets';
+elements.returnButton.className = 'return-to-decks-btn';
+elements.returnButton.addEventListener('click', () => {
+    window.location.href = '/anki';
+});
+
+// Get the card container and append the return button after it
+const cardContainer = elements.currentCard.closest('.card-container');
+if (cardContainer && cardContainer.parentElement) {
+    cardContainer.parentElement.insertBefore(elements.returnButton, cardContainer.nextSibling);
+}
+
 loadCards(); 
