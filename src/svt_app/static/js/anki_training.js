@@ -96,9 +96,7 @@ async function submitAnswer(ease) {
         
         if (data.success) {
             console.log("Answer submission successful");
-            currentCardIndex++;
-            updateProgress();
-            showNextCard();
+            await loadCards();
         } else {
             console.error("Answer submission failed:", data.error);
         }
