@@ -27,7 +27,7 @@ async function loadCards() {
             updateProgress();
             showNextCard();
         } else {
-            showMessage('Pas de cartes disponibles pour révijouer!');
+            showMessage('Tu as fini de révijouer ce paquet!');
         }
     } catch (error) {
         console.error('Error loading cards:', error);
