@@ -4,6 +4,7 @@ let currentCardIndex = 0;
 let totalCards = 0;
 let currentCardId = null;
 let isShowingAnswer = false;
+let lastAnsweredCardId = null;
 
 // UI Elements
 const elements = {
@@ -22,8 +23,14 @@ async function loadCards() {
         console.log("this is the data tarzan", data);
         
         if (data.success && data.cards.length > 0) {
+            // If more than one card, and the first is the last answered, rotate the array
+            if (data.cards.length > 1 && data.cards[0].cardId === lastAnsweredCardId) {
+                // Move the first card to the end
+                data.cards.push(data.cards.shift());
+            }
             currentCards = data.cards;
             totalCards = data.cards.length;
+            currentCardIndex = 0;
             updateProgress();
             showNextCard();
         } else {
@@ -96,6 +103,7 @@ async function submitAnswer(ease) {
         
         if (data.success) {
             console.log("Answer submission successful");
+            lastAnsweredCardId = currentCardId;
             await loadCards();
         } else {
             console.error("Answer submission failed:", data.error);
