@@ -19,6 +19,9 @@ const elements = {
 const wooshAudio = new Audio('/static/audio/short_woosh.mp3');
 wooshAudio.preload = 'auto';
 
+const deckCompletedAudio = new Audio('/static/audio/deck-completed.mp3');
+deckCompletedAudio.preload = 'auto';
+
 async function loadCards() {
     try {
         const response = await fetch(`/api/anki/cards/${deckName}`);
@@ -38,6 +41,7 @@ async function loadCards() {
             showNextCard();
         } else {
             showMessage('Tu as fini de révijouer ce paquet!');
+            deckCompletedAudio.play();
         }
     } catch (error) {
         console.error('Error loading cards:', error);
