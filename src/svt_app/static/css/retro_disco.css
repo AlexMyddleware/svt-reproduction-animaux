@@ -431,3 +431,10 @@ footer {
 #addOption {
   background-color: rgba(10, 10, 26, 0.8);
 }
+
+#decks-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
