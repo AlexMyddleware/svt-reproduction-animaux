@@ -16,6 +16,9 @@ const elements = {
     progress: document.getElementById('progress')
 };
 
+const wooshAudio = new Audio('/static/audio/short_woosh.mp3');
+wooshAudio.preload = 'auto';
+
 async function loadCards() {
     try {
         const response = await fetch(`/api/anki/cards/${deckName}`);
@@ -75,6 +78,9 @@ function toggleCard() {
     if (!currentCardId) return; // Don't toggle if showing a message
     
     if (!isShowingAnswer) {
+        wooshAudio.currentTime = 0; // rewind to start
+        wooshAudio.play();
+
         elements.currentCard.classList.add('flipped');
         elements.answerButtons.style.display = 'flex';
         isShowingAnswer = true;
