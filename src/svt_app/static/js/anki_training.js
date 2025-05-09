@@ -27,7 +27,7 @@ async function loadCards() {
             updateProgress();
             showNextCard();
         } else {
-            showMessage('No cards available for review!');
+            showMessage('Pas de cartes disponibles pour révijouer!');
         }
     } catch (error) {
         console.error('Error loading cards:', error);
