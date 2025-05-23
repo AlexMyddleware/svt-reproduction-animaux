@@ -1,0 +1,15 @@
+{
+    "text": "Quel muscle est responsable de l'extension de l'avant-bras selon le schéma ?",
+    "options": [
+        "Biceps",
+        "Brachial",
+        "Triceps",
+        "Deltoïde"
+    ],
+    "correct_answer": "Triceps",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 1,
+        "wrong_answers": 0
+    }
+}

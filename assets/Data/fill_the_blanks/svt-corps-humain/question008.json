@@ -1,0 +1,15 @@
+{
+    "text": "Que fait le triceps ?",
+    "options": [
+        "Il permet de plier le bras",
+        "Il permet de bouger les doigts",
+        "Il permet de courir",
+        "Il permet de déplier le bras"
+    ],
+    "correct_answer": "Il permet de déplier le bras",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "text": "Quelle couleur représente les tendons dans le schéma ?",
+    "options": [
+        "Rouge",
+        "Vert",
+        "Bleu",
+        "Noir"
+    ],
+    "correct_answer": "Bleu",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 1,
+        "wrong_answers": 0
+    }
+}

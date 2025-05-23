@@ -1,0 +1,15 @@
+{
+    "text": "Qu'est-ce qui pilote les muscles ?",
+    "options": [
+        "Le cœur",
+        "Les poumons",
+        "Le cerveau",
+        "La moelle osseuse"
+    ],
+    "correct_answer": "Le cerveau",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

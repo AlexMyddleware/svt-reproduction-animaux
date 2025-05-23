@@ -1,0 +1,15 @@
+{
+    "text": "Que fait le biceps ?",
+    "options": [
+        "Il permet de redresser le bras",
+        "Il permet de plier le bras",
+        "Il permet de tourner la tête",
+        "Il permet de courir"
+    ],
+    "correct_answer": "Il permet de plier le bras",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

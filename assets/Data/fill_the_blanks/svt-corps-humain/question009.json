@@ -1,0 +1,15 @@
+{
+    "text": "Quelle est la relation générale entre deux muscles comme le triceps et le biceps dans le corps ?",
+    "options": [
+        "Ils travaillent en même temps pour le même mouvement",
+        "Ils sont opposés et permettent des mouvements contraires",
+        "Ils ne sont pas liés",
+        "Ils contrôlent le cerveau"
+    ],
+    "correct_answer": "Ils sont opposés et permettent des mouvements contraires",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}
