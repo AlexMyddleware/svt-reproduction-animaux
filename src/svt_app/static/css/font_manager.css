@@ -1,5 +1,5 @@
 /* Font Family Manager CSS */
-/* This file manages the global font families used throughout the application */
+/* This file manages the global font families and colors used throughout the application */
 
 /* Import all required fonts */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Press+Start+2P&display=swap');
@@ -10,6 +10,10 @@
     --primary-font: 'Atkinson Hyperlegible', sans-serif;
     --heading-font: 'Atkinson Hyperlegible', sans-serif;
     --pixel-font: 'Atkinson Hyperlegible', sans-serif;
+    
+    /* Font color variables that can be dynamically changed */
+    --global-text-color: #ffffff;
+    --global-text-color-important: #ffffff;
     
     /* Original font definitions (kept for reference) */
     --original-heading-font: 'Orbitron', sans-serif;
@@ -71,13 +75,20 @@ body {
     font-family: var(--primary-font);
 }
 
-/* All elements now use the dynamic font variables */
+/* Global font color classes that override everything */
+.global-font-color,
+.global-font-color * {
+    color: var(--global-text-color) !important;
+}
+
+/* All elements now use the dynamic font variables and colors */
 .settings-title,
 .tree-title,
 header h1,
 .scores-display,
 .save-button {
     font-family: var(--pixel-font) !important;
+    color: var(--global-text-color) !important;
 }
 
 /* Elements that use heading font (now dynamic) */
@@ -98,9 +109,10 @@ header h1,
 .question-number,
 .select-group label {
     font-family: var(--heading-font) !important;
+    color: var(--global-text-color) !important;
 }
 
-/* Text content that uses the primary font */
+/* Text content that uses the primary font and global color */
 .question-text,
 .option,
 .blank,
@@ -110,8 +122,23 @@ label:not(.checkbox-group label):not(.select-group label),
 span,
 td,
 th,
-li {
+li,
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--primary-font);
+    color: var(--global-text-color) !important;
+}
+
+/* Specific overrides to ensure complete color control */
+* {
+    color: var(--global-text-color) !important;
+}
+
+/* Exception for some UI elements that need to keep their specific colors */
+input[type="color"],
+.border-color,
+.background-color,
+.neon-glow {
+    color: unset !important;
 }
 
 /* Dropdown styling for font selection */
@@ -141,8 +168,45 @@ li {
     padding: 10px;
 }
 
+/* Color picker styling */
+.color-picker {
+    width: 60px;
+    height: 40px;
+    padding: 0;
+    border: 2px solid var(--neon-blue);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.color-picker:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: 6px;
+}
+
+.color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
 /* Special class to restore original fonts if needed */
 .restore-original-fonts {
     --heading-font: var(--original-heading-font);
     --pixel-font: var(--original-pixel-font);
+}
+
+/* Override for the local color picker in games - global color takes precedence */
+body.global-color-override .option {
+    color: var(--global-text-color) !important;
+}
+
+body.global-color-override .question-text {
+    color: var(--global-text-color) !important;
 } 

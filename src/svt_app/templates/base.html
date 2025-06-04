@@ -62,20 +62,38 @@
         }
     }
 
-    // Load and apply font setting on page load
+    function applyFontColor(color) {
+        // Update the CSS custom property for global text color
+        document.documentElement.style.setProperty('--global-text-color', color);
+        document.documentElement.style.setProperty('--global-text-color-important', color);
+        
+        // Add override class to ensure global color takes precedence over local color pickers
+        document.body.classList.add('global-color-override');
+        
+        console.log('Applied global font color:', color);
+    }
+
+    // Load and apply font settings on page load
     async function loadFontSettings() {
         try {
             const response = await fetch('/settings/get-font');
             const data = await response.json();
-            if (data.success && data.font_family) {
-                applyFontFamily(data.font_family);
+            if (data.success) {
+                if (data.font_family) {
+                    applyFontFamily(data.font_family);
+                }
+                if (data.font_color) {
+                    applyFontColor(data.font_color);
+                }
             } else {
-                // Default to Atkinson Hyperlegible if no setting found
+                // Default to Atkinson Hyperlegible and white if no setting found
                 applyFontFamily('Atkinson Hyperlegible');
+                applyFontColor('#ffffff');
             }
         } catch (error) {
-            console.log('Could not load font settings, using default');
+            console.log('Could not load font settings, using defaults');
             applyFontFamily('Atkinson Hyperlegible');
+            applyFontColor('#ffffff');
         }
     }
 
@@ -190,8 +208,9 @@
         hasUnsavedChanges = value;
     };
 
-    // Export font function for other scripts
+    // Export font functions for other scripts
     window.applyFontFamily = applyFontFamily;
+    window.applyFontColor = applyFontColor;
     </script>
     {% block extra_js %}{% endblock %}
 </body>

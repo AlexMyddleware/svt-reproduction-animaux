@@ -132,6 +132,30 @@
         margin-bottom: 10px;
     }
 
+    .color-group {
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .color-group:hover {
+        background: rgba(153, 0, 255, 0.1);
+        border-color: var(--neon-purple);
+    }
+
+    .color-group label {
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        flex: 1;
+    }
+
     .save-button {
         display: block;
         width: 100%;
@@ -230,6 +254,24 @@
         font-size: 1rem;
         line-height: 1.5;
     }
+
+    .color-preview {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(5, 5, 15, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+    }
+
+    .color-preview h4 {
+        margin-bottom: 10px;
+        color: var(--neon-green);
+    }
+
+    .color-preview-text {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
 </style>
 {% endblock %}
 
@@ -253,9 +295,17 @@
                     <option value="fantasy" {% if font_family == "fantasy" %}selected{% endif %}>Fantasy (Impact)</option>
                 </select>
             </div>
+            <div class="color-group">
+                <label for="fontColor">Couleur du texte :</label>
+                <input type="color" id="fontColor" name="font_color" class="color-picker" value="{{ font_color }}">
+            </div>
             <div class="font-preview">
                 <h4>Aperçu :</h4>
                 <p class="font-preview-text">Cette police sera appliquée à tous les textes de l'application, y compris les titres, boutons et menus. Vous pouvez voir immédiatement le changement sur cette page.</p>
+            </div>
+            <div class="color-preview">
+                <h4>Aperçu couleur :</h4>
+                <p class="color-preview-text">Cette couleur sera appliquée à TOUS les textes de l'application et remplacera la couleur locale des jeux. Vous voyez le changement en temps réel !</p>
             </div>
         </div>
         
@@ -296,13 +346,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const settingsForm = document.getElementById('settingsForm');
     const settingsMessage = document.getElementById('settingsMessage');
     const fontFamilySelect = document.getElementById('fontFamily');
+    const fontColorPicker = document.getElementById('fontColor');
     
-    // Apply the current font family on page load
+    // Apply the current font family and color on page load
     applyFontFamily(fontFamilySelect.value);
+    applyFontColor(fontColorPicker.value);
     
     // Apply font family immediately when changed (preview)
     fontFamilySelect.addEventListener('change', function(e) {
         applyFontFamily(e.target.value);
+    });
+    
+    // Apply font color immediately when changed (preview)
+    fontColorPicker.addEventListener('input', function(e) {
+        applyFontColor(e.target.value);
     });
     
     function applyFontFamily(fontFamily) {
@@ -337,6 +394,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function applyFontColor(color) {
+        // Update the CSS custom property for global text color
+        document.documentElement.style.setProperty('--global-text-color', color);
+        document.documentElement.style.setProperty('--global-text-color-important', color);
+        
+        // Add override class to ensure global color takes precedence
+        document.body.classList.add('global-color-override');
+        
+        console.log('Applied global font color:', color);
+    }
+    
     function showMessage(message, isSuccess = true) {
         settingsMessage.textContent = message;
         settingsMessage.style.display = 'block';
@@ -353,6 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const autoValidate = document.getElementById('autoValidate').checked;
         const fontFamily = document.getElementById('fontFamily').value;
+        const fontColor = document.getElementById('fontColor').value;
         
         try {
             const response = await fetch('/settings/save', {
@@ -362,7 +431,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     auto_validate: autoValidate,
-                    font_family: fontFamily
+                    font_family: fontFamily,
+                    font_color: fontColor
                 })
             });
             

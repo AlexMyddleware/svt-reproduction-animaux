@@ -1,4 +1,5 @@
 {
     "auto_validate": true,
-    "font_family": "Orbitron"
+    "font_family": "Orbitron",
+    "font_color": "#e41f51"
 }
