@@ -21,7 +21,8 @@ def load_settings() -> Dict[str, Any]:
         Dict[str, Any]: Dictionary containing the settings.
     """
     default_settings = {
-        "auto_validate": True
+        "auto_validate": True,
+        "font_family": "Atkinson Hyperlegible"
     }
     
     if not os.path.exists(SETTINGS_FILE):
@@ -75,9 +76,28 @@ def settings() -> str:
     """
     settings_data = load_settings()
     auto_validate = settings_data.get("auto_validate", True)
+    font_family = settings_data.get("font_family", "Atkinson Hyperlegible")
     debug_log("Rendering settings page with data: {}", settings_data)
     debug_log("auto_validate value type: {}, value: {}", type(auto_validate), auto_validate)
-    return render_template("settings.html", auto_validate=auto_validate)
+    debug_log("font_family value: {}", font_family)
+    return render_template("settings.html", auto_validate=auto_validate, font_family=font_family)
+
+@settings_bp.route("/get-font", methods=["GET"])
+def get_font() -> Dict[str, Any]:
+    """
+    Get the current font family setting.
+    
+    Returns:
+        Dict[str, Any]: JSON response with the current font family.
+    """
+    try:
+        settings_data = load_settings()
+        font_family = settings_data.get("font_family", "Atkinson Hyperlegible")
+        debug_log("Retrieved font family: {}", font_family)
+        return jsonify({"success": True, "font_family": font_family})
+    except Exception as e:
+        debug_log("Error getting font setting: {}", str(e))
+        return jsonify({"success": False, "font_family": "Atkinson Hyperlegible"})
 
 @settings_bp.route("/save", methods=["POST"])
 def save() -> Dict[str, Any]:
@@ -94,6 +114,7 @@ def save() -> Dict[str, Any]:
         
         current_settings = load_settings()
         current_settings["auto_validate"] = bool(data.get("auto_validate", True))
+        current_settings["font_family"] = str(data.get("font_family", "Atkinson Hyperlegible"))
         debug_log("Saving new settings: {}", current_settings)
         
         if save_settings(current_settings):

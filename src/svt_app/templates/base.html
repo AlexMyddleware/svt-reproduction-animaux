@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Revijouer{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font_manager.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -28,6 +29,56 @@
     
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
+    // Global font management
+    function applyFontFamily(fontFamily) {
+        // Remove all existing font classes
+        document.body.classList.remove('font-atkinson', 'font-orbitron', 'font-serif', 'font-sans-serif', 'font-monospace', 'font-cursive', 'font-fantasy');
+        
+        // Apply the appropriate font class
+        switch(fontFamily) {
+            case 'Atkinson Hyperlegible':
+                document.body.classList.add('font-atkinson');
+                break;
+            case 'Orbitron':
+                document.body.classList.add('font-orbitron');
+                break;
+            case 'serif':
+                document.body.classList.add('font-serif');
+                break;
+            case 'sans-serif':
+                document.body.classList.add('font-sans-serif');
+                break;
+            case 'monospace':
+                document.body.classList.add('font-monospace');
+                break;
+            case 'cursive':
+                document.body.classList.add('font-cursive');
+                break;
+            case 'fantasy':
+                document.body.classList.add('font-fantasy');
+                break;
+            default:
+                document.body.classList.add('font-atkinson');
+        }
+    }
+
+    // Load and apply font setting on page load
+    async function loadFontSettings() {
+        try {
+            const response = await fetch('/settings/get-font');
+            const data = await response.json();
+            if (data.success && data.font_family) {
+                applyFontFamily(data.font_family);
+            } else {
+                // Default to Atkinson Hyperlegible if no setting found
+                applyFontFamily('Atkinson Hyperlegible');
+            }
+        } catch (error) {
+            console.log('Could not load font settings, using default');
+            applyFontFamily('Atkinson Hyperlegible');
+        }
+    }
+
     // Global flags
     let quitInitialized = false;
     let isQuitting = false;
@@ -129,12 +180,18 @@
     }
 
     // Initialize on DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', initQuitFunctionality);
+    document.addEventListener('DOMContentLoaded', function() {
+        loadFontSettings();
+        initQuitFunctionality();
+    });
 
     // Export function to set unsaved changes state
     window.setUnsavedChanges = function(value) {
         hasUnsavedChanges = value;
     };
+
+    // Export font function for other scripts
+    window.applyFontFamily = applyFontFamily;
     </script>
     {% block extra_js %}{% endblock %}
 </body>

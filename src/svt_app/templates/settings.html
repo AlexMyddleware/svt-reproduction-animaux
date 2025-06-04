@@ -8,6 +8,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/retro_disco.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/font_manager.css') }}">
 <style>
     /* Hide the base template header completely */
     header {
@@ -109,6 +110,28 @@
         line-height: 1.4;
     }
 
+    .select-group {
+        margin: 15px 0;
+        padding: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .select-group:hover {
+        background: rgba(153, 0, 255, 0.1);
+        border-color: var(--neon-purple);
+    }
+
+    .select-group label {
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        display: block;
+        margin-bottom: 10px;
+    }
+
     .save-button {
         display: block;
         width: 100%;
@@ -197,6 +220,23 @@
     
     <form id="settingsForm" class="settings-options">
         <div class="setting-group">
+            <h3>Police de caractères</h3>
+            <p>Choisissez la police de caractères utilisée dans toute l'application.</p>
+            <div class="select-group">
+                <label for="fontFamily">Police de caractères :</label>
+                <select id="fontFamily" name="font_family" class="font-select">
+                    <option value="Atkinson Hyperlegible" {% if font_family == "Atkinson Hyperlegible" %}selected{% endif %}>Atkinson Hyperlegible (par défaut)</option>
+                    <option value="Orbitron" {% if font_family == "Orbitron" %}selected{% endif %}>Orbitron</option>
+                    <option value="serif" {% if font_family == "serif" %}selected{% endif %}>Serif (Georgia)</option>
+                    <option value="sans-serif" {% if font_family == "sans-serif" %}selected{% endif %}>Sans-serif (Segoe UI)</option>
+                    <option value="monospace" {% if font_family == "monospace" %}selected{% endif %}>Monospace (Courier New)</option>
+                    <option value="cursive" {% if font_family == "cursive" %}selected{% endif %}>Cursive (Comic Sans MS)</option>
+                    <option value="fantasy" {% if font_family == "fantasy" %}selected{% endif %}>Fantasy (Impact)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="setting-group">
             <h3>Langue</h3>
             <p>Toutes les questions sont en français.</p>
         </div>
@@ -232,6 +272,47 @@
 document.addEventListener('DOMContentLoaded', function() {
     const settingsForm = document.getElementById('settingsForm');
     const settingsMessage = document.getElementById('settingsMessage');
+    const fontFamilySelect = document.getElementById('fontFamily');
+    
+    // Apply the current font family on page load
+    applyFontFamily(fontFamilySelect.value);
+    
+    // Apply font family immediately when changed (preview)
+    fontFamilySelect.addEventListener('change', function(e) {
+        applyFontFamily(e.target.value);
+    });
+    
+    function applyFontFamily(fontFamily) {
+        // Remove all existing font classes
+        document.body.classList.remove('font-atkinson', 'font-orbitron', 'font-serif', 'font-sans-serif', 'font-monospace', 'font-cursive', 'font-fantasy');
+        
+        // Apply the appropriate font class
+        switch(fontFamily) {
+            case 'Atkinson Hyperlegible':
+                document.body.classList.add('font-atkinson');
+                break;
+            case 'Orbitron':
+                document.body.classList.add('font-orbitron');
+                break;
+            case 'serif':
+                document.body.classList.add('font-serif');
+                break;
+            case 'sans-serif':
+                document.body.classList.add('font-sans-serif');
+                break;
+            case 'monospace':
+                document.body.classList.add('font-monospace');
+                break;
+            case 'cursive':
+                document.body.classList.add('font-cursive');
+                break;
+            case 'fantasy':
+                document.body.classList.add('font-fantasy');
+                break;
+            default:
+                document.body.classList.add('font-atkinson');
+        }
+    }
     
     function showMessage(message, isSuccess = true) {
         settingsMessage.textContent = message;
@@ -248,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         
         const autoValidate = document.getElementById('autoValidate').checked;
+        const fontFamily = document.getElementById('fontFamily').value;
         
         try {
             const response = await fetch('/settings/save', {
@@ -256,7 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    auto_validate: autoValidate
+                    auto_validate: autoValidate,
+                    font_family: fontFamily
                 })
             });
             
