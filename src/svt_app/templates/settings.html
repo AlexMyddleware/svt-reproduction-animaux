@@ -211,6 +211,25 @@
             opacity: 1;
         }
     }
+
+    .font-preview {
+        margin-top: 15px;
+        padding: 15px;
+        background: rgba(5, 5, 15, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        color: white;
+    }
+
+    .font-preview h4 {
+        margin-bottom: 10px;
+        color: var(--neon-blue);
+    }
+
+    .font-preview-text {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
 </style>
 {% endblock %}
 
@@ -233,6 +252,10 @@
                     <option value="cursive" {% if font_family == "cursive" %}selected{% endif %}>Cursive (Comic Sans MS)</option>
                     <option value="fantasy" {% if font_family == "fantasy" %}selected{% endif %}>Fantasy (Impact)</option>
                 </select>
+            </div>
+            <div class="font-preview">
+                <h4>Aperçu :</h4>
+                <p class="font-preview-text">Cette police sera appliquée à tous les textes de l'application, y compris les titres, boutons et menus. Vous pouvez voir immédiatement le changement sur cette page.</p>
             </div>
         </div>
         

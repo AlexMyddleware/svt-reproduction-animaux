@@ -8,8 +8,12 @@
 :root {
     /* Font family variables that can be dynamically changed */
     --primary-font: 'Atkinson Hyperlegible', sans-serif;
-    --heading-font: 'Orbitron', sans-serif;
-    --pixel-font: 'Press Start 2P', cursive;
+    --heading-font: 'Atkinson Hyperlegible', sans-serif;
+    --pixel-font: 'Atkinson Hyperlegible', sans-serif;
+    
+    /* Original font definitions (kept for reference) */
+    --original-heading-font: 'Orbitron', sans-serif;
+    --original-pixel-font: 'Press Start 2P', cursive;
     
     /* Fallback font stacks for standard fonts */
     --serif-font: Georgia, 'Times New Roman', Times, serif;
@@ -19,33 +23,47 @@
     --fantasy-font: Impact, 'Arial Black', sans-serif;
 }
 
-/* Font family mapping classes */
+/* Font family mapping classes - these will update ALL font variables */
 .font-atkinson {
     --primary-font: 'Atkinson Hyperlegible', sans-serif;
+    --heading-font: 'Atkinson Hyperlegible', sans-serif;
+    --pixel-font: 'Atkinson Hyperlegible', sans-serif;
 }
 
 .font-orbitron {
     --primary-font: 'Orbitron', sans-serif;
+    --heading-font: 'Orbitron', sans-serif;
+    --pixel-font: 'Orbitron', sans-serif;
 }
 
 .font-serif {
     --primary-font: var(--serif-font);
+    --heading-font: var(--serif-font);
+    --pixel-font: var(--serif-font);
 }
 
 .font-sans-serif {
     --primary-font: var(--sans-serif-font);
+    --heading-font: var(--sans-serif-font);
+    --pixel-font: var(--sans-serif-font);
 }
 
 .font-monospace {
     --primary-font: var(--monospace-font);
+    --heading-font: var(--monospace-font);
+    --pixel-font: var(--monospace-font);
 }
 
 .font-cursive {
     --primary-font: var(--cursive-font);
+    --heading-font: var(--cursive-font);
+    --pixel-font: var(--cursive-font);
 }
 
 .font-fantasy {
     --primary-font: var(--fantasy-font);
+    --heading-font: var(--fantasy-font);
+    --pixel-font: var(--fantasy-font);
 }
 
 /* Apply the primary font to the body and most elements */
@@ -53,7 +71,7 @@ body {
     font-family: var(--primary-font);
 }
 
-/* Override specific elements that should maintain their special fonts */
+/* All elements now use the dynamic font variables */
 .settings-title,
 .tree-title,
 header h1,
@@ -62,7 +80,7 @@ header h1,
     font-family: var(--pixel-font) !important;
 }
 
-/* Elements that should maintain Orbitron for UI consistency */
+/* Elements that use heading font (now dynamic) */
 .menu-button,
 .retro-button,
 .nav-button,
@@ -82,7 +100,7 @@ header h1,
     font-family: var(--heading-font) !important;
 }
 
-/* Text content that should use the primary font */
+/* Text content that uses the primary font */
 .question-text,
 .option,
 .blank,
@@ -121,4 +139,10 @@ li {
     background: rgba(15, 15, 35, 0.9);
     color: white;
     padding: 10px;
+}
+
+/* Special class to restore original fonts if needed */
+.restore-original-fonts {
+    --heading-font: var(--original-heading-font);
+    --pixel-font: var(--original-pixel-font);
 } 
