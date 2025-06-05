@@ -1,0 +1,15 @@
+{
+    "text": "Quel roi récupère la région de Champagne grâce à un mariage ?",
+    "options": [
+        "Louis IX",
+        "Hugues Capet",
+        "Philippe Auguste",
+        "Philippe le Bel"
+    ],
+    "correct_answer": "Philippe le Bel",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

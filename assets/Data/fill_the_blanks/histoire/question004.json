@@ -1,0 +1,15 @@
+{
+    "text": "Quel est le rôle des seigneurs au Moyen Âge ?",
+    "options": [
+        "Construire des églises",
+        "Gouverner une région et protéger les habitants",
+        "Faire des spectacles pour le roi",
+        "Voyager dans tout le royaume"
+    ],
+    "correct_answer": "Gouverner une région et protéger les habitants",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

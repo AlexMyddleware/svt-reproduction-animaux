@@ -1,0 +1,15 @@
+{
+    "text": "Quel roi a créé les premiers États généraux en 1302 ?",
+    "options": [
+        "Louis IX",
+        "Hugues Capet",
+        "Philippe Auguste",
+        "Philippe le Bel"
+    ],
+    "correct_answer": "Philippe le Bel",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "text": "Que reçoit un petit seigneur (baron, châtelain) de la part d’un grand seigneur ?",
+    "options": [
+        "Un titre royal",
+        "Des terres (un fief) et la protection du seigneur",
+        "Un droit de lever des impôts sur le roi",
+        "Une charge ecclésiastique"
+    ],
+    "correct_answer": "Des terres (un fief) et la protection du seigneur",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

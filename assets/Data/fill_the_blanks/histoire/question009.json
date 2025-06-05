@@ -1,0 +1,15 @@
+{
+    "text": "Quel personnage se trouve tout en haut de la hiérarchie féodale ?",
+    "options": [
+        "Les simples chevaliers",
+        "Les petits seigneurs (barons, châtelains)",
+        "Les grands seigneurs (ducs, comtes)",
+        "Le roi"
+    ],
+    "correct_answer": "Le roi",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

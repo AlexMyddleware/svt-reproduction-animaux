@@ -1,0 +1,15 @@
+{
+    "text": "Que risque un seigneur qui refuse de faire hommage au roi ?",
+    "options": [
+        "Il doit quitter le royaume",
+        "Il perd son château",
+        "Il se voit confisquer son fief",
+        "Il devient un chevalier du roi"
+    ],
+    "correct_answer": "Il se voit confisquer son fief",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

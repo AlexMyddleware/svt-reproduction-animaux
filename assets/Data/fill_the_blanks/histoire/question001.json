@@ -1,0 +1,15 @@
+{
+    "text": "Pourquoi le roi fait-il la cérémonie du sacre à Reims ?",
+    "options": [
+        "Pour montrer sa richesse",
+        "Pour devenir un personnage élu de Dieu",
+        "Pour recevoir des cadeaux",
+        "Pour rencontrer les chevaliers"
+    ],
+    "correct_answer": "Pour devenir un personnage élu de Dieu",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

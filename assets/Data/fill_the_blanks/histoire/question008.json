@@ -1,0 +1,15 @@
+{
+    "text": "Pourquoi Philippe Auguste est-il célèbre ?",
+    "options": [
+        "Il a fondé l’université de Paris",
+        "Il a été sacré à Reims",
+        "Il a gagné la bataille de Bouvines en 1214",
+        "Il a conquis l’Angleterre"
+    ],
+    "correct_answer": "Il a gagné la bataille de Bouvines en 1214",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

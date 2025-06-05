@@ -1,0 +1,15 @@
+{
+    "text": "Comment les rois agrandissent-ils leur domaine royal ?",
+    "options": [
+        "En construisant des églises",
+        "En achetant ou en récupérant des terres",
+        "En demandant des dons aux seigneurs",
+        "En fuyant les grandes batailles"
+    ],
+    "correct_answer": "En achetant ou en récupérant des terres",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

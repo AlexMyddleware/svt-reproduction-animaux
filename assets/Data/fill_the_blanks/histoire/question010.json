@@ -1,0 +1,16 @@
+
+{
+    "text": "Quel est le rang le plus bas dans la hiérarchie féodale ?",
+    "options": [
+        "Grands seigneurs, ducs et comtes",
+        "Petits seigneurs, barons et châtelains",
+        "Simples chevaliers",
+        "Le roi"
+    ],
+    "correct_answer": "Simples chevaliers",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

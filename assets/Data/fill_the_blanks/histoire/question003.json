@@ -1,0 +1,15 @@
+{
+    "text": "Pourquoi les rois de France veulent-ils être sacrés dans la cathédrale de Reims ?",
+    "options": [
+        "Parce que c'est une belle ville",
+        "Parce que tous les rois aiment Reims",
+        "Parce que c'est une tradition religieuse importante",
+        "Parce que leurs familles y vivent"
+    ],
+    "correct_answer": "Parce que c'est une tradition religieuse importante",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}
