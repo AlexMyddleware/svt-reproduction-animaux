@@ -34,6 +34,15 @@
             </div>
         </div>
 
+        {% if focused_folder %}
+        <div style="background: rgba(153, 0, 255, 0.2); border: 2px solid #9900ff; color: #9900ff; padding: 10px 15px; border-radius: 8px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px;">
+            <span>🎯 Mode Focus: {{ focused_folder }}</span>
+            <button onclick="window.location.href = '/game/texte_a_trous'" style="background: transparent; border: 1px solid #9900ff; color: #9900ff; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                Retirer le focus
+            </button>
+        </div>
+        {% endif %}
+
         <div class="question-text">
             <p id="question-text">{{ question.text }}</p>
         </div>
@@ -67,11 +76,11 @@
             <button id="reset-btn" class="retro-button">Réinitialiser</button>
             
             {% if question_id > 1 %}
-            <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1) }}" class="retro-button">Précédent</a>
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id-1, focus=focused_folder) if focused_folder else url_for('game.texte_a_trous', question_id=question_id-1) }}" class="retro-button">Précédent</a>
             {% endif %}
             
             {% if question_id < total_questions %}
-            <a href="{{ url_for('game.texte_a_trous', question_id=question_id+1) }}" class="retro-button">Suivant</a>
+            <a href="{{ url_for('game.texte_a_trous', question_id=question_id+1, focus=focused_folder) if focused_folder else url_for('game.texte_a_trous', question_id=question_id+1) }}" class="retro-button">Suivant</a>
             {% endif %}
         </div>
 

@@ -31,8 +31,12 @@ def texte_a_trous() -> str:
     # Get question ID from request parameters
     question_id = request.args.get("question_id", None, type=int)
     
+    # Get focused folder from request parameters
+    focused_folder = request.args.get("focus", "")
+    conditional_log("Texte à trous: received focus parameter: '{}'", focused_folder)
+    
     # Get game data from service
-    game_data = texte_a_trous_service.get_game_data(question_id)
+    game_data = texte_a_trous_service.get_game_data(question_id, focused_folder)
     
     # Render template with game data
     return render_template("texte_a_trous.html", **game_data)
@@ -369,6 +373,7 @@ def save_question() -> Dict[str, Any]:
         return jsonify({"success": False, "message": "Une erreur est survenue lors de la sauvegarde de la question"})
 
 
+
 @game_bp.route("/questions_tree")
 def questions_tree() -> str:
     """
@@ -382,6 +387,10 @@ def questions_tree() -> str:
     
     # Get the game type from query parameters, default to texte_a_trous
     game_type = request.args.get('type', 'texte_a_trous')
+    
+    # Get the focused folder from query parameters
+    focused_folder = request.args.get('focus', '')
+    conditional_log("Received focus parameter: '{}'", focused_folder)
     
     # Validate game type
     if game_type not in ['texte_a_trous', 'relier_images']:
@@ -454,6 +463,63 @@ def questions_tree() -> str:
             return []
         
         return items
+
+    def get_questions_in_focused_folder(directory: str, focused_folder: str) -> List[Dict[str, Any]]:
+        """
+        Get questions only from a specific focused folder (no subfolders).
+        
+        Args:
+            directory: The absolute base directory path
+            focused_folder: The relative path of the folder to focus on
+            
+        Returns:
+            List[Dict[str, Any]]: List of questions from the focused folder only
+        """
+        items: List[Dict[str, Any]] = []
+        
+        try:
+            # Build the full path to the focused folder
+            focused_path = os.path.join(directory, focused_folder) if focused_folder else directory
+            
+            # Make sure the focused directory exists
+            if not os.path.exists(focused_path):
+                conditional_log("Focused directory does not exist: {}", focused_path)
+                return items
+                
+            # Get all items in the focused directory only
+            dir_contents = os.listdir(focused_path)
+            conditional_log("Found {} items in focused directory {}", len(dir_contents), focused_path)
+            
+            for item in sorted(dir_contents):
+                full_path = os.path.join(focused_path, item)
+                rel_path = os.path.join(focused_folder, item) if focused_folder else item
+                
+                if item.startswith("question") and item.endswith(".json"):
+                    # If it's a question file, add it to the list
+                    try:
+                        with open(full_path, 'r', encoding='utf-8') as f:
+                            question_data = json.load(f)
+                            items.append({
+                                'type': 'question',
+                                'id': item[8:11],  # Extract number from filename
+                                'text': question_data.get('text', 'No text available'),
+                                'file': rel_path,
+                                'completed': question_data.get('completed', False),
+                                'statistics': question_data.get('statistics', {
+                                    'correct_answers': 0,
+                                    'wrong_answers': 0
+                                })
+                            })
+                            conditional_log("Added focused question: {}", item)
+                    except Exception as e:
+                        conditional_log("Error reading question file {}: {}", full_path, str(e))
+                        continue
+                        
+        except Exception as e:
+            conditional_log("Error reading focused directory {}: {}", focused_path, str(e))
+            return []
+        
+        return items
     
     # Set the base directory based on game type
     base_dir = "assets/Data/fill_the_blanks" if game_type == "texte_a_trous" else "assets/Data/image_matching"
@@ -463,12 +529,27 @@ def questions_tree() -> str:
         os.makedirs(base_dir)
         conditional_log("Created directory: {}", base_dir)
     
-    # Get all questions and folders starting from the base directory
-    conditional_log("Scanning directory tree starting from: {}", base_dir)
-    tree_data = get_questions_in_directory(base_dir)
-    conditional_log("Found {} top-level items in tree", len(tree_data))
+    # Check if we have a focused folder
+    if focused_folder:
+        # Validate the focused folder path exists
+        focused_path = os.path.join(base_dir, focused_folder)
+        if not os.path.exists(focused_path) or not os.path.isdir(focused_path):
+            conditional_log("Invalid focused folder: {}", focused_folder)
+            focused_folder = ""  # Reset if invalid
+        
+    if focused_folder:
+        # Get questions only from the focused folder
+        conditional_log("Getting questions from focused folder: {}", focused_folder)
+        tree_data = get_questions_in_focused_folder(base_dir, focused_folder)
+        conditional_log("Found {} questions in focused folder", len(tree_data))
+        conditional_log("Tree data items: {}", [item.get('file', item.get('name', 'unknown')) for item in tree_data])
+    else:
+        # Get all questions and folders starting from the base directory
+        conditional_log("Scanning directory tree starting from: {}", base_dir)
+        tree_data = get_questions_in_directory(base_dir)
+        conditional_log("Found {} top-level items in tree", len(tree_data))
     
-    return render_template("questions_tree.html", tree_data=tree_data, game_type=game_type)
+    return render_template("questions_tree.html", tree_data=tree_data, game_type=game_type, focused_folder=focused_folder)
 
 
 @game_bp.route("/toggle_question_completion", methods=["POST"])

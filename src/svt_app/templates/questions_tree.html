@@ -434,6 +434,46 @@
     .action-button.open-folder:hover {
         box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
     }
+
+    .action-button.focus-folder {
+        border-color: var(--neon-purple);
+        color: var(--neon-purple);
+    }
+
+    .action-button.focus-folder:hover {
+        box-shadow: 0 0 20px rgba(153, 0, 255, 0.4);
+    }
+
+    .focused-folder-indicator {
+        background: rgba(153, 0, 255, 0.2);
+        border: 2px solid var(--neon-purple);
+        color: var(--neon-purple);
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .clear-focus-btn {
+        background: transparent;
+        border: 1px solid var(--neon-purple);
+        color: var(--neon-purple);
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.3s;
+    }
+
+    .clear-focus-btn:hover {
+        background: rgba(153, 0, 255, 0.1);
+        box-shadow: 0 0 10px rgba(153, 0, 255, 0.3);
+    }
 </style>
 {% endblock %}
 
@@ -444,6 +484,20 @@
     <div class="navigation top-nav">
         <a href="{{ url_for('index') }}" class="nav-button">Retour au menu</a>
     </div>
+    
+    {% if focused_folder %}
+    <div class="focused-folder-indicator">
+        <span>🎯 Focus sur: {{ focused_folder }}</span>
+        <div style="display: flex; gap: 10px;">
+            <button class="clear-focus-btn" onclick="window.location.href = '/game/{{ game_type }}?focus={{ focused_folder }}'">
+                🎮 Jouer avec ce focus
+            </button>
+            <button class="clear-focus-btn" onclick="window.location.href = '/game/questions_tree?type={{ game_type }}'">
+                Retirer le focus
+            </button>
+        </div>
+    </div>
+    {% endif %}
     
     <div class="tree-toolbar">
         <div class="selection-info">
@@ -473,6 +527,7 @@
                                 </div>
                                 <div class="folder-actions">
                                     <button class="action-button rename-folder" data-path="{{ item.path }}">Renommer</button>
+                                    <button class="action-button focus-folder" data-path="{{ item.path }}">Focus</button>
                                     <button class="action-button open-folder" data-path="{{ item.path }}">Ouvrir</button>
                                     <button class="action-button delete-button" data-path="{{ item.path }}">Supprimer</button>
                                 </div>
@@ -987,6 +1042,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error:', error);
                 alert('Une erreur est survenue lors de l\'ouverture du dossier');
             }
+        });
+    });
+
+    // Focus on folder
+    document.querySelectorAll('.focus-folder').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const path = this.dataset.path;
+            const gameType = currentGameType;
+            
+            // Navigate to questions tree with focus on this folder
+            const url = `/game/questions_tree?type=${gameType}&focus=${encodeURIComponent(path)}`;
+            window.location.href = url;
         });
     });
 });

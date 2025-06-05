@@ -190,10 +190,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Show success message and proceed to next question after a delay
                     setTimeout(() => {
                         if (data.next_question_id !== null && data.next_question_id !== undefined) {
-                            const nextUrl = window.location.pathname + '?question_id=' + data.next_question_id;
+                            // Preserve focus parameter if present
+                            const urlParams = new URLSearchParams(window.location.search);
+                            const focusParam = urlParams.get('focus');
+                            let nextUrl = window.location.pathname + '?question_id=' + data.next_question_id;
+                            if (focusParam) {
+                                nextUrl += '&focus=' + encodeURIComponent(focusParam);
+                            }
                             window.location.replace(nextUrl);
                         } else {
-                            window.location.replace(window.location.pathname);
+                            // Preserve focus parameter when reloading
+                            window.location.replace(window.location.href);
                         }
                     }, 1500);
                 } else {
