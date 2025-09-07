@@ -1,4 +1,3 @@
-
 {
     "text": "Quel est le rang le plus bas dans la hiérarchie féodale ?",
     "options": [
@@ -8,9 +7,9 @@
         "Le roi"
     ],
     "correct_answer": "Simples chevaliers",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
+        "correct_answers": 2,
         "wrong_answers": 0
     }
 }

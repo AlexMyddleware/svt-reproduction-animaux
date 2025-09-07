@@ -1,0 +1,15 @@
+{
+    "text": "D'où peut provenir l'énergie ?",
+    "options": [
+        "Uniquement d’un processeur",
+        "Des roues",
+        "D'une batterie ou du réseau électrique",
+        "Uniquement du soleil"
+    ],
+    "correct_answer": "D'une batterie ou du réseau électrique",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

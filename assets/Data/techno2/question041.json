@@ -1,0 +1,15 @@
+{
+    "text": "Qu'est-ce qu'une chaîne d'information  dans un système ?",
+    "options": [
+        "Un composant mécanique",
+        "Une batterie",
+        "Une partie du système qui traite les données",
+        "Une source d'énergie"
+    ],
+    "correct_answer": "Une partie du système qui traite les données",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

@@ -7,9 +7,9 @@
         "Parce que leurs familles y vivent"
     ],
     "correct_answer": "Parce que c'est une tradition religieuse importante",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
+        "correct_answers": 2,
         "wrong_answers": 0
     }
 }

@@ -1,0 +1,15 @@
+{
+    "text": "Comment les résultats sont-ils communiqués à l'utilisateur  dans un système ?",
+    "options": [
+        "Par un moteur",
+        "Par des engrenages",
+        "Par une batterie",
+        "Par signaux visuels ou sonores"
+    ],
+    "correct_answer": "Par signaux visuels ou sonores",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

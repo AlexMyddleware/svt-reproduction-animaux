@@ -1,0 +1,15 @@
+{
+    "text": "Quel est le rôle final de la chaîne d’énergie ?",
+    "options": [
+        "Transmettre l’énergie pour faire une action",
+        "Rendre silencieux",
+        "Mesurer des données",
+        "Décorer"
+    ],
+    "correct_answer": "Transmettre l’énergie pour faire une action",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

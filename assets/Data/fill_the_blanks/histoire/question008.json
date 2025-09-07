@@ -7,9 +7,9 @@
         "Il a conquis l’Angleterre"
     ],
     "correct_answer": "Il a gagné la bataille de Bouvines en 1214",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
+        "correct_answers": 2,
         "wrong_answers": 0
     }
 }

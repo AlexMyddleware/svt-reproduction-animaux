@@ -1,0 +1,15 @@
+{
+    "text": "Qu'est-ce que la chaîne d'énergie  dans un système ?",
+    "options": [
+        "Une suite de capteurs",
+        "Un écran",
+        "La partie qui pense",
+        "La partie qui fournit l'énergie"
+    ],
+    "correct_answer": "La partie qui fournit l'énergie",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

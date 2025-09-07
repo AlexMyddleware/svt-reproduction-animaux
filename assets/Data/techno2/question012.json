@@ -1,0 +1,15 @@
+{
+    "text": "Quel élément commence la chaîne d'information  dans un système ?",
+    "options": [
+        "Un moteur",
+        "Une roue",
+        "Une batterie",
+        "Un capteur"
+    ],
+    "correct_answer": "Un capteur",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

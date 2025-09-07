@@ -1,0 +1,15 @@
+{
+    "text": "Que fait la chaîne d’énergie après avoir reçu l’énergie  dans un système ?",
+    "options": [
+        "La vend",
+        "La distribue et la convertit",
+        "La mesure",
+        "La jette"
+    ],
+    "correct_answer": "La distribue et la convertit",
+    "completed": false,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

@@ -7,9 +7,9 @@
         "Il devient un chevalier du roi"
     ],
     "correct_answer": "Il se voit confisquer son fief",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
+        "correct_answers": 2,
+        "wrong_answers": 1
     }
 }

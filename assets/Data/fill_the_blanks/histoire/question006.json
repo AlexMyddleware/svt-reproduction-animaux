@@ -7,9 +7,9 @@
         "En fuyant les grandes batailles"
     ],
     "correct_answer": "En achetant ou en récupérant des terres",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
+        "correct_answers": 2,
+        "wrong_answers": 3
     }
 }

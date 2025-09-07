@@ -7,9 +7,9 @@
         "Philippe le Bel"
     ],
     "correct_answer": "Philippe le Bel",
-    "completed": false,
+    "completed": true,
     "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
+        "correct_answers": 2,
+        "wrong_answers": 2
     }
 }
