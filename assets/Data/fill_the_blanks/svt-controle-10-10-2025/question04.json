@@ -1,0 +1,15 @@
+{
+    "text": "Quelle conséquence économique a eu l’éruption du Piton de la Fournaise ?",
+    "options": [
+        "Perte de 2 milliards de dollars",
+        "Aucune",
+        "Positives, car le spectacle attire les touristes",
+        "Destruction d’une ville"
+    ],
+    "correct_answer": "Positives, car le spectacle attire les touristes",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}

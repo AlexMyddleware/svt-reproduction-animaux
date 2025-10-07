@@ -1,0 +1,15 @@
+{
+    "text": "Où se trouve le volcan Eyjafjallajökull ?",
+    "options": [
+        "En Italie",
+        "En Islande",
+        "Aux États-Unis",
+        "En Martinique"
+    ],
+    "correct_answer": "En Islande",
+    "completed": true,
+    "statistics": {
+        "correct_answers": 0,
+        "wrong_answers": 0
+    }
+}
