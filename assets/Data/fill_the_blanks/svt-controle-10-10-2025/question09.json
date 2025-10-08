@@ -1,15 +1,15 @@
 {
-    "text": "Le volcan Etna se situe dans quel pays ?",
-    "options": [
-        "Italie",
-        "Islande",
-        "États-Unis",
-        "France"
-    ],
-    "correct_answer": "Italie",
-    "completed": true,
-    "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
-    }
+  "text": "Le volcan Etna se situe dans quel pays ?",
+  "options": [
+    "Italie",
+    "Islande",
+    "États-Unis",
+    "France"
+  ],
+  "correct_answer": "Italie",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
 }

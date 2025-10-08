@@ -1,15 +1,15 @@
 {
-    "text": "Quelle est la principale conséquence économique de l’éruption de l’Eyjafjallajökull ?",
-    "options": [
-        "Destruction de maisons",
-        "Arrêt du tourisme",
-        "Perturbation du trafic aérien en Europe",
-        "Disparition d’une ville"
-    ],
-    "correct_answer": "Perturbation du trafic aérien en Europe",
-    "completed": true,
-    "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
-    }
+  "text": "Quelle est la principale conséquence économique de l’éruption de l’Eyjafjallajökull ?",
+  "options": [
+    "Destruction de maisons",
+    "Arrêt du tourisme",
+    "Perturbation du trafic aérien en Europe",
+    "Disparition d’une ville"
+  ],
+  "correct_answer": "Perturbation du trafic aérien en Europe",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
 }

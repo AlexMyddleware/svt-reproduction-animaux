@@ -1,15 +1,15 @@
 {
-    "text": "Quelle ville a été entièrement détruite lors de l’éruption de la Montagne Pelée ?",
-    "options": [
-        "Saint-Denis",
-        "Saint-Pierre",
-        "Reykjavik",
-        "Naples"
-    ],
-    "correct_answer": "Saint-Pierre",
-    "completed": true,
-    "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
-    }
+  "text": "Quelle ville a été entièrement détruite lors de l’éruption de la Montagne Pelée ?",
+  "options": [
+    "Saint-Denis",
+    "Saint-Pierre",
+    "Reykjavik",
+    "Naples"
+  ],
+  "correct_answer": "Saint-Pierre",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
 }

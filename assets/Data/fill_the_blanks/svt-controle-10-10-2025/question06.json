@@ -1,15 +1,15 @@
 {
-    "text": "En quelle année a eu lieu l’éruption de la Montagne Pelée ?",
-    "options": [
-        "1902",
-        "1980",
-        "2019",
-        "2023"
-    ],
-    "correct_answer": "1902",
-    "completed": true,
-    "statistics": {
-        "correct_answers": 0,
-        "wrong_answers": 0
-    }
+  "text": "En quelle année a eu lieu l’éruption de la Montagne Pelée ?",
+  "options": [
+    "1902",
+    "1980",
+    "2019",
+    "2023"
+  ],
+  "correct_answer": "1902",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
 }
