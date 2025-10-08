@@ -98,53 +98,87 @@ def check_answer() -> Dict[str, Any]:
         game_type = data.get("game_type")
         question_id = data.get("question_id")
         answer = data.get("answer")
-        
-        conditional_log("Processing answer - Game: {}, Question: {}, Answer: {}", 
-                 game_type, question_id, answer)
-        
+        focused_folder = data.get("focused_folder", "")
+
+        conditional_log("Processing answer - Game: {}, Question: {}, Answer: {}, Focused: '{}'",
+                 game_type, question_id, answer, focused_folder)
+
         # Validate required fields
         if not all([game_type, question_id is not None, answer]):
             conditional_log("Missing required fields in answer submission")
             return jsonify({"success": False, "message": "Missing required fields"})
-        
+
         # Ensure question_id is an integer
         try:
             question_id = int(question_id)
         except (TypeError, ValueError):
             conditional_log("Invalid question ID format: {}", question_id)
             return jsonify({"success": False, "message": "Invalid question ID"})
-        
+
         # Check the answer based on the game type
         if game_type == "texte_a_trous":
-            question = question_service.get_fill_in_blank_question_by_id(question_id)
-            conditional_log("Retrieved question for checking: {}", question)
-            
-            if not question:
-                conditional_log("Question not found: {}", question_id)
-                return jsonify({"success": False, "message": "Question not found"})
-            
-            # Find the question file in all subdirectories
+            # Find the question file
             base_dir = "assets/Data/fill_the_blanks"
-            question_file = f"question{question_id:03d}.json"
             file_path = None
-            
-            # First try to find the file in the root directory
-            root_path = os.path.join(base_dir, question_file)
-            if os.path.exists(root_path):
-                file_path = root_path
-            else:
-                # If not found in root, search in subdirectories
-                for root, _, files in os.walk(base_dir):
-                    if question_file in files:
-                        file_path = os.path.join(root, question_file)
+            correct_answer_value = None
+
+            # Try multiple filename formats
+            question_file_formats = [
+                f"question{question_id:02d}.json",  # question01.json
+                f"question{question_id:03d}.json",  # question001.json
+                f"question{question_id}.json"       # question1.json
+            ]
+
+            if focused_folder:
+                # If focused, look only in the focused folder
+                focused_path = os.path.join(base_dir, focused_folder)
+                conditional_log("Looking for question {} in focused folder: {}", question_id, focused_path)
+
+                for question_file in question_file_formats:
+                    test_path = os.path.join(focused_path, question_file)
+                    if os.path.exists(test_path):
+                        file_path = test_path
+                        conditional_log("Found question file: {}", file_path)
                         break
-            
+            else:
+                # If not focused, search everywhere (but skip backups)
+                for question_file in question_file_formats:
+                    # First try root directory
+                    root_path = os.path.join(base_dir, question_file)
+                    if os.path.exists(root_path):
+                        file_path = root_path
+                        break
+
+                    # Then search subdirectories
+                    if not file_path:
+                        for root, dirs, files in os.walk(base_dir):
+                            # Skip backup directories
+                            dirs[:] = [d for d in dirs if not d.startswith('.focused_backup_')]
+
+                            if question_file in files:
+                                test_path = os.path.join(root, question_file)
+                                if '.focused_backup_' not in test_path:
+                                    file_path = test_path
+                                    break
+
+                    if file_path:
+                        break
+
             if not file_path:
                 conditional_log("Could not find file for question {}", question_id)
                 return jsonify({"success": False, "message": "Question file not found"})
-            
-            is_correct = answer == question.correct_answer
-            conditional_log("Answer is {}", "correct" if is_correct else "incorrect")
+
+            # Load question data from file
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    question_data = json.load(f)
+                    correct_answer_value = question_data.get('correct_answer')
+            except Exception as e:
+                conditional_log("Error reading question file {}: {}", file_path, str(e))
+                return jsonify({"success": False, "message": "Error reading question file"})
+
+            is_correct = answer == correct_answer_value
+            conditional_log("Answer is {} (expected: {}, got: {})", "correct" if is_correct else "incorrect", correct_answer_value, answer)
             
             try:
                 # Load existing data
@@ -176,27 +210,43 @@ def check_answer() -> Dict[str, Any]:
                 
                 # Find the next available question ID
                 active_questions = []
-                conditional_log("Finding next available question after ID {}", question_id)
-                
-                # First, get all questions sorted by ID
-                all_questions = sorted(question_service.get_fill_in_blank_questions(), key=lambda x: x.id)
-                question_ids = [q.id for q in all_questions]
-                conditional_log("All questions (sorted): {}", question_ids)
-                
-                # Then filter for active (non-completed) questions
-                for q in all_questions:
-                    q_file = os.path.join(base_dir, f"question{q.id:03d}.json")
-                    if os.path.exists(q_file):
-                        try:
-                            with open(q_file, 'r', encoding='utf-8') as f:
-                                q_data = json.load(f)
-                                if not q_data.get('completed', False):
-                                    active_questions.append(q.id)
-                                    conditional_log("Found active question: {}", q.id)
-                        except Exception as e:
-                            conditional_log("Error reading question file {}: {}", q_file, str(e))
-                            continue
-                
+                conditional_log("Finding next available question after ID {} (focused: '{}')", question_id, focused_folder)
+
+                # Determine search path based on focus
+                if focused_folder:
+                    search_path = os.path.join(base_dir, focused_folder)
+                    conditional_log("Searching for active questions in focused folder: {}", search_path)
+                else:
+                    search_path = base_dir
+                    conditional_log("Searching for active questions in all folders")
+
+                # Find all question files in the search path
+                try:
+                    if os.path.exists(search_path):
+                        for item in sorted(os.listdir(search_path)):
+                            if item.startswith("question") and item.endswith(".json"):
+                                item_path = os.path.join(search_path, item)
+
+                                # Extract question ID
+                                import re
+                                match = re.search(r'question(\d+)\.json', item)
+                                if not match:
+                                    continue
+
+                                q_id = int(match.group(1))
+
+                                try:
+                                    with open(item_path, 'r', encoding='utf-8') as f:
+                                        q_data = json.load(f)
+                                        if not q_data.get('completed', False):
+                                            active_questions.append(q_id)
+                                            conditional_log("Found active question: {}", q_id)
+                                except Exception as e:
+                                    conditional_log("Error reading question file {}: {}", item_path, str(e))
+                                    continue
+                except Exception as e:
+                    conditional_log("Error searching for questions: {}", str(e))
+
                 conditional_log("Active (non-completed) questions: {}", active_questions)
                 
                 # Find the next available question ID after the current one
