@@ -487,13 +487,13 @@
     
     {% if focused_folder %}
     <div class="focused-folder-indicator">
-        <span>🎯 Focus sur: {{ focused_folder }}</span>
+        <span>🎯 Focus actif sur: {{ focused_folder }}</span>
         <div style="display: flex; gap: 10px;">
-            <button class="clear-focus-btn" onclick="window.location.href = '/game/{{ game_type }}?focus={{ focused_folder }}'">
+            <button class="clear-focus-btn" onclick="window.location.href = '/game/texte_a_trous?focus={{ focused_folder | urlencode }}'">
                 🎮 Jouer avec ce focus
             </button>
-            <button class="clear-focus-btn" onclick="window.location.href = '/game/questions_tree?type={{ game_type }}'">
-                Retirer le focus
+            <button class="clear-focus-btn" id="unfocus-btn" data-path="{{ focused_folder }}">
+                ❌ Retirer le focus
             </button>
         </div>
     </div>
@@ -1047,16 +1047,72 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Focus on folder
     document.querySelectorAll('.focus-folder').forEach(button => {
-        button.addEventListener('click', function(e) {
+        button.addEventListener('click', async function(e) {
             e.stopPropagation();
             const path = this.dataset.path;
-            const gameType = currentGameType;
-            
-            // Navigate to questions tree with focus on this folder
-            const url = `/game/questions_tree?type=${gameType}&focus=${encodeURIComponent(path)}`;
-            window.location.href = url;
+
+            if (!confirm(`Voulez-vous vraiment mettre le focus sur ce dossier ?\n\nTous les autres dossiers seront temporairement déplacés jusqu'à ce que vous retiriez le focus.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/game/focus_folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ path: path })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    // Reload the page to show the focused view
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Une erreur est survenue lors du focus');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors du focus');
+            }
         });
     });
+
+    // Unfocus folder button
+    const unfocusBtn = document.getElementById('unfocus-btn');
+    if (unfocusBtn) {
+        unfocusBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const path = this.dataset.path;
+
+            if (!confirm('Voulez-vous vraiment retirer le focus ?\n\nTous les dossiers seront restaurés à leur emplacement d\'origine.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/game/unfocus_folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ path: path })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    // Reload the page to show all folders
+                    window.location.reload();
+                } else {
+                    alert(result.message || 'Une erreur est survenue lors du retrait du focus');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors du retrait du focus');
+            }
+        });
+    }
 });
 </script>
 {% endblock %} 

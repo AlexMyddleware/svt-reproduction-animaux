@@ -395,7 +395,50 @@ def questions_tree() -> str:
     # Validate game type
     if game_type not in ['texte_a_trous', 'relier_images']:
         game_type = 'texte_a_trous'
-    
+
+    # Check if there's an active focus by looking for backup directories
+    def find_active_focus(directory: str, current_relative_path: str = "") -> Optional[str]:
+        """
+        Recursively find if there's an active focus by looking for backup directories.
+        Returns the focused folder path (relative to base_dir) if found, None otherwise.
+        """
+        conditional_log("Searching for active focus in: {} (relative: '{}')", directory, current_relative_path)
+        try:
+            items = os.listdir(directory)
+            conditional_log("Items in directory: {}", items)
+
+            for item in items:
+                item_path = os.path.join(directory, item)
+
+                if item.startswith('.focused_backup_'):
+                    # Extract the focused folder name from the backup directory name
+                    focused_folder_name = item.replace('.focused_backup_', '')
+                    conditional_log("Found backup directory for: '{}'", focused_folder_name)
+
+                    # Check if the focused folder still exists
+                    focused_folder_path = os.path.join(directory, focused_folder_name)
+                    if os.path.exists(focused_folder_path):
+                        # Get relative path from base_dir
+                        if current_relative_path:
+                            result = os.path.join(current_relative_path, focused_folder_name)
+                        else:
+                            result = focused_folder_name
+                        conditional_log("Returning focused folder: '{}'", result)
+                        return result
+                    else:
+                        conditional_log("Focused folder does not exist: '{}'", focused_folder_path)
+
+                # Recursively search in subdirectories (but skip backup directories)
+                elif os.path.isdir(item_path) and not item.startswith('.focused_backup_'):
+                    new_relative_path = os.path.join(current_relative_path, item) if current_relative_path else item
+                    result = find_active_focus(item_path, new_relative_path)
+                    if result:
+                        return result
+
+        except Exception as e:
+            conditional_log("Error finding active focus in {}: {}", directory, str(e))
+        return None
+
     def get_questions_in_directory(directory: str, relative_path: str = "") -> List[Dict[str, Any]]:
         """
         Recursively get all questions in a directory and its subdirectories.
@@ -422,12 +465,17 @@ def questions_tree() -> str:
             for item in sorted(dir_contents):
                 full_path = os.path.join(directory, item)
                 rel_path = os.path.join(relative_path, item) if relative_path else item
-                
+
+                # Skip backup directories (hidden folders used for focus)
+                if item.startswith('.focused_backup_'):
+                    conditional_log("Skipping backup directory: {}", item)
+                    continue
+
                 if os.path.isdir(full_path):
                     # If it's a directory, recursively get its contents
                     conditional_log("Found directory: {}", full_path)
                     subfolder_items = get_questions_in_directory(full_path, rel_path)
-                    
+
                     # Add folder even if empty
                     folder_data = {
                         'type': 'folder',
@@ -523,12 +571,19 @@ def questions_tree() -> str:
     
     # Set the base directory based on game type
     base_dir = "assets/Data/fill_the_blanks" if game_type == "texte_a_trous" else "assets/Data/image_matching"
-    
+
     # Create the base directory if it doesn't exist
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
         conditional_log("Created directory: {}", base_dir)
-    
+
+    # If no focused_folder specified in URL, check if there's an active focus
+    if not focused_folder:
+        active_focus = find_active_focus(base_dir)
+        if active_focus:
+            focused_folder = active_focus
+            conditional_log("Found active focus: {}", focused_folder)
+
     # Check if we have a focused folder
     if focused_folder:
         # Validate the focused folder path exists
@@ -536,7 +591,7 @@ def questions_tree() -> str:
         if not os.path.exists(focused_path) or not os.path.isdir(focused_path):
             conditional_log("Invalid focused folder: {}", focused_folder)
             focused_folder = ""  # Reset if invalid
-        
+
     if focused_folder:
         # Get questions only from the focused folder
         conditional_log("Getting questions from focused folder: {}", focused_folder)
@@ -875,23 +930,23 @@ def open_folder():
         data = request.get_json()
         if not data:
             return jsonify({'success': False, 'message': 'Invalid JSON data'}), 400
-            
+
         folder_path = data.get('path', '')
-        
+
         # Get the base directory (where the questions are stored)
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'assets', 'Data', 'fill_the_blanks'))
-        
+
         # Join with the requested folder path
         abs_path = os.path.abspath(os.path.join(base_dir, folder_path))
-        
+
         # Security check - make sure the path is within the base directory
         if not abs_path.startswith(base_dir):
             return jsonify({'success': False, 'message': 'Invalid folder path'}), 403
-            
+
         # Check if the folder exists
         if not os.path.exists(abs_path):
             return jsonify({'success': False, 'message': 'Folder not found'}), 404
-            
+
         if os.name == 'nt':  # Windows
             os.startfile(abs_path)
         elif os.name == 'posix':  # macOS and Linux
@@ -899,7 +954,164 @@ def open_folder():
                 subprocess.run(['xdg-open', abs_path])
             else:  # macOS
                 subprocess.run(['open', abs_path])
-        
+
         return jsonify({'success': True})
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500 
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@game_bp.route('/focus_folder', methods=['POST'])
+def focus_folder():
+    """
+    Focus on a specific folder by moving all other sibling folders to a temporary backup location.
+
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data:
+            return jsonify({"success": False, "message": "Missing folder path"})
+
+        folder_path = data['path'].strip()
+        conditional_log("Focus request for folder: '{}'", folder_path)
+
+        # Get the base directory
+        base_dir = "assets/Data/fill_the_blanks"
+        focused_folder_path = os.path.join(base_dir, folder_path)
+        conditional_log("Full focused folder path: '{}'", focused_folder_path)
+
+        # Check if folder exists
+        if not os.path.exists(focused_folder_path) or not os.path.isdir(focused_folder_path):
+            conditional_log("Folder not found: '{}'", focused_folder_path)
+            return jsonify({"success": False, "message": "Folder not found"})
+
+        # Get the parent directory
+        parent_dir = os.path.dirname(focused_folder_path)
+        focused_folder_name = os.path.basename(focused_folder_path)
+        conditional_log("Parent dir: '{}', Folder name: '{}'", parent_dir, focused_folder_name)
+
+        # Create backup directory at the same level as the focused folder
+        backup_dir = os.path.join(parent_dir, f".focused_backup_{focused_folder_name}")
+
+        # Check if already focused
+        if os.path.exists(backup_dir):
+            return jsonify({"success": False, "message": "Un dossier est déjà en focus dans ce répertoire"})
+
+        # Create the backup directory
+        os.makedirs(backup_dir, exist_ok=True)
+
+        # Move all sibling folders (except the focused one) to the backup
+        moved_folders = []
+        try:
+            for item in os.listdir(parent_dir):
+                item_path = os.path.join(parent_dir, item)
+
+                # Skip if it's the focused folder, backup folder, or not a directory
+                if item == focused_folder_name or item.startswith('.focused_backup_') or not os.path.isdir(item_path):
+                    continue
+
+                # Move folder to backup
+                import shutil
+                dest_path = os.path.join(backup_dir, item)
+                shutil.move(item_path, dest_path)
+                moved_folders.append(item)
+                conditional_log("Moved {} to backup", item)
+
+        except Exception as e:
+            # If something goes wrong, try to restore what we've moved
+            conditional_log("Error during focus, attempting restore: {}", str(e))
+            for folder in moved_folders:
+                try:
+                    shutil.move(os.path.join(backup_dir, folder), os.path.join(parent_dir, folder))
+                except:
+                    pass
+
+            # Remove backup directory if empty
+            try:
+                if os.path.exists(backup_dir) and not os.listdir(backup_dir):
+                    os.rmdir(backup_dir)
+            except:
+                pass
+
+            return jsonify({"success": False, "message": f"Erreur lors du focus: {str(e)}"})
+
+        return jsonify({
+            "success": True,
+            "message": f"Focus activé sur {focused_folder_name}. {len(moved_folders)} dossier(s) déplacé(s).",
+            "moved_folders": moved_folders
+        })
+
+    except Exception as e:
+        conditional_log("Error focusing folder: {}", str(e))
+        return jsonify({"success": False, "message": "Une erreur est survenue lors du focus"})
+
+
+@game_bp.route('/unfocus_folder', methods=['POST'])
+def unfocus_folder():
+    """
+    Remove focus from a folder by restoring all folders from the backup location.
+
+    Returns:
+        Dict[str, Any]: JSON response indicating success or failure.
+    """
+    try:
+        data = request.get_json()
+        if not data or 'path' not in data:
+            return jsonify({"success": False, "message": "Missing folder path"})
+
+        folder_path = data['path'].strip()
+
+        # Get the base directory
+        base_dir = "assets/Data/fill_the_blanks"
+        focused_folder_path = os.path.join(base_dir, folder_path)
+
+        # Get the parent directory
+        parent_dir = os.path.dirname(focused_folder_path)
+        focused_folder_name = os.path.basename(focused_folder_path)
+
+        # Find the backup directory
+        backup_dir = os.path.join(parent_dir, f".focused_backup_{focused_folder_name}")
+
+        # Check if backup exists
+        if not os.path.exists(backup_dir):
+            return jsonify({"success": False, "message": "Aucun backup trouvé pour ce dossier"})
+
+        # Restore all folders from backup
+        restored_folders = []
+        import shutil
+
+        try:
+            for item in os.listdir(backup_dir):
+                item_path = os.path.join(backup_dir, item)
+
+                if os.path.isdir(item_path):
+                    # Move folder back to parent directory
+                    dest_path = os.path.join(parent_dir, item)
+
+                    # If destination already exists, skip (shouldn't happen normally)
+                    if os.path.exists(dest_path):
+                        conditional_log("Warning: {} already exists, skipping", item)
+                        continue
+
+                    shutil.move(item_path, dest_path)
+                    restored_folders.append(item)
+                    conditional_log("Restored {} from backup", item)
+
+            # Remove the backup directory
+            if os.path.exists(backup_dir) and not os.listdir(backup_dir):
+                os.rmdir(backup_dir)
+
+        except Exception as e:
+            conditional_log("Error during unfocus: {}", str(e))
+            return jsonify({"success": False, "message": f"Erreur lors de la restauration: {str(e)}"})
+
+        return jsonify({
+            "success": True,
+            "message": f"Focus retiré. {len(restored_folders)} dossier(s) restauré(s).",
+            "restored_folders": restored_folders
+        })
+
+    except Exception as e:
+        conditional_log("Error unfocusing folder: {}", str(e))
+        return jsonify({"success": False, "message": "Une erreur est survenue lors du retrait du focus"}) 
