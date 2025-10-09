@@ -1,0 +1,15 @@
+{
+  "text": "D'où vient le magma ?",
+  "options": [
+    "De la fusion d'un petit groupe de roches en profondeur",
+    "De l'évaporation de l'eau de mer",
+    "De la condensation des nuages",
+    "De la surface de la Terre"
+  ],
+  "correct_answer": "De la fusion d'un petit groupe de roches en profondeur",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Que fait un volcan quand il entre en éruption ?",
+  "options": [
+    "Il rejette de la lave, des cendres et des gaz",
+    "Il aspire la lave vers le sol",
+    "Il se transforme en montagne de glace",
+    "Il arrête tous les tremblements de terre"
+  ],
+  "correct_answer": "Il rejette de la lave, des cendres et des gaz",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

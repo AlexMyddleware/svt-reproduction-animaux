@@ -1,0 +1,15 @@
+{
+  "text": "Qu'est-ce que ça veut dire de dévier une coulée de lave ?",
+  "options": [
+    "La réorienter comme une rivière pour éviter les dangers",
+    "L'arrêter complètement",
+    "La refroidir avec de l'eau",
+    "La transformer en pierre"
+  ],
+  "correct_answer": "La réorienter comme une rivière pour éviter les dangers",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Où est-ce que va le magma ?",
+  "options": [
+    "Il va s'accumuler dans la chambre magmatique",
+    "Il reste à la surface",
+    "Il se transforme en gaz",
+    "Il descend vers le noyau"
+  ],
+  "correct_answer": "Il va s'accumuler dans la chambre magmatique",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

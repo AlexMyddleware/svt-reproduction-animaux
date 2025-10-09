@@ -94,3 +94,6 @@ pytest
 ## Licence
 
 Ce projet est sous licence MIT.
+
+
+python empty-json.py 012 023 "C:\webdev\svt-reproduction-animaux\assets\Data\fill_the_blanks\svt-controle-10-10-2025"

@@ -1,0 +1,15 @@
+{
+  "text": "Qu'est-ce que c'est qu'une évacuation ?",
+  "options": [
+    "Quand on demande aux gens de partir d'une zone dangereuse",
+    "Quand on éteint un volcan",
+    "Quand on observe la lave de près",
+    "Quand on construit un volcan"
+  ],
+  "correct_answer": "Quand on demande aux gens de partir d'une zone dangereuse",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

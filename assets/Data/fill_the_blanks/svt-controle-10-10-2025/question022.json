@@ -1,0 +1,15 @@
+{
+  "text": "Qu'est-ce que le foyer du séisme ?",
+  "options": [
+    "L'endroit qui est à l'origine des ondes sismiques",
+    "La surface de la Terre",
+    "La chambre magmatique",
+    "Une faille tectonique visible"
+  ],
+  "correct_answer": "L'endroit qui est à l'origine des ondes sismiques",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}
