@@ -1,0 +1,15 @@
+{
+  "text": "Quel est l’élément tenu constant entre les deux béchers pour comparer les éruptions ?",
+  "options": [
+    "La quantité de farine",
+    "La quantité de vinaigre et de bicarbonate",
+    "La couleur du bécher",
+    "La température du four"
+  ],
+  "correct_answer": "La quantité de vinaigre et de bicarbonate",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

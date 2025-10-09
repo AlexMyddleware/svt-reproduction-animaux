@@ -1,0 +1,15 @@
+{
+  "text": "Dans le modèle, quel ingrédient rend les bulles de gaz plus visibles et stables ?",
+  "options": [
+    "Sel",
+    "Liquide vaisselle",
+    "Farine de maïs",
+    "Sucre"
+  ],
+  "correct_answer": "Liquide vaisselle",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Quel ingrédient de l’expérience épaissit le mélange pour simuler une lave visqueuse ?",
+  "options": [
+    "Vinaigre blanc",
+    "Bicarbonate de soude",
+    "Farine",
+    "Eau"
+  ],
+  "correct_answer": "Farine",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

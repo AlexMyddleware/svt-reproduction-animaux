@@ -1,0 +1,15 @@
+{
+  "text": "Quel couple d’ingrédients produit le gaz (CO₂) dans l’expérience ?",
+  "options": [
+    "Farine + liquide vaisselle",
+    "Bicarbonate + vinaigre",
+    "Vinaigre + eau",
+    "Bicarbonate + sel"
+  ],
+  "correct_answer": "Bicarbonate + vinaigre",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

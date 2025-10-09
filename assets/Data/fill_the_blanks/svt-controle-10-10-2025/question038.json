@@ -1,0 +1,15 @@
+{
+  "text": "Pourquoi identifie-t-on les deux béchers au début de l’expérience ?",
+  "options": [
+    "Pour mesurer la température",
+    "Pour distinguer celui avec farine de celui sans farine",
+    "Pour peser le gaz produit",
+    "Pour éviter l’évaporation"
+  ],
+  "correct_answer": "Pour distinguer celui avec farine de celui sans farine",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

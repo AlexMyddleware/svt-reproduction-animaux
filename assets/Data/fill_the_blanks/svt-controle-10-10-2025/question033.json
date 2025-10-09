@@ -1,0 +1,15 @@
+{
+  "text": "Quel ustensile est utilisé pour doser les réactifs dans le protocole ?",
+  "options": [
+    "Pipette graduée 10 mL",
+    "Cuillère à café",
+    "Balance 1 g",
+    "Bécher 1 L"
+  ],
+  "correct_answer": "Cuillère à café",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

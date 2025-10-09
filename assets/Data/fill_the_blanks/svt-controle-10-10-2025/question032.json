@@ -1,0 +1,15 @@
+{
+  "text": "Quel paramètre de volcanisme l’expérience cherche-t-elle à tester ?",
+  "options": [
+    "La température de l’air",
+    "La viscosité de la lave",
+    "La couleur des roches",
+    "La profondeur de la chambre magmatique"
+  ],
+  "correct_answer": "La viscosité de la lave",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

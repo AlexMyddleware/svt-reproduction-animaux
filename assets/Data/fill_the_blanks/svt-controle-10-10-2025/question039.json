@@ -1,0 +1,15 @@
+{
+  "text": "Quelle quantité de farine est ajoutée selon le protocole type ?",
+  "options": [
+    "Une cuillère à soupe",
+    "Une pincée",
+    "Une cuillère à café",
+    "Aucune, on n’en met jamais"
+  ],
+  "correct_answer": "Une cuillère à café",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

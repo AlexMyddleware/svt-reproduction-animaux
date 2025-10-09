@@ -1,0 +1,15 @@
+{
+  "text": "Dans quel bécher observe-t-on un comportement de type explosif ?",
+  "options": [
+    "Celui avec farine",
+    "Celui sans farine",
+    "Les deux",
+    "Aucun"
+  ],
+  "correct_answer": "Celui avec farine",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}
