@@ -1,0 +1,15 @@
+{
+  "text": "Quel est l’élément qui représente les gaz volcaniques libérés lors d’une éruption ?",
+  "options": [
+    "La farine",
+    "La mousse",
+    "Le bicarbonate solide",
+    "Le sable"
+  ],
+  "correct_answer": "La mousse",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

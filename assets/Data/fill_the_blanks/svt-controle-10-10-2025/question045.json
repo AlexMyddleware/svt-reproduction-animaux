@@ -1,0 +1,15 @@
+{
+  "text": "Dans ce modèle, quel élément représente la ‘lave’ ?",
+  "options": [
+    "Le mélange liquide dans le bécher",
+    "La cuvette à dissection",
+    "La cuillère à café",
+    "Le CO₂"
+  ],
+  "correct_answer": "Le mélange liquide dans le bécher",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

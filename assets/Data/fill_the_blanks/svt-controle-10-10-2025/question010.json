@@ -1,0 +1,15 @@
+{
+  "text": "Quelle éruption n’a causé aucune victime ni dégât matériel ?",
+  "options": [
+    "Mont Saint Helens",
+    "Montagne Pelée",
+    "Etna",
+    "Eyjafjallajökull"
+  ],
+  "correct_answer": "Etna",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Quel résultat final compare-t-on grâce à cette expérience ?",
+  "options": [
+    "La hauteur des panaches de cendre",
+    "Effusif (lave fluide) vs explosif (lave visqueuse)",
+    "La vitesse de refroidissement des basaltes",
+    "La composition minéralogique"
+  ],
+  "correct_answer": "Effusif (lave fluide) vs explosif (lave visqueuse)",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

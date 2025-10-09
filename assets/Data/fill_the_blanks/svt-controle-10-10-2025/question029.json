@@ -1,0 +1,15 @@
+{
+  "text": "Quel matériel sert à contenir les débordements lors de l’expérience ?",
+  "options": [
+    "Un entonnoir",
+    "Une cuvette à dissection",
+    "Un bec Bunsen",
+    "Un entonnoir Büchner"
+  ],
+  "correct_answer": "Une cuvette à dissection",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

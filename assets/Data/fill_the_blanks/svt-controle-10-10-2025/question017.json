@@ -1,0 +1,15 @@
+{
+  "text": "Où peut-on voir les résultats d'un sismographe ?",
+  "options": [
+    "Sur papier ou sur ordinateur",
+    "Dans un microscope",
+    "Dans un satellite",
+    "Dans un thermomètre"
+  ],
+  "correct_answer": "Sur papier ou sur ordinateur",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Pour garantir une comparaison juste, que doit-on garder constant entre les deux montages ?",
+  "options": [
+    "Le volume de vinaigre et la quantité de bicarbonate",
+    "La quantité de farine",
+    "La couleur des béchers",
+    "La présence d’un bec Bunsen"
+  ],
+  "correct_answer": "Le volume de vinaigre et la quantité de bicarbonate",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

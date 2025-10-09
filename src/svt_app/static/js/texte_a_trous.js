@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get the question ID from the data attribute
     const questionId = questionContainer ? parseInt(questionContainer.dataset.questionId) : 1;
+
+    // Get the focused folder from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const focusedFolder = urlParams.get('focus') || '';
     
     // Initialize the drag and drop functionality
     initDragAndDrop();
@@ -171,7 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify({
                 game_type: 'texte_a_trous',
                 question_id: questionId,
-                answer: answer
+                answer: answer,
+                focused_folder: focusedFolder
             })
         })
         .then(response => response.json())

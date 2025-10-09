@@ -1,0 +1,15 @@
+{
+  "text": "Comment peut-on observer des signes d'activité sismique ?",
+  "options": [
+    "Avec des gonflements, des gaz qui s'échappent et des tremblements",
+    "Avec la couleur du ciel",
+    "Avec la vitesse du vent",
+    "Avec le niveau de la mer"
+  ],
+  "correct_answer": "Avec des gonflements, des gaz qui s'échappent et des tremblements",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

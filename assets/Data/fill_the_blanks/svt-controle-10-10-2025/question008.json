@@ -1,0 +1,15 @@
+{
+  "text": "Quelle somme a coûté la catastrophe du Mont Saint Helens ?",
+  "options": [
+    "2 millions de dollars",
+    "200 000 dollars",
+    "2 milliards de dollars",
+    "200 milliards de dollars"
+  ],
+  "correct_answer": "2 milliards de dollars",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -61,13 +61,22 @@ class QuestionService:
         """Load fill-in-the-blank questions from JSON files."""
         conditional_log("Loading fill-in-the-blank questions")
         self.fill_in_blank_questions = []
-        
+
         try:
             # Walk through the directory and its subdirectories
-            for root, _, files in os.walk(self.fill_blanks_path):
+            for root, dirs, files in os.walk(self.fill_blanks_path):
+                # Skip backup directories
+                dirs[:] = [d for d in dirs if not d.startswith('.focused_backup_')]
+
                 for file in files:
                     if file.startswith("question") and file.endswith(".json"):
                         file_path = os.path.join(root, file)
+
+                        # Double-check: skip if the file is in a backup directory
+                        if '.focused_backup_' in file_path:
+                            conditional_log("Skipping question in backup directory: {}", file_path)
+                            continue
+
                         try:
                             with open(file_path, 'r', encoding='utf-8') as f:
                                 data = json.load(f)

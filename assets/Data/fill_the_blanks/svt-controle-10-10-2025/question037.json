@@ -1,0 +1,15 @@
+{
+  "text": "Quelle est la première étape avant d’ajouter le bicarbonate ?",
+  "options": [
+    "Mettre la farine dans les deux béchers",
+    "Placer une goutte de liquide vaisselle et du vinaigre dans chaque bécher",
+    "Allumer le bec Bunsen",
+    "Chauffer le vinaigre"
+  ],
+  "correct_answer": "Placer une goutte de liquide vaisselle et du vinaigre dans chaque bécher",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

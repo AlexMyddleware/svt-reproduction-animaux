@@ -1,0 +1,15 @@
+{
+  "text": "Combien de morts a causé l’éruption du Mont Saint Helens ?",
+  "options": [
+    "30 000",
+    "57",
+    "0",
+    "500"
+  ],
+  "correct_answer": "57",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

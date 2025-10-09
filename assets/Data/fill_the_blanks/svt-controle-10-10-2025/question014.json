@@ -1,0 +1,15 @@
+{
+  "text": "Où sont les chambres magmatiques d'un volcan ?",
+  "options": [
+    "À quelques kilomètres sous la surface",
+    "À la surface de la Terre",
+    "Au centre de la Terre",
+    "Dans les nuages"
+  ],
+  "correct_answer": "À quelques kilomètres sous la surface",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

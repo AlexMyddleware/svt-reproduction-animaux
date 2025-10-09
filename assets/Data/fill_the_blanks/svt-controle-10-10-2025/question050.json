@@ -1,0 +1,15 @@
+{
+  "text": "Dans la réalité, qu’est-ce qui déclenche une éruption volcanique ?",
+  "options": [
+    "L’évaporation de l’eau de pluie",
+    "La surpression des gaz dans le magma (ATTENTION SUR PRESSION pas suppression = beaucoup de pression)",
+    "Le refroidissement rapide de la croûte",
+    "La couleur sombre des basaltes"
+  ],
+  "correct_answer": "La surpression des gaz dans le magma (ATTENTION SUR PRESSION pas suppression = beaucoup de pression)",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

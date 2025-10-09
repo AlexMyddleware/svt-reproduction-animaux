@@ -1,0 +1,15 @@
+{
+  "text": "Quel énoncé résume le mieux le bilan de l’expérience ?",
+  "options": [
+    "La viscosité élevée favorise des éruptions explosives ; une viscosité faible favorise des éruptions effusives.",
+    "La viscosité n’influence pas le type d’éruption.",
+    "Les éruptions effusives se produisent uniquement sans gaz.",
+    "Les éruptions explosives ne contiennent pas de gaz."
+  ],
+  "correct_answer": "La viscosité élevée favorise des éruptions explosives ; une viscosité faible favorise des éruptions effusives.",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

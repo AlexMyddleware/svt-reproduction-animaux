@@ -1,0 +1,15 @@
+{
+  "text": "Lequel de ces éléments n’est PAS listé dans le matériel ?",
+  "options": [
+    "Deux béchers",
+    "Cuvette à dissection",
+    "Thermomètre électronique",
+    "Cuillère à café"
+  ],
+  "correct_answer": "Thermomètre électronique",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

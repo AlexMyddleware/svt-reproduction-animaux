@@ -1,0 +1,15 @@
+{
+  "text": "Comment peut-on mesurer l'activité sismique d'un volcan ?",
+  "options": [
+    "Avec un sismographe",
+    "Avec un thermomètre",
+    "Avec un baromètre",
+    "Avec un radar"
+  ],
+  "correct_answer": "Avec un sismographe",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

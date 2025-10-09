@@ -1,0 +1,15 @@
+{
+  "text": "Quel gaz est libéré par la réaction entre le vinaigre et le bicarbonate ?",
+  "options": [
+    "Dioxyde de soufre (SO₂)",
+    "Dioxyde de carbone (CO₂)",
+    "Dioxygène (O₂)",
+    "Méthane (CH₄)"
+  ],
+  "correct_answer": "Dioxyde de carbone (CO₂)",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

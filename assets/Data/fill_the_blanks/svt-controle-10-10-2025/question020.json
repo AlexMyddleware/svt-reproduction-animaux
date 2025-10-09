@@ -1,0 +1,15 @@
+{
+  "text": "D'où est-ce que viennent les ondes sismiques ?",
+  "options": [
+    "Du foyer du séisme",
+    "De la surface de la Terre",
+    "Des nuages",
+    "De la chambre magmatique"
+  ],
+  "correct_answer": "Du foyer du séisme",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "text": "Entre les deux expériences, quel est le seul paramètre que l’on fait varier ?",
+  "options": [
+    "La quantité de vinaigre",
+    "La quantité de bicarbonate",
+    "La présence (ou quantité) de farine donc la viscosité",
+    "La taille du bécher"
+  ],
+  "correct_answer": "La présence (ou quantité) de farine donc la viscosité",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

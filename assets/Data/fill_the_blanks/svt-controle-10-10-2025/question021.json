@@ -1,0 +1,15 @@
+{
+  "text": "Qu'est-ce que l'épicentre ?",
+  "options": [
+    "L'endroit à la surface directement au-dessus du foyer du séisme",
+    "L'endroit le plus profond du volcan",
+    "La chambre magmatique",
+    "Une plaque tectonique"
+  ],
+  "correct_answer": "L'endroit à la surface directement au-dessus du foyer du séisme",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

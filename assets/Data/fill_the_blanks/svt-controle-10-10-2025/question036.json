@@ -1,0 +1,15 @@
+{
+  "text": "Quelle observation indique un volcanisme effusif dans le modèle ?",
+  "options": [
+    "Mousse qui jaillit par à-coups",
+    "Coulée lente et fluide débordant calmement",
+    "Aucune mousse",
+    "Explosion sonore"
+  ],
+  "correct_answer": "Coulée lente et fluide débordant calmement",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

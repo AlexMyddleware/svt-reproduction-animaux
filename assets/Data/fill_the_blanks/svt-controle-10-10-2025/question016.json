@@ -1,0 +1,15 @@
+{
+  "text": "Comment est faite la mesure du sismographe ?",
+  "options": [
+    "Avec la mesure des vibrations dans le sol",
+    "Avec la mesure de la température de la lave",
+    "Avec la hauteur des nuages",
+    "Avec la pression atmosphérique"
+  ],
+  "correct_answer": "Avec la mesure des vibrations dans le sol",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

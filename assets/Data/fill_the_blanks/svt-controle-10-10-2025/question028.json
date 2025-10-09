@@ -1,0 +1,15 @@
+{
+  "text": "Quel rôle joue le liquide vaisselle dans le modèle ?",
+  "options": [
+    "Colorer le mélange",
+    "Faire mousser et piéger le gaz",
+    "Neutraliser le vinaigre",
+    "Refroidir le mélange"
+  ],
+  "correct_answer": "Faire mousser et piéger le gaz",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}
