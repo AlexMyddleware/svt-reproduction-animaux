@@ -1,0 +1,15 @@
+{
+  "text": "Quel problème scientifique l’expérience cherche-t-elle à tester ?",
+  "options": [
+    "La couleur de la lave dépend-elle de la température ?",
+    "Le type de volcanisme dépend-il de la viscosité de la lave ?",
+    "La masse du volcan dépend-elle de l'altitude ?",
+    "Les volcans apparaissent-ils seulement en été ?"
+  ],
+  "correct_answer": "Le type de volcanisme dépend-il de la viscosité de la lave ?",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

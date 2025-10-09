@@ -1,0 +1,15 @@
+{
+  "text": "Quelle hypothèse correspond le mieux au modèle utilisé ?",
+  "options": [
+    "Plus la lave est visqueuse, plus l’éruption est explosive.",
+    "Plus la lave est visqueuse, plus l’éruption est effusive.",
+    "La viscosité n’a aucun effet sur le type d’éruption.",
+    "Les éruptions ne dépendent que de la température de l’air."
+  ],
+  "correct_answer": "Plus la lave est visqueuse, plus l’éruption est explosive.",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}

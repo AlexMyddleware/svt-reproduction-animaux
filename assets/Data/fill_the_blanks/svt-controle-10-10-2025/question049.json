@@ -1,0 +1,15 @@
+{
+  "text": "Quelle est la variable observée pour déterminer le résultat de l’expérience ?",
+  "options": [
+    "La couleur de la mousse",
+    "Le caractère effusif ou explosif du débordement",
+    "La température du mélange",
+    "La masse de CO₂ exacte"
+  ],
+  "correct_answer": "Le caractère effusif ou explosif du débordement",
+  "completed": false,
+  "statistics": {
+    "correct_answers": 0,
+    "wrong_answers": 0
+  }
+}
